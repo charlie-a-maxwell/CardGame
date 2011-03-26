@@ -415,6 +415,7 @@ namespace OacPan
 
 
             int test = 1;
+            int test2 = 0;
         }
 
         public Ghost(GhostType t)
