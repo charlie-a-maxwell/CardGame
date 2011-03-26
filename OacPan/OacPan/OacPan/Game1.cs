@@ -412,6 +412,9 @@ namespace OacPan
             scatterLoc.X = 204;
 
             mode = GhostMode.Pen;
+
+
+            int test = 1;
         }
 
         public Ghost(GhostType t)
