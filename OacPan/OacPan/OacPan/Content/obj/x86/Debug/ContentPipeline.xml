@@ -70,6 +70,27 @@
       <Output>C:\projects\OacPan\OacPan\OacPan\bin\x86\Debug\Content\Clyde.xnb</Output>
       <Time>2011-03-26T10:35:21.83455-05:00</Time>
     </Item>
+    <Item>
+      <Source>MainFont.spritefont</Source>
+      <Name>MainFont</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\OacPan\OacPan\OacPan\bin\x86\Debug\Content\MainFont.xnb</Output>
+      <Time>2011-03-29T20:52:40.401-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Dot.bmp</Source>
+      <Name>Dot</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Parameters>
+        <Data Key="ColorKeyColor">0, 0, 0, 255</Data>
+      </Parameters>
+      <Options>None</Options>
+      <Output>C:\projects\OacPan\OacPan\OacPan\bin\x86\Debug\Content\Dot.xnb</Output>
+      <Time>2011-03-29T21:42:54.398-05:00</Time>
+    </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
       <TargetPlatform>Windows</TargetPlatform>

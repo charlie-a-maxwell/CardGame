@@ -17,47 +17,54 @@ namespace OacPan
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
+        enum GameMode { Start, Normal, Scatter, Frightened, Lost };
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Texture2D mapTexture;
         Texture2D pacMan;
+        Texture2D dot;
+        SpriteFont font;
         Point prevDir = new Point (0,0);
         List<Ghost> ghosts;
+        GameMode gameMode = GameMode.Start;
+        int peletCount = 0;
+        int max = 244;
+
 
         int[][] map = new int[][]{
                          new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                          new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                          new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                          new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-                         new int[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                         new int[] { 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1},
-                         new int[] { 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1},
-                         new int[] { 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1},
-                         new int[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                         new int[] { 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1},
-                         new int[] { 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1},
-                         new int[] { 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1},
-                         new int[] { 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-                         new int[] { 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0},
-                         new int[] { 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0},
-                         new int[] { 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0},
-                         new int[] { 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-                         new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                         new int[] { 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-                         new int[] { 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0},
-                         new int[] { 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0},
-                         new int[] { 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0},
-                         new int[] { 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1},
-                         new int[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-                         new int[] { 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1},
-                         new int[] { 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1},
-                         new int[] { 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 1},
-                         new int[] { 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1},
-                         new int[] { 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1},
-                         new int[] { 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1},
-                         new int[] { 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1},
-                         new int[] { 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1},
-                         new int[] { 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+                         new int[] { 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
+                         new int[] { 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1},
+                         new int[] { 1, 2, 1, 0, 0, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 0, 0, 0, 1, 2, 1, 1, 1, 1, 2, 1},
+                         new int[] { 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1},
+                         new int[] { 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
+                         new int[] { 1, 2, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 2, 1},
+                         new int[] { 1, 2, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 2, 1},
+                         new int[] { 1, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 1},
+                         new int[] { 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1},
+                         new int[] { 0, 0, 0, 0, 0, 1, 2, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 2, 1, 0, 0, 0, 0, 0},
+                         new int[] { 0, 0, 0, 0, 0, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1, 0, 0, 0, 0, 0},
+                         new int[] { 0, 0, 0, 0, 0, 1, 2, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 2, 1, 0, 0, 0, 0, 0},
+                         new int[] { 1, 1, 1, 1, 1, 1, 2, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 2, 1, 1, 1, 1, 1, 1},
+                         new int[] { 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0},
+                         new int[] { 1, 1, 1, 1, 1, 1, 2, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 2, 1, 1, 1, 1, 1, 1},
+                         new int[] { 0, 0, 0, 0, 0, 1, 2, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 2, 1, 0, 0, 0, 0, 0},
+                         new int[] { 0, 0, 0, 0, 0, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 1, 0, 0, 0, 0, 0},
+                         new int[] { 0, 0, 0, 0, 0, 1, 2, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 2, 1, 0, 0, 0, 0, 0},
+                         new int[] { 1, 1, 1, 1, 1, 1, 2, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 2, 1, 1, 1, 1, 1, 1},
+                         new int[] { 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
+                         new int[] { 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1},
+                         new int[] { 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1},
+                         new int[] { 1, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 1},
+                         new int[] { 1, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1, 1},
+                         new int[] { 1, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1, 1},
+                         new int[] { 1, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 1},
+                         new int[] { 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1},
+                         new int[] { 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1},
+                         new int[] { 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
                          new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
                          new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                          new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
@@ -87,9 +94,10 @@ namespace OacPan
             pacManLoc.Y = 212;
 
             ghosts = new List<Ghost>(4);
-            //ghosts.Add(new Ghost(Ghost.GhostType.Blinky));
+            ghosts.Add(new Ghost(Ghost.GhostType.Blinky));
             ghosts.Add(new Ghost(Ghost.GhostType.Pinky));
-
+            ghosts.Add(new Ghost(Ghost.GhostType.Inky));
+            ghosts.Add(new Ghost(Ghost.GhostType.Clyde));
 
             base.Initialize();
         }
@@ -105,6 +113,8 @@ namespace OacPan
 
             mapTexture = Content.Load<Texture2D>("Map");
             pacMan = Content.Load<Texture2D>("PacMan");
+            font = Content.Load<SpriteFont>("MainFont");
+            dot = Content.Load<Texture2D>("Dot");
 
             foreach (Ghost g in ghosts)
             {
@@ -130,6 +140,15 @@ namespace OacPan
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            if (gameMode == GameMode.Start)
+            {
+                if (Keyboard.GetState().IsKeyDown(Keys.Enter))
+                    gameMode = GameMode.Normal;
+                return;
+            }
+            if (gameMode == GameMode.Lost)
+                return;
+
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
@@ -154,7 +173,7 @@ namespace OacPan
             switch (dir)
             {
                 case 1:
-                    if (map[pmapLoc.Y - 1][pmapLoc.X] == 0)
+                    if (map[pmapLoc.Y - 1][pmapLoc.X] != 1)
                     {
                         prevDir.Y = -1;
                         prevDir.X = 0;
@@ -162,7 +181,7 @@ namespace OacPan
                     break;
 
                 case 2:
-                    if (map[pmapLoc.Y][pmapLoc.X + 1] == 0)
+                    if (map[pmapLoc.Y][pmapLoc.X + 1] != 1)
                     {
                         prevDir.Y = 0;
                         prevDir.X = 1;
@@ -170,7 +189,7 @@ namespace OacPan
                     break;
 
                 case 3:
-                    if (map[pmapLoc.Y + 1][pmapLoc.X] == 0)
+                    if (map[pmapLoc.Y + 1][pmapLoc.X] != 1)
                     {
                         prevDir.Y = 1;
                         prevDir.X = 0;
@@ -178,7 +197,7 @@ namespace OacPan
                     break;
 
                 case 4:
-                    if (map[pmapLoc.Y][pmapLoc.X - 1] == 0)
+                    if (map[pmapLoc.Y][pmapLoc.X - 1] != 1)
                     {
                         prevDir.Y = 0;
                         prevDir.X = -1;
@@ -188,7 +207,7 @@ namespace OacPan
 
             pmapLoc = GetMapLoc(pacManLoc,prevDir.X, prevDir.Y);
 
-            if ((prevDir.X != 0 || prevDir.Y != 0) && map[pmapLoc.Y][pmapLoc.X] == 0)
+            if ((prevDir.X != 0 || prevDir.Y != 0) && map[pmapLoc.Y][pmapLoc.X] != 1)
             {
 
                 pacManLoc.X += prevDir.X;
@@ -204,13 +223,58 @@ namespace OacPan
                     int Yloc = (pacManLoc.Y / 8) * 8 + 4;
                     pacManLoc.Y -= pacManLoc.Y - Yloc;
                 }
+
+                if (map[pmapLoc.Y][pmapLoc.X] == 2)
+                {
+                    peletCount++;
+                    map[pmapLoc.Y][pmapLoc.X] = 0;
+                }
             }
+
+            pmapLoc = GetMapLoc(pacManLoc, 0, 0);
 
             foreach (Ghost g in ghosts)
             {
-                GhostMovement(g);
-            }
+                switch (g.mode)
+                {
+                    case Ghost.GhostMode.Running:
+                        GhostMovement(g);
+                        break;
 
+                    case Ghost.GhostMode.OutPen:
+                        if (g.loc.Y > 116)
+                        {
+                            g.loc.Y--;
+                        }
+                        else
+                        {
+                            g.mode = Ghost.GhostMode.Running;
+                        }
+                        break;
+
+                    case Ghost.GhostMode.CenterPen:
+                        if (g.loc.X < 116)
+                        {
+                            g.loc.X++;
+                        }
+                        else if (g.loc.X > 116)
+                        {
+                            g.loc.X--;
+                        }
+                        else
+                        {
+                            g.mode = Ghost.GhostMode.OutPen;
+                        }
+                        break;
+                }
+
+                Point ghostLoc = GetMapLoc(g.loc, 0, 0);
+
+                if (ghostLoc.X == pmapLoc.X && ghostLoc.Y == pmapLoc.Y)
+                {
+                    gameMode = GameMode.Lost;
+                }                
+            }
 
             base.Update(gameTime);
         }
@@ -230,69 +294,57 @@ namespace OacPan
             Point mapLoc = GetMapLoc(g.loc, 0, 0);
             if (g.loc.X - (mapLoc.X * 8 + 4) == 0 && g.loc.Y - (mapLoc.Y * 8 + 4) == 0)
             {
-                switch (g.mode)
+                if (gameMode == GameMode.Normal)
                 {
-                    case Ghost.GhostMode.Running:
-                        switch (g.type)
-                        {
-                            case Ghost.GhostType.Blinky:
-                                targetLoc = GetMapLoc(pacManLoc,0, 0);
-                                break;
+                    switch (g.type)
+                    {
+                        case Ghost.GhostType.Blinky:
+                            targetLoc = GetMapLoc(pacManLoc, 0, 0);
+                            break;
 
-                            case Ghost.GhostType.Inky:
-                                Ghost Blinky= null;
-                                foreach (Ghost gs in ghosts)
-                                    if (gs.type == Ghost.GhostType.Blinky)
-                                    {
-                                        Blinky = gs;
-                                        break;
-                                    }
-
-                                if (Blinky != null)
+                        case Ghost.GhostType.Inky:
+                            Ghost Blinky = null;
+                            foreach (Ghost gs in ghosts)
+                                if (gs.type == Ghost.GhostType.Blinky)
                                 {
-                                    Point blinkLoc = GetMapLoc(Blinky.loc, 0, 0);
-                                    targetLoc = GetMapLoc(pacManLoc, prevDir.X * 2, prevDir.Y * 2);
-                                    targetLoc.X = targetLoc.X + (targetLoc.X - blinkLoc.X);
-                                    targetLoc.Y = targetLoc.Y + (targetLoc.Y - blinkLoc.Y);
+                                    Blinky = gs;
+                                    break;
                                 }
-                                else
-                                {
-                                    targetLoc = g.scatterLoc;
-                                }
-                                break;
 
-                            case Ghost.GhostType.Pinky:
-                                targetLoc = GetMapLoc(pacManLoc, prevDir.X * 4, prevDir.Y * 4);
-                                break;
+                            if (Blinky != null)
+                            {
+                                Point blinkLoc = GetMapLoc(Blinky.loc, 0, 0);
+                                targetLoc = GetMapLoc(pacManLoc, prevDir.X * 2, prevDir.Y * 2);
+                                targetLoc.X = targetLoc.X + (targetLoc.X - blinkLoc.X);
+                                targetLoc.Y = targetLoc.Y + (targetLoc.Y - blinkLoc.Y);
+                            }
+                            else
+                            {
+                                targetLoc = g.scatterLoc;
+                            }
+                            break;
 
-                            case Ghost.GhostType.Clyde:
-                                Point clydeLoc = GetMapLoc(g.loc, 0, 0);
-                                targetLoc = GetMapLoc(pacManLoc, 0, 0);
-                                if ((targetLoc.X - clydeLoc.X) * (targetLoc.X - clydeLoc.X) + (targetLoc.Y - clydeLoc.Y) * (targetLoc.Y - clydeLoc.Y) < 16)
-                                    targetLoc = g.scatterLoc;
-                                break;
-                        }
-                        break;
+                        case Ghost.GhostType.Pinky:
+                            targetLoc = GetMapLoc(pacManLoc, prevDir.X * 4, prevDir.Y * 4);
+                            break;
 
-                    case Ghost.GhostMode.CenterPen:
-                        g.mode = Ghost.GhostMode.Running;
-                        targetLoc = GetMapLoc(new Point(112,120), 0, 0);
-                        break;
-
-                    case Ghost.GhostMode.OutPen:
-                        g.mode = Ghost.GhostMode.Running;
-                        targetLoc = GetMapLoc(pacManLoc, 0, 0);
-                        break;
-
-                    case Ghost.GhostMode.Pen:
-                        targetLoc = GetMapLoc(g.loc, 0, 0);
-                        break;
+                        case Ghost.GhostType.Clyde:
+                            Point clydeLoc = GetMapLoc(g.loc, 0, 0);
+                            targetLoc = GetMapLoc(pacManLoc, 0, 0);
+                            if ((targetLoc.X - clydeLoc.X) * (targetLoc.X - clydeLoc.X) + (targetLoc.Y - clydeLoc.Y) * (targetLoc.Y - clydeLoc.Y) < 16)
+                                targetLoc = g.scatterLoc;
+                            break;
+                    }
+                }
+                else
+                {
+                    targetLoc = g.scatterLoc;
                 }
 
                 int minDistSqr = Int32.MaxValue;
                 int distSqr = 0;
                 int dir = 0;
-                if (map[mapLoc.Y - 1][mapLoc.X] == 0 && g.lastDir.Y != 1)
+                if (map[mapLoc.Y - 1][mapLoc.X] != 1 && g.lastDir.Y != 1)
                 {
                     distSqr = (targetLoc.X - mapLoc.X) * (targetLoc.X - mapLoc.X) + (targetLoc.Y - (mapLoc.Y - 1)) * (targetLoc.Y - (mapLoc.Y - 1));
                     if (distSqr < minDistSqr)
@@ -302,7 +354,7 @@ namespace OacPan
                     }
                 }
 
-                if (map[mapLoc.Y][mapLoc.X + 1] == 0 && g.lastDir.X != -1)
+                if (map[mapLoc.Y][mapLoc.X + 1] != 1 && g.lastDir.X != -1)
                 {
                     distSqr = (targetLoc.X - (mapLoc.X + 1)) * (targetLoc.X - (mapLoc.X + 1)) + (targetLoc.Y - mapLoc.Y ) * (targetLoc.Y - mapLoc.Y);
                     if (distSqr < minDistSqr)
@@ -312,7 +364,7 @@ namespace OacPan
                     }
                 }
 
-                if (map[mapLoc.Y + 1][mapLoc.X] == 0 && g.lastDir.Y != -1)
+                if (map[mapLoc.Y + 1][mapLoc.X] != 1 && g.lastDir.Y != -1)
                 {
                     distSqr = (targetLoc.X - mapLoc.X) * (targetLoc.X - mapLoc.X) + (targetLoc.Y - (mapLoc.Y + 1)) * (targetLoc.Y - (mapLoc.Y + 1));
                     if (distSqr < minDistSqr)
@@ -322,7 +374,7 @@ namespace OacPan
                     }
                 }
 
-                if (map[mapLoc.Y][mapLoc.X - 1] == 0 && g.lastDir.X != 1)
+                if (map[mapLoc.Y][mapLoc.X - 1] != 1 && g.lastDir.X != 1)
                 {
                     distSqr = (targetLoc.X - (mapLoc.X - 1)) * (targetLoc.X - (mapLoc.X - 1)) + (targetLoc.Y - mapLoc.Y) * (targetLoc.Y - mapLoc.Y);
                     if (distSqr < minDistSqr)
@@ -373,11 +425,45 @@ namespace OacPan
 
             spriteBatch.Draw(mapTexture, new Rectangle(0, 0, 224, 288), Color.White);
 
-            spriteBatch.Draw(pacMan, new Rectangle(pacManLoc.X, pacManLoc.Y, 16, 16), Color.White);
-
-            foreach (Ghost g in ghosts)
+            if (gameMode == GameMode.Normal || gameMode == GameMode.Scatter)
             {
-                spriteBatch.Draw(g.tex, new Rectangle(g.loc.X, g.loc.Y, 16, 16), Color.White);
+                string pc = peletCount.ToString();
+                Vector2 pos = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2, 10);
+                Vector2 origin = font.MeasureString(pc) / 2;
+
+                spriteBatch.DrawString(font, pc, pos, Color.White, 0, origin, 1.0f, SpriteEffects.None, 0.5f);
+
+                for (int i = 0; i < map.Length; i++)
+                {
+                    for (int j = 0; j < map[i].Length; j++)
+                    {
+                        if (map[i][j] == 2)
+                            spriteBatch.Draw(dot, new Rectangle(j * 8, i * 8, 8, 8), Color.White);
+                    }
+                }
+
+                spriteBatch.Draw(pacMan, new Rectangle(pacManLoc.X-8, pacManLoc.Y-8, 16, 16), Color.White);
+
+                foreach (Ghost g in ghosts)
+                {
+                    spriteBatch.Draw(g.tex, new Rectangle(g.loc.X-8, g.loc.Y-8, 16, 16), Color.White);
+                }
+            }
+            else if (gameMode == GameMode.Start)
+            {
+                string start = "Press Enter to Start";
+                Vector2 pos = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2, graphics.GraphicsDevice.Viewport.Height / 2);
+                Vector2 origin = font.MeasureString(start) / 2;
+
+                spriteBatch.DrawString(font, start, pos, Color.White, 0, origin, 1.0f, SpriteEffects.None, 0.5f);
+            }
+            else if (gameMode == GameMode.Lost)
+            {
+                string start = "You Lost";
+                Vector2 pos = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2, graphics.GraphicsDevice.Viewport.Height / 2);
+                Vector2 origin = font.MeasureString(start) / 2;
+
+                spriteBatch.DrawString(font, start, pos, Color.White, 0, origin, 1.0f, SpriteEffects.None, 0.5f);
             }
 
             spriteBatch.End();
@@ -412,17 +498,10 @@ namespace OacPan
             scatterLoc.X = 204;
 
             mode = GhostMode.Pen;
-
-
-            int test = 1;
-            int test2 = 0;
         }
 
         public Ghost(GhostType t)
         {
-            loc.Y = 44;
-            loc.X = 20;
-
             lastDir.X = 0;
             lastDir.Y = 0;
             tex = null;
@@ -434,12 +513,18 @@ namespace OacPan
                     scatterLoc.Y = 4;
                     scatterLoc.X = 204;
 
+                    loc.Y = 116;
+                    loc.X = 116;
+
                     mode = GhostMode.Running;
                     break;
 
                 case GhostType.Inky:
                     scatterLoc.Y = 220;
                     scatterLoc.X = 276;
+
+                    loc.Y = 144;
+                    loc.X = 128;
 
                     mode = GhostMode.Pen;
                     break;
@@ -448,12 +533,18 @@ namespace OacPan
                     scatterLoc.Y = 4;
                     scatterLoc.X = 20;
 
-                    mode = GhostMode.CenterPen;
+                    loc.Y = 144;
+                    loc.X = 116;
+
+                    mode = GhostMode.OutPen;
                     break;
 
                 case GhostType.Clyde:
                     scatterLoc.Y = 4;
                     scatterLoc.X = 276;
+
+                    loc.Y = 144;
+                    loc.X = 100;
 
                     mode = GhostMode.Pen;
                     break;
