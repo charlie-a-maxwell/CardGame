@@ -23,12 +23,14 @@ namespace OacPan
         Texture2D mapTexture;
         Texture2D pacMan;
         Texture2D dot;
+        Texture2D bigDot;
         SpriteFont font;
         Point prevDir = new Point (0,0);
         List<Ghost> ghosts;
         GameMode gameMode = GameMode.Start;
         int peletCount = 0;
         int max = 244;
+        TimeSpan timeToRelease = new TimeSpan(0, 0, 7);
 
 
         int[][] map = new int[][]{
@@ -38,7 +40,7 @@ namespace OacPan
                          new int[] { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
                          new int[] { 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
                          new int[] { 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1},
-                         new int[] { 1, 2, 1, 0, 0, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 0, 0, 0, 1, 2, 1, 1, 1, 1, 2, 1},
+                         new int[] { 1, 3, 1, 0, 0, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 0, 0, 0, 1, 2, 1, 1, 1, 1, 3, 1},
                          new int[] { 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1},
                          new int[] { 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
                          new int[] { 1, 2, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 2, 1},
@@ -58,7 +60,7 @@ namespace OacPan
                          new int[] { 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
                          new int[] { 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1},
                          new int[] { 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1},
-                         new int[] { 1, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 1},
+                         new int[] { 1, 3, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 3, 1},
                          new int[] { 1, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1, 1},
                          new int[] { 1, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 1, 2, 1, 1, 1},
                          new int[] { 1, 2, 2, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 1},
@@ -115,6 +117,8 @@ namespace OacPan
             pacMan = Content.Load<Texture2D>("PacMan");
             font = Content.Load<SpriteFont>("MainFont");
             dot = Content.Load<Texture2D>("Dot");
+            bigDot = Content.Load<Texture2D>("BigDot");
+
 
             foreach (Ghost g in ghosts)
             {
@@ -228,6 +232,34 @@ namespace OacPan
                 {
                     peletCount++;
                     map[pmapLoc.Y][pmapLoc.X] = 0;
+                    if (peletCount % 30 == 0 && peletCount != 0)
+                    {
+                        ReleaseGhost();
+                    }
+                }
+
+                if (map[pmapLoc.Y][pmapLoc.X] == 3)
+                {
+                    peletCount++;
+                    map[pmapLoc.Y][pmapLoc.X] = 0;
+                    SwitchMode(GameMode.Frightened);
+                    if (peletCount % 30 == 0 && peletCount != 0)
+                    {
+                        ReleaseGhost();
+                    }
+                    timeToRelease = new TimeSpan(0, 0, 10);
+                }
+
+                if (pmapLoc.Y == 17)
+                {
+                    if (pmapLoc.X == 0)
+                    {
+                        pacManLoc.X = 216;
+                    }
+                    else if (pmapLoc.X == 27)
+                    {
+                        pacManLoc.X = 8;
+                    }
                 }
             }
 
@@ -272,11 +304,62 @@ namespace OacPan
 
                 if (ghostLoc.X == pmapLoc.X && ghostLoc.Y == pmapLoc.Y)
                 {
-                    gameMode = GameMode.Lost;
+                    if (gameMode == GameMode.Frightened)
+                    {
+                        g.loc = g.startLoc;
+                        g.mode = g.startMode;
+                    }
+                    else
+                    {
+                        gameMode = GameMode.Lost;
+                    }
                 }                
             }
 
+            timeToRelease = timeToRelease.Subtract(gameTime.ElapsedGameTime);
+            if (timeToRelease.Ticks <= 0)
+            {
+                if (gameMode == GameMode.Normal)
+                {
+                    timeToRelease = new TimeSpan(0, 0, 7);
+                    gameMode = GameMode.Scatter;
+                }
+                else if (gameMode == GameMode.Scatter)
+                {
+                    timeToRelease = new TimeSpan(0, 0, 30);
+                    gameMode = GameMode.Normal;
+                }
+                else if (gameMode == GameMode.Frightened)
+                {
+                    gameMode = GameMode.Normal;
+                    timeToRelease = new TimeSpan(0, 0, 30);
+                }
+            }
+
             base.Update(gameTime);
+        }
+
+        private void SwitchMode(GameMode mode)
+        {
+            foreach (Ghost g in ghosts)
+            {
+                g.lastDir.X = -g.lastDir.X;
+                g.lastDir.Y = -g.lastDir.Y;
+            }
+
+            gameMode = mode;
+        }
+
+        protected void ReleaseGhost()
+        {
+            foreach (Ghost g in ghosts)
+            {
+                if(g.mode == Ghost.GhostMode.Pen)
+                {
+                    g.mode = Ghost.GhostMode.CenterPen;
+                    break;
+                }
+            }
         }
 
         protected Point GetMapLoc(Point curLoc, int xOffset, int yOffset)
@@ -335,6 +418,10 @@ namespace OacPan
                                 targetLoc = g.scatterLoc;
                             break;
                     }
+                }
+                else if (gameMode == GameMode.Frightened || gameMode == GameMode.Scatter)
+                {
+                    targetLoc = g.scatterLoc;
                 }
                 else
                 {
@@ -411,6 +498,19 @@ namespace OacPan
             g.loc.Y += g.lastDir.Y;
             g.loc.X += g.lastDir.X;
 
+            Point newLoc = GetMapLoc(g.loc, 0, 0);
+            if (newLoc.Y == 17)
+            {
+                if (newLoc.X == 0)
+                {
+                    g.loc.X = 216;
+                }
+                else if (newLoc.X == 27)
+                {
+                    g.loc.X = 8;
+                } 
+            }
+
         }
 
         /// <summary>
@@ -425,7 +525,7 @@ namespace OacPan
 
             spriteBatch.Draw(mapTexture, new Rectangle(0, 0, 224, 288), Color.White);
 
-            if (gameMode == GameMode.Normal || gameMode == GameMode.Scatter)
+            if (gameMode == GameMode.Normal || gameMode == GameMode.Scatter || gameMode == GameMode.Frightened)
             {
                 string pc = peletCount.ToString();
                 Vector2 pos = new Vector2(graphics.GraphicsDevice.Viewport.Width / 2, 10);
@@ -439,6 +539,8 @@ namespace OacPan
                     {
                         if (map[i][j] == 2)
                             spriteBatch.Draw(dot, new Rectangle(j * 8, i * 8, 8, 8), Color.White);
+                        else if (map[i][j] == 3)
+                            spriteBatch.Draw(bigDot, new Rectangle(j * 8, i * 8, 8, 8), Color.White);
                     }
                 }
 
@@ -483,6 +585,8 @@ namespace OacPan
         public Texture2D tex;
         public Point scatterLoc;
         public GhostMode mode;
+        public Point startLoc;
+        public GhostMode startMode;
 
         public Ghost()
         {
@@ -510,43 +614,50 @@ namespace OacPan
             switch (t)
             {
                 case GhostType.Blinky:
-                    scatterLoc.Y = 4;
-                    scatterLoc.X = 204;
+                    scatterLoc.Y = 0;
+                    scatterLoc.X = 26;
 
                     loc.Y = 116;
                     loc.X = 116;
 
+                    startLoc.Y = 144;
+                    startLoc.X = 116;
+
                     mode = GhostMode.Running;
+                    startMode = GhostMode.OutPen;
                     break;
 
                 case GhostType.Inky:
-                    scatterLoc.Y = 220;
-                    scatterLoc.X = 276;
+                    scatterLoc.Y = 35;
+                    scatterLoc.X = 26;
 
-                    loc.Y = 144;
-                    loc.X = 128;
+                    startLoc.Y = loc.Y = 144;
+                    startLoc.X = loc.X = 128;
 
                     mode = GhostMode.Pen;
+                    startMode = GhostMode.Pen;
                     break;
 
                 case GhostType.Pinky:
-                    scatterLoc.Y = 4;
-                    scatterLoc.X = 20;
+                    scatterLoc.Y = 0;
+                    scatterLoc.X = 2;
 
-                    loc.Y = 144;
-                    loc.X = 116;
+                    startLoc.Y = loc.Y = 144;
+                    startLoc.X = loc.X = 116;
 
                     mode = GhostMode.OutPen;
+                    startMode = GhostMode.Pen;
                     break;
 
                 case GhostType.Clyde:
-                    scatterLoc.Y = 4;
-                    scatterLoc.X = 276;
+                    scatterLoc.Y = 35;
+                    scatterLoc.X = 0;
 
-                    loc.Y = 144;
-                    loc.X = 100;
+                    startLoc.Y = loc.Y = 144;
+                    startLoc.X = loc.X = 100;
 
                     mode = GhostMode.Pen;
+                    startMode = GhostMode.Pen;
                     break;
             }
         }

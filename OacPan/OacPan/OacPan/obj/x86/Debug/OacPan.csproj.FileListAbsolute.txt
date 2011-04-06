@@ -12,3 +12,4 @@ C:\projects\OacPan\OacPan\OacPan\bin\x86\Debug\Content\Pinky.xnb
 C:\projects\OacPan\OacPan\OacPan\bin\x86\Debug\Content\Clyde.xnb
 C:\projects\OacPan\OacPan\OacPan\bin\x86\Debug\Content\MainFont.xnb
 C:\projects\OacPan\OacPan\OacPan\bin\x86\Debug\Content\Dot.xnb
+C:\projects\OacPan\OacPan\OacPan\bin\x86\Debug\Content\BigDot.xnb
