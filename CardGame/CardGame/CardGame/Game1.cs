@@ -19,6 +19,7 @@ namespace CardGame
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Map map;
 
         public Game1()
         {
