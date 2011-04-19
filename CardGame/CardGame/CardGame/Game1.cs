@@ -20,7 +20,7 @@ namespace CardGame
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Map map;
-
+        MouseHandler mouseHandler;
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -35,7 +35,15 @@ namespace CardGame
         /// </summary>
         protected override void Initialize()
         {
+            mouseHandler = new MouseHandler();
             // TODO: Add your initialization logic here
+            map = new Map();
+            map.PlaceCard(new CardClass(CardType.Soldier, "Card1"), 2, 2);
+            map.PlaceCard(new CardClass(CardType.Soldier, "Card1"), 1, 1);
+            map.PlaceCard(new CardClass(CardType.Soldier, "Card1"), 3, 3);
+            map.PlaceCard(new CardClass(CardType.Soldier, "Card1"), 4, 4);
+            map.PlaceCard(new CardClass(CardType.Soldier, "Card1"), 5, 5);
+
 
             base.Initialize();
         }
@@ -48,6 +56,10 @@ namespace CardGame
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            map.SetGraphics(GraphicsDevice);
+            map.SetContentManager(Content);
+            mouseHandler.SetTexture(Content.Load<Texture2D>("Cursor1"));
+
 
             // TODO: use this.Content to load your game content here
         }
@@ -72,8 +84,14 @@ namespace CardGame
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            // TODO: Add your update logic here
+            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
+            {
+                int x = Mouse.GetState().X;
+                int y = Mouse.GetState().Y;
+            }
 
+            // TODO: Add your update logic here
+            mouseHandler.Update();
             base.Update(gameTime);
         }
 
@@ -87,7 +105,43 @@ namespace CardGame
 
             // TODO: Add your drawing code here
 
+            spriteBatch.Begin();
+            map.RenderMap(spriteBatch);
+
+            mouseHandler.Render(spriteBatch);
+            spriteBatch.End();
+
             base.Draw(gameTime);
+        }
+    }
+
+    public class MouseHandler
+    {
+        private Vector2 pos;
+        private Texture2D tex;
+
+        public MouseHandler()
+        {
+            pos = new Vector2(0, 0);
+            tex = null;
+        }
+
+        public void Update()
+        {
+            MouseState state = Mouse.GetState();
+            this.pos.X = state.X;
+            this.pos.Y = state.Y;
+        }
+
+        public void SetTexture(Texture2D t)
+        {
+            tex = t;
+        }
+
+        public void Render(SpriteBatch sb)
+        {
+            if (tex != null)
+                sb.Draw(tex, pos, Color.White);
         }
     }
 }

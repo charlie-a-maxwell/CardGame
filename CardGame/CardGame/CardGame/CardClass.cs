@@ -15,23 +15,23 @@ namespace CardGame
         Texture2D texture;
         CardType type;
         string textureName;
-        public const int cardWidth = 10;
-        public const int cardHeight = 10;
+        public const int cardWidth = 50;
+        public const int cardHeight = 50;
 
 
-        CardClass()
+        public CardClass()
         {
             type = CardType.Soldier;
             texture = null;
         }
 
-        CardClass(CardType t)
+        public CardClass(CardType t)
         {
             type = t;
             texture = null;
         }
 
-        CardClass(CardType t, string tm)
+        public CardClass(CardType t, string tm)
         {
             type = t;
             textureName = tm;
@@ -49,7 +49,7 @@ namespace CardGame
         public void Render(SpriteBatch sb, Vector2 origin)
         {
             if (texture != null)
-                sb.Draw(texture, origin, Color.White);
+                sb.Draw(texture, new Rectangle((int)origin.X, (int)origin.Y, cardWidth, cardHeight), Color.White);
         }
 
     }

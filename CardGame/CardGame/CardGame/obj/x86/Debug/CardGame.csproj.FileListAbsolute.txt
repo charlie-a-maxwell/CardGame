@@ -4,3 +4,5 @@ C:\projects\CardGame\CardGame\CardGame\obj\x86\Debug\ResolveAssemblyReference.ca
 C:\projects\CardGame\CardGame\CardGame\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
 C:\projects\CardGame\CardGame\CardGame\obj\x86\Debug\CardGame.exe
 C:\projects\CardGame\CardGame\CardGame\obj\x86\Debug\CardGame.pdb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card1.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Cursor1.xnb
