@@ -15,12 +15,18 @@ namespace CardGame
     /// <summary>
     /// This is the main type for your game
     /// </summary>
+    /// 
+
+    public enum PlayerTurn { Player1, Player2 };
+
     public class Game1 : Microsoft.Xna.Framework.Game
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Map map;
+        MapView map;
         MouseHandler mouseHandler;
+        List<CardType> cardTypes;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -36,14 +42,26 @@ namespace CardGame
         protected override void Initialize()
         {
             mouseHandler = new MouseHandler();
-            // TODO: Add your initialization logic here
-            map = new Map();
-            map.PlaceCard(new CardClass(CardType.Soldier, "Card1"), 2, 2);
-            map.PlaceCard(new CardClass(CardType.Soldier, "Card1"), 1, 1);
-            map.PlaceCard(new CardClass(CardType.Soldier, "Card1"), 3, 3);
-            map.PlaceCard(new CardClass(CardType.Soldier, "Card1"), 4, 4);
-            map.PlaceCard(new CardClass(CardType.Soldier, "Card1"), 5, 5);
+            mouseHandler.leftMouseDown += new MouseHandler.LeftMouseDown(leftMouseDown);
 
+            cardTypes = new List<CardType>();
+            int[,] move = new int[5, 5] {
+                                            {0,0,0,0,0},
+                                            {0,0,1,0,0},
+                                            {0,1,6,1,0},
+                                            {0,0,1,0,0},
+                                            {0,0,0,0,0}
+                                        };
+
+            CardType soldier = new CardType("Soldier", "Card1", move, 6);
+            cardTypes.Add(soldier);
+
+            map = new MapView();
+            map.PlaceCard(new CardClass(soldier, PlayerTurn.Player1), 2, 1);
+            map.PlaceCard(new CardClass(soldier, PlayerTurn.Player2), 4, 1);
+            //map.PlaceCard(new CardClass(soldier), 3, 3);
+            //map.PlaceCard(new CardClass(soldier), 4, 4);
+            //map.PlaceCard(new CardClass(soldier), 5, 5);
 
             base.Initialize();
         }
@@ -59,6 +77,12 @@ namespace CardGame
             map.SetGraphics(GraphicsDevice);
             map.SetContentManager(Content);
             mouseHandler.SetTexture(Content.Load<Texture2D>("Cursor1"));
+
+            foreach (CardType cc in cardTypes)
+            {
+                if (cc != null)
+                    cc.LoadTexture(Content);
+            }
 
 
             // TODO: use this.Content to load your game content here
@@ -113,12 +137,21 @@ namespace CardGame
 
             base.Draw(gameTime);
         }
+
+        private void leftMouseDown(Vector2 pos)
+        {
+            map.HandleMouseClick(pos);
+        }
     }
 
     public class MouseHandler
     {
         private Vector2 pos;
         private Texture2D tex;
+
+        public delegate void LeftMouseDown(Vector2 pos);
+
+        public LeftMouseDown leftMouseDown = null;
 
         public MouseHandler()
         {
@@ -131,6 +164,9 @@ namespace CardGame
             MouseState state = Mouse.GetState();
             this.pos.X = state.X;
             this.pos.Y = state.Y;
+            if (state.LeftButton == ButtonState.Pressed && leftMouseDown != null)
+                leftMouseDown(pos);
+                
         }
 
         public void SetTexture(Texture2D t)
@@ -142,6 +178,8 @@ namespace CardGame
         {
             if (tex != null)
                 sb.Draw(tex, pos, Color.White);
+            //               sb.Draw(tex, pos, null, Color.White, 0.0f, new Vector2(0, 0), 1.0f, SpriteEffects.None, 1.0f);
+      
         }
     }
 }
