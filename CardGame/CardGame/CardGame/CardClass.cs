@@ -14,7 +14,6 @@ namespace CardGame
         string textureName;
         public Texture2D texture;
         int[,] moveOptions;
-        int stat;
 
         public CardType(string name, string texName)
         {
@@ -23,19 +22,18 @@ namespace CardGame
             moveOptions = new int[5, 5];
         }
 
-        public CardType(string name, string texName, int[,] move, int s)
+        public CardType(string name, string texName, int[,] move)
         {
             typeName = name;
             textureName = texName;
             moveOptions = new int[5, 5];
-            stat = s;
 
             SetMove(move);
         }
 
         public int GetStat()
         {
-            return stat;
+            return moveOptions[2,2];
         }
 
         public void SetMove(int[,] move)
@@ -67,23 +65,85 @@ namespace CardGame
         public const int cardWidth = 50;
         public const int cardHeight = 50;
         public PlayerTurn player;
+        Vector2 loc;
+        Vector2 oldLoc;
 
         public CardClass(CardType t)
         {
             player = PlayerTurn.Player1;
             type = t;
+            loc = new Vector2(-1, -1);
+            oldLoc = new Vector2(-1, -1);
         }
 
         public CardClass(CardType t, PlayerTurn pt)
         {
             player = pt;
             type = t;
+            loc = new Vector2(-1, -1);
+            oldLoc = new Vector2(-1, -1);
         }
 
-        public void Render(SpriteBatch sb, Vector2 origin)
+        public void Render(SpriteBatch sb)
+        {
+            Render(sb, false);
+        }
+
+        public void Render(SpriteBatch sb, bool selected)
         {
             if (type.texture != null)
-                sb.Draw(type.texture, new Rectangle((int)origin.X, (int)origin.Y, cardWidth, cardHeight), (player == PlayerTurn.Player1 ? Color.Red: Color.LightBlue));
+                sb.Draw(type.texture, new Rectangle((int)loc.X, (int)loc.Y, cardWidth, cardHeight), (player == PlayerTurn.Player1 ? Color.Red : Color.LightBlue));
+
+            if (selected)
+            {
+                // Incoming Magic numbers!
+                int originX = 30;
+                int originY = 30;
+                int width = 95;
+                int height = 145;
+                int xMargin = 5;
+                int yMargin = 5;
+                int[,] cardMove = GetCardType().GetMove();
+
+                float xSize = (width - xMargin * 2) / cardMove.GetLength(1);
+                float ySize = (height - CardClass.cardHeight - yMargin * 2) / cardMove.GetLength(0);
+                float offsetX = xMargin + originX;
+                float offsetY = originY + CardClass.cardHeight + yMargin * 2;
+
+
+                MapView.FillColor(sb, originX, originY, width, height, Color.White);
+                MapView.DrawLine(sb, new Vector2(originX, originY), new Vector2(originX, originY + height), Color.Black);
+                MapView.DrawLine(sb, new Vector2(originX, originY), new Vector2(originX + width, originY), Color.Black);
+                MapView.DrawLine(sb, new Vector2(originX + width, originY), new Vector2(originX + width, originY + height), Color.Black);
+                MapView.DrawLine(sb, new Vector2(originX, originY + height), new Vector2(originX + width, originY + height), Color.Black);
+
+                //selectedCard.Render(sb, new Vector2(originX + (width - CardClass.cardWidth) / 2, originY + yMargin));
+
+                for (int i = 0; i < cardMove.GetLength(0); i++)
+                {
+                    for (int j = 0; j < cardMove.GetLength(1); j++)
+                    {
+                        if (cardMove[i, j] != 0)
+                        {
+                            MapView.DrawLine(sb, new Vector2(xSize * j + offsetX, ySize * i + offsetY), new Vector2(xSize * j + offsetX, ySize * (i + 1) + offsetY), Color.Black);
+                            MapView.DrawLine(sb, new Vector2(xSize * j + offsetX, ySize * i + offsetY), new Vector2(xSize * (j + 1) + offsetX, ySize * i + offsetY), Color.Black);
+                            MapView.DrawLine(sb, new Vector2(xSize * (j + 1) + offsetX, ySize * i + offsetY), new Vector2(xSize * (j + 1) + offsetX, ySize * (i + 1) + offsetY), Color.Black);
+                            MapView.DrawLine(sb, new Vector2(xSize * j + offsetX, ySize * (i + 1) + offsetY), new Vector2(xSize * (j + 1) + offsetX, ySize * (i + 1) + offsetY), Color.Black);
+                            MapView.DrawText(sb, cardMove[i, j].ToString(), new Vector2(xSize * j + offsetX, ySize * i + offsetY));
+
+                            MapView.DrawLine(sb, new Vector2((int)loc.X + cardWidth * (j - 2), (int)loc.Y + cardHeight * (i - 2)), new Vector2((int)loc.X + cardWidth * (j - 2), (int)loc.Y + cardHeight * (i - 1)), Color.Orange);
+                            MapView.DrawLine(sb, new Vector2((int)loc.X + cardWidth * (j - 2), (int)loc.Y + cardHeight * (i - 2)), new Vector2((int)loc.X + cardWidth * (j - 1), (int)loc.Y + cardHeight * (i - 2)), Color.Orange);
+                            MapView.DrawLine(sb, new Vector2((int)loc.X + cardWidth * (j - 1), (int)loc.Y + cardHeight * (i - 2)), new Vector2((int)loc.X + cardWidth * (j - 1), (int)loc.Y + cardHeight * (i - 1)), Color.Orange);
+                            MapView.DrawLine(sb, new Vector2((int)loc.X + cardWidth * (j - 2), (int)loc.Y + cardHeight * (i - 1)), new Vector2((int)loc.X + cardWidth * (j - 1), (int)loc.Y + cardHeight * (i - 1)), Color.Orange);
+
+                            if (type.texture != null)
+                                sb.Draw(type.texture, new Rectangle(originX + (width - CardClass.cardWidth) / 2, originX + (width - CardClass.cardWidth) / 2, cardWidth, cardHeight), (player == PlayerTurn.Player1 ? Color.Red : Color.LightBlue));
+
+                        }
+                    }
+                }
+
+            }
         }
 
         public CardType GetCardType()
@@ -95,15 +155,124 @@ namespace CardGame
         {
             type.LoadTexture(cm);
         }
+
+        public void SetLocation(Vector2 l)
+        {
+            oldLoc = loc;
+            loc = l;
+        }
+
+        public Vector2 GetPrevLocation()
+        {
+            return oldLoc;
+        }
+
+        public bool Intersect(Vector2 point)
+        {
+            if (point.X > loc.X && point.Y > loc.Y && point.X < loc.X + cardWidth && point.Y < loc.Y + cardHeight)
+                return true;
+            return false;
+        }
+    }
+
+    public class Hand
+    {
+        List<CardClass> hand;
+        PlayerTurn owner;
+        Vector2 renderLoc;
+
+        public Hand(PlayerTurn player)
+        {
+            hand = new List<CardClass>();
+            owner = player;
+            renderLoc = new Vector2(0, 0);
+        }
+
+        public void SetRenderLoc(Vector2 loc)
+        {
+            renderLoc = loc;
+        }
+
+        public bool AddCard(CardClass card)
+        {
+            if (card.player == owner)
+            {
+                Vector2 offset = new Vector2(CardClass.cardWidth, 0);
+                card.SetLocation(renderLoc + offset*hand.Count);
+                hand.Add(card);
+                return true;
+            }
+            return false;
+        }
+
+        public int Count
+        {
+            get
+            {
+                return hand.Count;
+            }
+        }
+
+        public bool RemoveCard(CardClass card)
+        {
+            return hand.Remove(card);
+        }
+
+        public CardClass SelectCard(int i)
+        {
+            if (i >= 0 && i < hand.Count)
+            {
+                return hand[i];
+            }
+
+            return null;
+        }
+
+        public CardClass SelectCard(Vector2 pos)
+        {
+            CardClass found = null;
+            foreach (CardClass card in hand)
+            {
+                if (card.Intersect(pos))
+                {
+                    found = card;
+                    break;
+                }
+            }
+
+            return found;
+        }
+
+        public void Render(SpriteBatch sb)
+        {
+            Render(sb, renderLoc, null);
+        }
+
+        public void Render(SpriteBatch sb, CardClass selectedCard)
+        {
+            Render(sb, renderLoc, selectedCard);
+        }
+
+        public void Render(SpriteBatch sb, Vector2 origin, CardClass selectedCard)
+        {
+            CardClass card;
+            for (int i = 0; i < hand.Count; i++ )
+            {
+                card = hand[i];
+                card.Render(sb, card == selectedCard);
+            }
+        }
     }
 
     public class Deck
     {
         Stack<CardClass> deck;
+        PlayerTurn owner;
 
-        public Deck()
+        public Deck(PlayerTurn player)
         {
             deck = new Stack<CardClass>();
+            owner = player;
         }
 
         public CardClass GetTopCard()
@@ -130,6 +299,16 @@ namespace CardGame
             }
 
             deck = new Stack<CardClass>(deckArray);
+        }
+
+        public bool AddCard(CardClass card)
+        {
+            if (card.player == owner)
+            {
+                deck.Push(card);
+                return true;
+            }
+            return false;
         }
 
         public void SendToGraveYard()

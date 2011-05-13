@@ -31,6 +31,8 @@ namespace CardGame
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            cardTypes = new List<CardType>();
+            map = new MapView();
         }
 
         /// <summary>
@@ -44,25 +46,6 @@ namespace CardGame
             mouseHandler = new MouseHandler();
             mouseHandler.leftMouseDown += new MouseHandler.LeftMouseDown(leftMouseDown);
 
-            cardTypes = new List<CardType>();
-            int[,] move = new int[5, 5] {
-                                            {0,0,0,0,0},
-                                            {0,0,1,0,0},
-                                            {0,1,6,1,0},
-                                            {0,0,1,0,0},
-                                            {0,0,0,0,0}
-                                        };
-
-            CardType soldier = new CardType("Soldier", "Card1", move, 6);
-            cardTypes.Add(soldier);
-
-            map = new MapView();
-            map.PlaceCard(new CardClass(soldier, PlayerTurn.Player1), 2, 1);
-            map.PlaceCard(new CardClass(soldier, PlayerTurn.Player2), 4, 1);
-            //map.PlaceCard(new CardClass(soldier), 3, 3);
-            //map.PlaceCard(new CardClass(soldier), 4, 4);
-            //map.PlaceCard(new CardClass(soldier), 5, 5);
-
             base.Initialize();
         }
 
@@ -74,9 +57,34 @@ namespace CardGame
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            int[,] move = new int[5, 5] {
+                                            {0,0,0,0,0},
+                                            {0,0,1,0,0},
+                                            {0,1,6,1,0},
+                                            {0,0,1,0,0},
+                                            {0,0,0,0,0}
+                                        };
+
+            int[,] move2 = new int[5, 5] {
+                                            {0,0,0,0,0},
+                                            {0,0,-1,0,0},
+                                            {0,-1,8,-1,0},
+                                            {0,0,-1,0,0},
+                                            {0,0,0,0,0}
+                                        };
+
             map.SetGraphics(GraphicsDevice);
             map.SetContentManager(Content);
+            CardType soldier = new CardType("Soldier", "Card1", move);
+            cardTypes.Add(soldier);
+            CardType defender = new CardType("Defender", "Card2", move2);
+            cardTypes.Add(defender);
+
             mouseHandler.SetTexture(Content.Load<Texture2D>("Cursor1"));
+            map.player1Hand.AddCard(new CardClass(soldier, PlayerTurn.Player1));
+            map.player1Hand.AddCard(new CardClass(defender, PlayerTurn.Player1));
+            map.player2Hand.AddCard(new CardClass(soldier, PlayerTurn.Player2));
+            map.player2Hand.AddCard(new CardClass(defender, PlayerTurn.Player2));
 
             foreach (CardType cc in cardTypes)
             {
@@ -115,7 +123,7 @@ namespace CardGame
             }
 
             // TODO: Add your update logic here
-            mouseHandler.Update();
+            mouseHandler.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -148,7 +156,8 @@ namespace CardGame
     {
         private Vector2 pos;
         private Texture2D tex;
-
+        private long lastMouseDown;
+        private const long mouseRefresh = 200;
         public delegate void LeftMouseDown(Vector2 pos);
 
         public LeftMouseDown leftMouseDown = null;
@@ -157,15 +166,21 @@ namespace CardGame
         {
             pos = new Vector2(0, 0);
             tex = null;
+            lastMouseDown = mouseRefresh;
         }
 
-        public void Update()
+        public void Update(GameTime gameTime)
         {
             MouseState state = Mouse.GetState();
             this.pos.X = state.X;
             this.pos.Y = state.Y;
-            if (state.LeftButton == ButtonState.Pressed && leftMouseDown != null)
+            if (state.LeftButton == ButtonState.Pressed && leftMouseDown != null && lastMouseDown < 0)
+            {
                 leftMouseDown(pos);
+                lastMouseDown = mouseRefresh;
+            }
+            else
+                lastMouseDown -= (long)gameTime.ElapsedGameTime.TotalMilliseconds;
                 
         }
 

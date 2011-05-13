@@ -40,6 +40,39 @@
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Wall.xnb</Output>
       <Time>2011-05-01T12:10:43.544-05:00</Time>
     </Item>
+    <Item>
+      <Source>Card2.bmp</Source>
+      <Name>Card2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card2.xnb</Output>
+      <Time>2011-05-10T21:02:23.269-05:00</Time>
+    </Item>
+    <Item>
+      <Source>DoorPlayer2.bmp</Source>
+      <Name>DoorPlayer2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Parameters>
+        <Data Key="ColorKeyColor">255, 255, 255, 255</Data>
+      </Parameters>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DoorPlayer2.xnb</Output>
+      <Time>2011-05-12T21:01:33.104-05:00</Time>
+    </Item>
+    <Item>
+      <Source>DoorPlayer1.bmp</Source>
+      <Name>DoorPlayer1</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Parameters>
+        <Data Key="ColorKeyColor">255, 255, 255, 255</Data>
+      </Parameters>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DoorPlayer1.xnb</Output>
+      <Time>2011-05-12T20:57:47.328-05:00</Time>
+    </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
       <TargetPlatform>Windows</TargetPlatform>
