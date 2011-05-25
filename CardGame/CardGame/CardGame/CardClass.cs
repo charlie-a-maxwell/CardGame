@@ -345,6 +345,13 @@ namespace CardGame
             deck = new Stack<CardClass>(deckArray);
         }
 
+        public bool AddCards(Stack<CardClass> d)
+        {
+            deck = d;
+
+            return true;
+        }
+
         public bool AddCard(CardClass card)
         {
             if (card.player == owner)

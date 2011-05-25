@@ -19,8 +19,10 @@ namespace CardGame
         Vector2 selectedCardLoc;
         CardClass selectedCard;
         static SpriteFont font;
-        public Hand player1Hand;
-        public Hand player2Hand;
+        Hand player1Hand;
+        Hand player2Hand;
+        Deck player1Deck;
+        Deck player2Deck;
         PlayerTurn currentTurn;
         PlayerTurn winner;
         bool over = false;
@@ -34,6 +36,8 @@ namespace CardGame
             selectedCardLoc.Y = -1;
             player1Hand = new Hand(PlayerTurn.Player1);
             player2Hand = new Hand(PlayerTurn.Player2);
+            player1Deck = new Deck(PlayerTurn.Player1);
+            player2Deck = new Deck(PlayerTurn.Player2);
 
             currentTurn = PlayerTurn.Player1;
             winner = 0;
@@ -353,6 +357,20 @@ namespace CardGame
             else
             {
                 MoveCard(pos);
+            }
+        }
+
+        public void SetPlayerDeck(Deck d, PlayerTurn pt)
+        {
+            switch (pt)
+            {
+                case PlayerTurn.Player1:
+                    player1Deck = d;
+                    break;
+
+                case PlayerTurn.Player2:
+                    player2Deck = d;
+                    break;
             }
         }
 

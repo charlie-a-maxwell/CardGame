@@ -59,44 +59,18 @@ namespace CardGame
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            int[,] move = new int[5, 5] {
-                                            {1,0,1,0,0},
-                                            {0,0,1,0,0},
-                                            {0,1,6,1,0},
-                                            {0,0,1,0,0},
-                                            {0,0,1,0,0}
-                                        };
-
-            int[,] move2 = new int[5, 5] {
-                                            {0,0,0,0,0},
-                                            {0,0,-1,0,0},
-                                            {0,-1,8,-1,0},
-                                            {0,0,-1,0,0},
-                                            {0,0,0,0,0}
-                                        };
-
-
 
             map.SetGraphics(GraphicsDevice);
             map.SetContentManager(Content);
-            CardType soldier = new CardType("Soldier", "Card1", move);
-            cardTypes.Add(soldier);
-            CardType defender = new CardType("Defender", "Card2", move2);
-            cardTypes.Add(defender);
 
+            XmlSerializer serializer = new XmlSerializer(typeof(List<CardType>));
+            Stream cardTypeFile = File.Open("Content/CardTypes.xml", FileMode.Open);
+            cardTypes = (List<CardType>)serializer.Deserialize(cardTypeFile);
+            cardTypeFile.Close();
 
-            XmlSerializer serializer = new XmlSerializer(typeof(CardType));
-            StringWriter textWriter = new StringWriter();
-            serializer.Serialize(textWriter, soldier);
-            textWriter.Close();
-
-            CardType test = (CardType)serializer.Deserialize(new StringReader(textWriter.ToString()));
-
+            LoadDecks();
+            
             mouseHandler.SetTexture(Content.Load<Texture2D>("Cursor1"));
-            map.player1Hand.AddCard(new CardClass(soldier, PlayerTurn.Player1));
-            map.player1Hand.AddCard(new CardClass(defender, PlayerTurn.Player1));
-            map.player2Hand.AddCard(new CardClass(soldier, PlayerTurn.Player2));
-            map.player2Hand.AddCard(new CardClass(defender, PlayerTurn.Player2));
 
             foreach (CardType cc in cardTypes)
             {
@@ -106,6 +80,26 @@ namespace CardGame
 
 
             // TODO: use this.Content to load your game content here
+        }
+
+        protected void LoadDecks()
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(Stack<CardClass>));
+            Stream deckstream = File.Open("Content/PlayerDeck1.xml", FileMode.Open);
+            Stack<CardClass> stack = (Stack<CardClass>)serializer.Deserialize(deckstream);
+            deckstream.Close();
+
+            Deck deck = new Deck(PlayerTurn.Player1);
+            deck.AddCards(stack);
+            map.SetPlayerDeck(deck, PlayerTurn.Player1);
+
+            deckstream = File.Open("Content/PlayerDeck2.xml", FileMode.Open);
+            stack = (Stack<CardClass>)serializer.Deserialize(deckstream);
+            deckstream.Close();
+
+            deck = new Deck(PlayerTurn.Player2);
+            deck.AddCards(stack);
+            map.SetPlayerDeck(deck, PlayerTurn.Player2);
         }
 
         /// <summary>

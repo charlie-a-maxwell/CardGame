@@ -73,6 +73,33 @@
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DoorPlayer1.xnb</Output>
       <Time>2011-05-12T20:57:47.328-05:00</Time>
     </Item>
+    <Item>
+      <Source>Card3.bmp</Source>
+      <Name>Card3</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card3.xnb</Output>
+      <Time>2011-05-24T19:58:02.443-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Card4.bmp</Source>
+      <Name>Card4</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card4.xnb</Output>
+      <Time>2011-05-24T20:02:51.164-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Card5.bmp</Source>
+      <Name>Card5</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card5.xnb</Output>
+      <Time>2011-05-24T20:03:19.899-05:00</Time>
+    </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
       <TargetPlatform>Windows</TargetPlatform>
