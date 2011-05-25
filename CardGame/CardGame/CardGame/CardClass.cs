@@ -4,16 +4,60 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Storage;
+using System.Xml.Serialization;
 
 
 namespace CardGame
 {
     public class CardType
     {
-        string typeName;
-        string textureName;
+        
+        public string typeName;
+        public string textureName;
         public Texture2D texture;
-        int[,] moveOptions;
+        [XmlIgnore]
+        private int[,] moveOptions;
+        
+        public string moveString
+        {
+            get
+            {
+                string data = "";
+                for (int i = 0; i < moveOptions.GetLength(0); i++)
+                {
+                    for (int j = 0; j < moveOptions.GetLength(1); j++)
+                    {
+                        data += moveOptions[i, j] + ",";
+                    }
+                    data = data.TrimEnd(',');
+                    data += "|";
+                }
+                data = data.TrimEnd('|');
+
+                return data;
+            }
+
+            set
+            {
+                string data = value;
+
+                string[] rows = data.Split('|');
+                moveOptions = new int[rows.Length, rows[0].Split(',').Length];
+                int i= 0, j=0;
+                foreach (string col in rows)
+                {
+                    foreach (string item in col.Split(','))
+                        moveOptions[i, j++] = Convert.ToInt32(item);
+                    j = 0;
+                    i++;
+                }
+            }
+        }
+
+        public CardType()
+        {
+        }
 
         public CardType(string name, string texName)
         {

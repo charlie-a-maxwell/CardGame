@@ -9,6 +9,8 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Net;
 using Microsoft.Xna.Framework.Storage;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace CardGame
 {
@@ -58,11 +60,11 @@ namespace CardGame
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             int[,] move = new int[5, 5] {
-                                            {0,0,0,0,0},
+                                            {1,0,1,0,0},
                                             {0,0,1,0,0},
                                             {0,1,6,1,0},
                                             {0,0,1,0,0},
-                                            {0,0,0,0,0}
+                                            {0,0,1,0,0}
                                         };
 
             int[,] move2 = new int[5, 5] {
@@ -73,12 +75,22 @@ namespace CardGame
                                             {0,0,0,0,0}
                                         };
 
+
+
             map.SetGraphics(GraphicsDevice);
             map.SetContentManager(Content);
             CardType soldier = new CardType("Soldier", "Card1", move);
             cardTypes.Add(soldier);
             CardType defender = new CardType("Defender", "Card2", move2);
             cardTypes.Add(defender);
+
+
+            XmlSerializer serializer = new XmlSerializer(typeof(CardType));
+            StringWriter textWriter = new StringWriter();
+            serializer.Serialize(textWriter, soldier);
+            textWriter.Close();
+
+            CardType test = (CardType)serializer.Deserialize(new StringReader(textWriter.ToString()));
 
             mouseHandler.SetTexture(Content.Load<Texture2D>("Cursor1"));
             map.player1Hand.AddCard(new CardClass(soldier, PlayerTurn.Player1));
