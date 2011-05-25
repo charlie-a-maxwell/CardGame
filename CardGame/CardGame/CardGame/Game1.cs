@@ -82,24 +82,60 @@ namespace CardGame
             // TODO: use this.Content to load your game content here
         }
 
+        protected override void BeginRun()
+        {
+            base.BeginRun();
+
+            map.StartGame();
+        }
+
         protected void LoadDecks()
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(Stack<CardClass>));
-            Stream deckstream = File.Open("Content/PlayerDeck1.xml", FileMode.Open);
-            Stack<CardClass> stack = (Stack<CardClass>)serializer.Deserialize(deckstream);
+            Texture2D deckTeck = Content.Load<Texture2D>("DeckBack");
+
+            XmlSerializer serializer = new XmlSerializer(typeof(List<string>));
+            Stream deckstream = File.Open("Content/Deck1.xml", FileMode.Open);
+            List<string> list = (List<string>)serializer.Deserialize(deckstream);
             deckstream.Close();
 
             Deck deck = new Deck(PlayerTurn.Player1);
-            deck.AddCards(stack);
+            CardType type;
+            foreach (string card in list)
+            {
+                type = cardTypes.Find(
+                            delegate(CardType t)
+                            {
+                                return t.typeName.ToLower() == card.ToLower();
+                            });
+                if (type != null)
+                {
+                    deck.AddCard(new CardClass(type, PlayerTurn.Player1));
+                }
+            }
+
+            deck.SetTexure(deckTeck);
             map.SetPlayerDeck(deck, PlayerTurn.Player1);
 
-            deckstream = File.Open("Content/PlayerDeck2.xml", FileMode.Open);
-            stack = (Stack<CardClass>)serializer.Deserialize(deckstream);
+            deckstream = File.Open("Content/Deck2.xml", FileMode.Open);
+            list = (List<string>)serializer.Deserialize(deckstream);
             deckstream.Close();
 
-            deck = new Deck(PlayerTurn.Player2);
-            deck.AddCards(stack);
-            map.SetPlayerDeck(deck, PlayerTurn.Player2);
+            Deck deck2 = new Deck(PlayerTurn.Player2);
+            foreach (string card in list)
+            {
+                type = cardTypes.Find(
+                            delegate(CardType t)
+                            {
+                                return t.typeName.ToLower() == card.ToLower();
+                            });
+                if (type != null)
+                {
+                    deck2.AddCard(new CardClass(type, PlayerTurn.Player2));
+                }
+            }
+
+            deck2.SetTexure(deckTeck);
+            map.SetPlayerDeck(deck2, PlayerTurn.Player2);
         }
 
         /// <summary>

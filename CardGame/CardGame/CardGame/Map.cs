@@ -84,6 +84,8 @@ namespace CardGame
             player1Hand.SetRenderLoc(new Vector2(center.X + 30, center.Y + CardClass.cardHeight * map.GetLength(0) + 30));
             player2Hand.SetRenderLoc(new Vector2(center.X + 30, 40));
 
+            player1Deck.SetLoc(new Vector2(center.X + CardClass.cardWidth * map.GetLength(1) + 30, center.Y + CardClass.cardHeight * map.GetLength(0) + 30));
+            player2Deck.SetLoc(new Vector2(center.X + CardClass.cardWidth * map.GetLength(1) + 30, 40));
         }
 
         public void DrawOutline(SpriteBatch sb)
@@ -153,6 +155,9 @@ namespace CardGame
                 player2Hand.Render(sb, selectedCard);
                 DrawText(sb, "Player 2 Turn", new Vector2(center.X + maxCardWidth / 2, 10));
             }
+
+            player1Deck.Render(sb);
+            player2Deck.Render(sb);
         }
 
         public bool PlaceCard(CardClass card, int x, int y)
@@ -374,5 +379,25 @@ namespace CardGame
             }
         }
 
+        public void StartGame()
+        {
+            player1Deck.ShuffleCurrentDeck();
+
+            for (int i = 0; i < 5; i++)
+            {
+                player1Hand.AddCard(player1Deck.GetTopCard());
+            }
+
+            player2Deck.ShuffleCurrentDeck();
+
+            for (int i = 0; i < 5; i++)
+            {
+                player2Hand.AddCard(player2Deck.GetTopCard());
+            }
+
+            player1Deck.SetLoc(new Vector2(center.X + CardClass.cardWidth * map.GetLength(1) + 30, center.Y + CardClass.cardHeight * map.GetLength(0) + 30));
+            player2Deck.SetLoc(new Vector2(center.X + CardClass.cardWidth * map.GetLength(1) + 30, 40));
+
+        }
     }
 }

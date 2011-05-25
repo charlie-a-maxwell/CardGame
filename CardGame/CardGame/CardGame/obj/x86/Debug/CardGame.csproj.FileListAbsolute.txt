@@ -15,3 +15,6 @@ C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\CardTypes.xml
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card3.xnb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card4.xnb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card5.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Deck1.xml
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Deck2.xml
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DeckBack.xnb

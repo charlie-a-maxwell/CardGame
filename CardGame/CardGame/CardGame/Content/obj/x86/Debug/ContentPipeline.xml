@@ -100,6 +100,15 @@
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card5.xnb</Output>
       <Time>2011-05-24T20:03:19.899-05:00</Time>
     </Item>
+    <Item>
+      <Source>DeckBack.bmp</Source>
+      <Name>DeckBack</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DeckBack.xnb</Output>
+      <Time>2011-05-24T21:07:55.372-05:00</Time>
+    </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
       <TargetPlatform>Windows</TargetPlatform>

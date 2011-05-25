@@ -312,11 +312,24 @@ namespace CardGame
     {
         Stack<CardClass> deck;
         PlayerTurn owner;
+        static Random rand = new Random();
+        Vector2 renderLoc;
+        Texture2D deckTex;
 
         public Deck(PlayerTurn player)
         {
             deck = new Stack<CardClass>();
             owner = player;
+        }
+
+        public void SetTexure(Texture2D tex)
+        {
+            deckTex = tex;
+        }
+
+        public void SetLoc(Vector2 v)
+        {
+            renderLoc = v;
         }
 
         public CardClass GetTopCard()
@@ -329,7 +342,6 @@ namespace CardGame
         public void ShuffleCurrentDeck()
         {
             CardClass[] deckArray = deck.ToArray();
-            Random rand = new Random();
             int first, second;
             int length = deckArray.Length;
             CardClass temp;
@@ -345,12 +357,12 @@ namespace CardGame
             deck = new Stack<CardClass>(deckArray);
         }
 
-        public bool AddCards(Stack<CardClass> d)
+        public void Render(SpriteBatch sb)
         {
-            deck = d;
-
-            return true;
+            if (deckTex != null && deck.Count > 0)
+                sb.Draw(deckTex, new Rectangle((int)renderLoc.X, (int)renderLoc.Y, CardClass.cardWidth, CardClass.cardHeight), (owner == PlayerTurn.Player1 ? Color.Red : Color.LightBlue));
         }
+
 
         public bool AddCard(CardClass card)
         {
