@@ -259,6 +259,22 @@ namespace CardGame
 
         public bool RemoveCard(CardClass card)
         {
+            bool found = false;
+            Vector2 offset = new Vector2(CardClass.cardWidth, 0);
+            int count = 0;
+            foreach (CardClass cc in hand)
+            {
+                if (cc == card && !found)
+                {
+                    found = true;
+                    count--;
+                }
+                else if (found)
+                {
+                    cc.SetLocation(renderLoc + offset * count);
+                }
+                count++;
+            }
             return hand.Remove(card);
         }
 
@@ -361,6 +377,13 @@ namespace CardGame
         {
             if (deckTex != null && deck.Count > 0)
                 sb.Draw(deckTex, new Rectangle((int)renderLoc.X, (int)renderLoc.Y, CardClass.cardWidth, CardClass.cardHeight), (owner == PlayerTurn.Player1 ? Color.Red : Color.LightBlue));
+        }
+
+        public bool Intersect(Vector2 point)
+        {
+            if (point.X > renderLoc.X && point.Y > renderLoc.Y && point.X < renderLoc.X + CardClass.cardWidth && point.Y < renderLoc.Y + CardClass.cardHeight)
+                return true;
+            return false;
         }
 
 

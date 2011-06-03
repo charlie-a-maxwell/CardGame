@@ -355,7 +355,17 @@ namespace CardGame
             if (over)
                 return;
 
-            if (selectedCard == null)
+            if (currentTurn == PlayerTurn.Player1 && player1Deck.Intersect(pos))
+            {
+                player1Hand.AddCard(player1Deck.GetTopCard());
+                SwitchTurns();
+            }
+            else if (currentTurn == PlayerTurn.Player2 && player2Deck.Intersect(pos))
+            {
+                player2Hand.AddCard(player2Deck.GetTopCard());
+                SwitchTurns();
+            }
+            else if (selectedCard == null)
             {
                 ScreenCardSelect(pos);
             }
