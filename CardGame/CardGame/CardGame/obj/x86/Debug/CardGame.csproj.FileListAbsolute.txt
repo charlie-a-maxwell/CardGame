@@ -18,3 +18,7 @@ C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card5.xnb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Deck1.xml
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Deck2.xml
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DeckBack.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\CardGame.exe.manifest
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\CardGame.application
+C:\projects\CardGame\CardGame\CardGame\obj\x86\Debug\CardGame.exe.manifest
+C:\projects\CardGame\CardGame\CardGame\obj\x86\Debug\CardGame.application

@@ -306,6 +306,7 @@ namespace CardGame
 
                 if (mapLoc.X == 0 || mapLoc.X == map.GetLength(0) - 1)
                     return;
+                // Check for movement into the gates
                 if (mapLoc.Y == 0)
                 {
                     if (currentTurn == PlayerTurn.Player1 && mapLoc.X == 3)
@@ -316,7 +317,7 @@ namespace CardGame
 
                     return;
                 }
-
+                // Check for movement into the gates
                 if (mapLoc.Y == map.GetLength(1)-1)
                 {
                     if (currentTurn == PlayerTurn.Player2 && mapLoc.X == 3)
@@ -328,6 +329,7 @@ namespace CardGame
                     return;
                 }
 
+                // Check for the actual move.
                 if (transX >= 0 && transY >= 0 && transX < moveOption.GetLength(0) && transY < moveOption.GetLength(1) && moveOption[transY, transX] != 0 && PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX]))
                 {
                     SwitchTurns();
