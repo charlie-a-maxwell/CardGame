@@ -297,7 +297,7 @@ namespace CardGame
             // Handle card movement.
             else if (mapLoc.X >= 0 && mapLoc.Y >= 0 && mapLoc.X < map.GetLength(0) && mapLoc.Y < map.GetLength(1) && selectedCard != null && selectedCard.player == currentTurn)
             {
-                int[,] moveOption = selectedCard.GetCardType().GetMove();
+                int[,] moveOption = selectedCard.GetMove();
                 int transX = (int)(mapLoc.X - selectedCardLoc.X) + 2;
                 int transY = (int)(mapLoc.Y - selectedCardLoc.Y) + 2;
 

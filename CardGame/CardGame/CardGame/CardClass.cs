@@ -147,7 +147,7 @@ namespace CardGame
                 int height = 145;
                 int xMargin = 5;
                 int yMargin = 5;
-                int[,] cardMove = GetCardType().GetMove();
+                int[,] cardMove = GetMove();
 
                 float xSize = (width - xMargin * 2) / cardMove.GetLength(1);
                 float ySize = (height - CardClass.cardHeight - yMargin * 2) / cardMove.GetLength(0);
@@ -216,6 +216,28 @@ namespace CardGame
             if (point.X > loc.X && point.Y > loc.Y && point.X < loc.X + cardWidth && point.Y < loc.Y + cardHeight)
                 return true;
             return false;
+        }
+
+        public int[,] GetMove()
+        {
+            if (player == PlayerTurn.Player1)
+            {
+                return type.GetMove();
+            }
+            else
+            {
+                int[,] moves = new int [type.GetMove().GetLength(0), type.GetMove().GetLength(1)];
+
+                for (int i = 0; i < moves.GetLength(0); i++)
+                {
+                    for (int j = 0; j < moves.GetLength(1); j++)
+                    {
+                        moves[moves.GetLength(0) - i -1, j] = type.GetMove()[i, j];
+                    }
+                }
+
+                return moves;
+            }
         }
     }
 
