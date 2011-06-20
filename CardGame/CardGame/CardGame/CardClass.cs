@@ -10,6 +10,30 @@ using System.Xml.Serialization;
 
 namespace CardGame
 {
+    public class MoveLocation
+    {
+        public MoveLocation()
+        {
+            x = 0;
+            y = 0;
+            modifier = 0;
+        }
+        public MoveLocation(int mod)
+        {
+            x = 0;
+            y = 0;
+            modifier = mod;
+        }
+        public int x;
+        public int y;
+        public int modifier;
+
+        public override string ToString()
+        {
+            return modifier.ToString();
+        }
+    }
+
     public class CardType
     {
         
@@ -111,6 +135,37 @@ namespace CardGame
         public PlayerTurn player;
         Vector2 loc;
         Vector2 oldLoc;
+        private MoveLocation[,] _moves = null;
+        protected MoveLocation[,] moves
+        {
+            get
+            {
+                if (_moves == null)
+                {
+                    int[,] tempMoves;
+                    if (player == PlayerTurn.Player1)
+                    {
+                        tempMoves = type.GetMove();
+                    }
+                    else
+                    {
+                        tempMoves = new int[type.GetMove().GetLength(0), type.GetMove().GetLength(1)];
+
+                        for (int i = 0; i < tempMoves.GetLength(0); i++)
+                        {
+                            for (int j = 0; j < tempMoves.GetLength(1); j++)
+                            {
+                                tempMoves[tempMoves.GetLength(0) - i - 1, j] = type.GetMove()[i, j];
+                            }
+                        }
+                    }
+
+                    _moves = ParseIntMoves(tempMoves);
+                }
+
+                return _moves;
+            }
+        }
 
         public CardClass(CardType t)
         {
@@ -147,7 +202,7 @@ namespace CardGame
                 int height = 145;
                 int xMargin = 5;
                 int yMargin = 5;
-                int[,] cardMove = GetMove();
+                MoveLocation[,] cardMove = GetMove();
 
                 float xSize = (width - xMargin * 2) / cardMove.GetLength(1);
                 float ySize = (height - CardClass.cardHeight - yMargin * 2) / cardMove.GetLength(0);
@@ -167,7 +222,7 @@ namespace CardGame
                 {
                     for (int j = 0; j < cardMove.GetLength(1); j++)
                     {
-                        if (cardMove[i, j] != 0)
+                        if (cardMove[i, j] != null)
                         {
                             MapView.DrawLine(sb, new Vector2(xSize * j + offsetX, ySize * i + offsetY), new Vector2(xSize * j + offsetX, ySize * (i + 1) + offsetY), Color.Black);
                             MapView.DrawLine(sb, new Vector2(xSize * j + offsetX, ySize * i + offsetY), new Vector2(xSize * (j + 1) + offsetX, ySize * i + offsetY), Color.Black);
@@ -218,26 +273,27 @@ namespace CardGame
             return false;
         }
 
-        public int[,] GetMove()
+        public MoveLocation[,] GetMove()
         {
-            if (player == PlayerTurn.Player1)
-            {
-                return type.GetMove();
-            }
-            else
-            {
-                int[,] moves = new int [type.GetMove().GetLength(0), type.GetMove().GetLength(1)];
+            return moves;
+        }
 
-                for (int i = 0; i < moves.GetLength(0); i++)
+        private MoveLocation[,] ParseIntMoves(int[,] m)
+        {
+            MoveLocation[,] temp = new MoveLocation[m.GetLength(0), m.GetLength(1)];
+            for (int i = 0; i < temp.GetLength(0); i++)
+            {
+                for (int j = 0; j < temp.GetLength(1); j++)
                 {
-                    for (int j = 0; j < moves.GetLength(1); j++)
+                    if (m[i, j] == 0)
+                        temp[i, j] = null;
+                    else
                     {
-                        moves[moves.GetLength(0) - i -1, j] = type.GetMove()[i, j];
+                        temp[i, j] = new MoveLocation(m[i, j]);
                     }
                 }
-
-                return moves;
             }
+            return temp;
         }
     }
 

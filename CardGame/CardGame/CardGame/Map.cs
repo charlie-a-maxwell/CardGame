@@ -297,7 +297,7 @@ namespace CardGame
             // Handle card movement.
             else if (mapLoc.X >= 0 && mapLoc.Y >= 0 && mapLoc.X < map.GetLength(0) && mapLoc.Y < map.GetLength(1) && selectedCard != null && selectedCard.player == currentTurn)
             {
-                int[,] moveOption = selectedCard.GetMove();
+                MoveLocation[,] moveOption = selectedCard.GetMove();
                 int transX = (int)(mapLoc.X - selectedCardLoc.X) + 2;
                 int transY = (int)(mapLoc.Y - selectedCardLoc.Y) + 2;
 
@@ -311,7 +311,7 @@ namespace CardGame
                 {
                     if (currentTurn == PlayerTurn.Player1 && mapLoc.X == 3)
                     {
-                        PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX]);
+                        PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX].modifier);
                         SwitchTurns();
                     }
 
@@ -322,7 +322,7 @@ namespace CardGame
                 {
                     if (currentTurn == PlayerTurn.Player2 && mapLoc.X == 3)
                     {
-                        PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX]);
+                        PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX].modifier);
                         SwitchTurns();
                     }
 
@@ -330,7 +330,7 @@ namespace CardGame
                 }
 
                 // Check for the actual move.
-                if (transX >= 0 && transY >= 0 && transX < moveOption.GetLength(0) && transY < moveOption.GetLength(1) && moveOption[transY, transX] != 0 && PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX]))
+                if (transX >= 0 && transY >= 0 && transX < moveOption.GetLength(0) && transY < moveOption.GetLength(1) && moveOption[transY, transX] != null && PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX].modifier))
                 {
                     SwitchTurns();
                 }
