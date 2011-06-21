@@ -289,7 +289,38 @@ namespace CardGame
                         temp[i, j] = null;
                     else
                     {
+                        int tempX = -1;
+                        int tempY = -1;
+                        int locX = 0;
+                        int locY = 0;
+                        int dist = int.MaxValue;
+                        int tempDist = 0;
+                        int midX = temp.GetLength(0) / 2;
+                        int midY = temp.GetLength(1) / 2;
+
+
                         temp[i, j] = new MoveLocation(m[i, j]);
+                        for (int k = 0; k < 9; k++)
+                        {
+                            locX = (k % 3) - 1;
+                            locY = (int)(k / 3) - 1;
+                            if ((locX + i >= 0 && locX + i < temp.GetLength(0)) && (locY + j >= 0 && locY + j < temp.GetLength(1)) && (m[locX + i, locY + j] != 0))
+                            {
+                                tempDist = (((locX + i) - midX) * ((locX + i) - midX)) + (((locY + j) - midY) * ((locY + j) -midY));
+                                if (tempDist < dist)
+                                {
+                                    tempX = locX + i;
+                                    tempY = locY + j;
+                                    dist = tempDist;
+                                }
+                            }
+                        }
+
+                        if (tempX != -1 && tempY != -1)
+                        {
+                            temp[i, j].x = tempX;
+                            temp[i, j].y = tempY;
+                        }
                     }
                 }
             }

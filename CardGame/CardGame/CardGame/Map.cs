@@ -330,8 +330,9 @@ namespace CardGame
                 }
 
                 // Check for the actual move.
-                if (transX >= 0 && transY >= 0 && transX < moveOption.GetLength(0) && transY < moveOption.GetLength(1) && moveOption[transY, transX] != null && PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX].modifier))
+                if (transX >= 0 && transY >= 0 && transX < moveOption.GetLength(0) && transY < moveOption.GetLength(1) && moveOption[transY, transX] != null)
                 {
+                    RecursiveCardMovement(moveOption[transY, transX], moveOption, transY, transX);
                     SwitchTurns();
                 }
                 else
@@ -343,6 +344,20 @@ namespace CardGame
             {
                 ResetSelectedCard();
             }
+        }
+
+        private bool RecursiveCardMovement(MoveLocation currentLoc, MoveLocation[,] map, int transX, int transY)
+        {
+            if (transX == 2 && transY == 2)
+                return true;
+
+            if (currentLoc.x >= 0 && currentLoc.y >= 0 && !(currentLoc.x == 2 && currentLoc.y == 2))
+            {
+                if (!RecursiveCardMovement(map[currentLoc.x, currentLoc.y], map, currentLoc.x, currentLoc.y))
+                    return false;
+            }
+            //PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX].modifier)
+            return PlaceCard(selectedCard, (int)selectedCardLoc.X + transX - 2, (int)selectedCardLoc.Y + transY - 2, currentLoc.modifier);
         }
 
         private void ResetSelectedCard()
