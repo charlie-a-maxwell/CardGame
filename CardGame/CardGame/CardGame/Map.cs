@@ -26,6 +26,7 @@ namespace CardGame
         PlayerTurn currentTurn;
         PlayerTurn winner;
         bool over = false;
+        int deploy = (2 * 3);
 
         public MapView()
         {
@@ -69,8 +70,13 @@ namespace CardGame
 
         public static void DrawText(SpriteBatch sb, string s, Vector2 loc)
         {
+            DrawText(sb, s, loc, Color.Black, 1.0f);
+        }
+            
+        public static void DrawText(SpriteBatch sb, string s, Vector2 loc, Color c, float scale)
+        {
             Vector2 fontOrigin = font.MeasureString(s);
-            sb.DrawString(font, s, loc + fontOrigin, Color.Black, 0, fontOrigin, 1.0f, SpriteEffects.None, 0.5f);
+            sb.DrawString(font, s, loc + fontOrigin, c, 0, fontOrigin, scale, SpriteEffects.None, 0.5f);
         }
 
         public static void FillColor(SpriteBatch sb,int originX, int originY, int width, int height, Color color)
@@ -130,7 +136,7 @@ namespace CardGame
             }
 
             if (selectedCard != null)
-                selectedCard.Render(sb, true);
+                selectedCard.Render(sb, true);               
 
             DrawOutline(sb);
             if (over && winner == PlayerTurn.Player1)
@@ -156,6 +162,11 @@ namespace CardGame
                 DrawText(sb, "Player 2 Turn", new Vector2(center.X + maxCardWidth / 2, 10));
             }
 
+            if (deploy > 0)
+            {
+                DrawText(sb, "DEPLOYMENT PHASE", new Vector2(center.X + maxCardWidth / 2, center.Y - 25), Color.Red, 1.5f);
+            }
+
             player1Deck.Render(sb);
             player2Deck.Render(sb);
         }
@@ -174,9 +185,10 @@ namespace CardGame
                     card.LoadTexture(cm);
 
                 CardClass replacedCard = map[y, x];
+                CardClass winner = card;
                 if (replacedCard != null && replacedCard.player != card.player)
                     // Check to see which one wins in this battle.
-                    card = replacedCard.GetCardType().GetStat() <= card.GetCardType().GetStat() + modifier ? card : replacedCard;
+                    winner = replacedCard.GetCardType().GetStat() <= card.GetCardType().GetStat() + modifier ? card : replacedCard;
                 else if (replacedCard != null)
                     // tried to move onto own card.
                     return false;
@@ -184,17 +196,18 @@ namespace CardGame
                 // Cards can't move into their old position.
                 if ((int)oldLoc.X == x && (int)oldLoc.Y == y)
                     return false;
-                map[y, x] = card;
-                if (selectedCardLoc.Y >= 0 && selectedCardLoc.X >= 0)
-                    map[(int)selectedCardLoc.Y, (int)selectedCardLoc.X] = null;
-                card.SetLocation(center + new Vector2(x * CardClass.cardWidth, y * CardClass.cardHeight));
+                map[y, x] = winner;
+                Vector2 clear = ConvertScreenCoordToMap(card.GetLoc());
+                if (clear.Y >= 0 && clear.X >= 0)
+                    map[(int)clear.Y, (int)clear.X] = null;
+                winner.SetLocation(center + new Vector2(x * CardClass.cardWidth, y * CardClass.cardHeight));
 
                 if (card.player == PlayerTurn.Player1)
                     player1Hand.RemoveCard(card);
                 else if (card.player == PlayerTurn.Player2)
                     player2Hand.RemoveCard(card);
 
-                return true;
+                return (winner == card);
             }
 
             return false;
@@ -242,6 +255,15 @@ namespace CardGame
         private void SwitchTurns()
         {
             CheckWin();
+            if (currentTurn == PlayerTurn.Player1 && player1Hand.Count < 3)
+                player1Hand.AddCard(player1Deck.GetTopCard());
+
+            if (currentTurn == PlayerTurn.Player2 && player2Hand.Count < 3)
+                player2Hand.AddCard(player2Deck.GetTopCard());
+
+            if (deploy > 0)
+                deploy--;
+
             currentTurn = (currentTurn == PlayerTurn.Player1 ? PlayerTurn.Player2 : PlayerTurn.Player1);
             ResetSelectedCard();
         }
@@ -281,11 +303,11 @@ namespace CardGame
             if (selectedCard != null && selectedCardLoc.X == -1 && selectedCardLoc.Y == -1)
             { 
                 // placing a new card.
-                if (currentTurn == PlayerTurn.Player1 && mapLoc.Y == map.GetLength(0) - 2 && PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y))
+                if (currentTurn == PlayerTurn.Player1 && mapLoc.Y == map.GetLength(1) - 2 && mapLoc.X > 0 && mapLoc.X < map.GetLength(0)-1 && PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y))
                 {
                     SwitchTurns();
                 }
-                else if (currentTurn == PlayerTurn.Player2 && mapLoc.Y == 1 && PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y))
+                else if (currentTurn == PlayerTurn.Player2 && mapLoc.Y == 1 && mapLoc.X > 0 && mapLoc.X < map.GetLength(0)-1 && PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y))
                 {
                     SwitchTurns();
                 }
@@ -295,7 +317,7 @@ namespace CardGame
                 }
             }
             // Handle card movement.
-            else if (mapLoc.X >= 0 && mapLoc.Y >= 0 && mapLoc.X < map.GetLength(0) && mapLoc.Y < map.GetLength(1) && selectedCard != null && selectedCard.player == currentTurn)
+            else if (deploy == 0 && mapLoc.X >= 0 && mapLoc.Y >= 0 && mapLoc.X < map.GetLength(0) && mapLoc.Y < map.GetLength(1) && selectedCard != null && selectedCard.player == currentTurn)
             {
                 MoveLocation[,] moveOption = selectedCard.GetMove();
                 int transX = (int)(mapLoc.X - selectedCardLoc.X) + 2;
@@ -332,7 +354,7 @@ namespace CardGame
                 // Check for the actual move.
                 if (transX >= 0 && transY >= 0 && transX < moveOption.GetLength(0) && transY < moveOption.GetLength(1) && moveOption[transY, transX] != null)
                 {
-                    RecursiveCardMovement(moveOption[transY, transX], moveOption, transY, transX);
+                    RecursiveCardMovement(moveOption[transY, transX], moveOption, transX, transY);
                     SwitchTurns();
                 }
                 else
@@ -353,7 +375,7 @@ namespace CardGame
 
             if (currentLoc.x >= 0 && currentLoc.y >= 0 && !(currentLoc.x == 2 && currentLoc.y == 2))
             {
-                if (!RecursiveCardMovement(map[currentLoc.x, currentLoc.y], map, currentLoc.x, currentLoc.y))
+                if (!RecursiveCardMovement(map[currentLoc.x, currentLoc.y], map, currentLoc.y, currentLoc.x))
                     return false;
             }
             //PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX].modifier)
@@ -372,17 +394,19 @@ namespace CardGame
             if (over)
                 return;
 
-            if (currentTurn == PlayerTurn.Player1 && player1Deck.Intersect(pos))
-            {
-                player1Hand.AddCard(player1Deck.GetTopCard());
-                SwitchTurns();
-            }
-            else if (currentTurn == PlayerTurn.Player2 && player2Deck.Intersect(pos))
-            {
-                player2Hand.AddCard(player2Deck.GetTopCard());
-                SwitchTurns();
-            }
-            else if (selectedCard == null)
+            //if (currentTurn == PlayerTurn.Player1 && player1Deck.Intersect(pos))
+            //{
+            //    player1Hand.AddCard(player1Deck.GetTopCard());
+            //    SwitchTurns();
+            //}
+            //else if (currentTurn == PlayerTurn.Player2 && player2Deck.Intersect(pos))
+            //{
+            //    player2Hand.AddCard(player2Deck.GetTopCard());
+            //    SwitchTurns();
+            //}
+            //else 
+                
+            if (selectedCard == null)
             {
                 ScreenCardSelect(pos);
             }

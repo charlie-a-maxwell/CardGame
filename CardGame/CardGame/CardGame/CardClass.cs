@@ -266,6 +266,11 @@ namespace CardGame
             return oldLoc;
         }
 
+        public Vector2 GetLoc()
+        {
+            return loc;
+        }
+
         public bool Intersect(Vector2 point)
         {
             if (point.X > loc.X && point.Y > loc.Y && point.X < loc.X + cardWidth && point.Y < loc.Y + cardHeight)
@@ -348,7 +353,7 @@ namespace CardGame
 
         public bool AddCard(CardClass card)
         {
-            if (card.player == owner)
+            if (card != null && card.player == owner)
             {
                 Vector2 offset = new Vector2(CardClass.cardWidth, 0);
                 card.SetLocation(renderLoc + offset*hand.Count);
