@@ -131,7 +131,7 @@ namespace CardGame
         CardType type;
 
         public const int cardWidth = 50;
-        public const int cardHeight = 50;
+        public const int cardHeight = 75;
         public PlayerTurn player;
         Vector2 loc;
         Vector2 oldLoc;
@@ -185,10 +185,15 @@ namespace CardGame
 
         public void Render(SpriteBatch sb)
         {
-            Render(sb, false);
+            Render(sb, false, 0);
         }
 
         public void Render(SpriteBatch sb, bool selected)
+        {
+            Render(sb, selected, 0);
+        }
+
+        public void Render(SpriteBatch sb, bool selected, int space)
         {
             if (type.texture != null)
                 sb.Draw(type.texture, new Rectangle((int)loc.X, (int)loc.Y, cardWidth, cardHeight), (player == PlayerTurn.Player1 ? Color.Red : Color.LightBlue));
@@ -217,6 +222,9 @@ namespace CardGame
                 MapView.DrawLine(sb, new Vector2(originX, originY + height), new Vector2(originX + width, originY + height), Color.Black);
 
                 //selectedCard.Render(sb, new Vector2(originX + (width - CardClass.cardWidth) / 2, originY + yMargin));
+                Vector2 origin = new Vector2();
+                Vector2 hor = new Vector2(CardClass.cardWidth, 0);
+                Vector2 ver = new Vector2(0, CardClass.cardHeight);
 
                 for (int i = 0; i < cardMove.GetLength(0); i++)
                 {
@@ -224,16 +232,17 @@ namespace CardGame
                     {
                         if (cardMove[i, j] != null)
                         {
+                            origin = new Vector2((int)loc.X + (cardWidth + space) * (j - 2), (int)loc.Y + (cardHeight + space) * (i - 2));
                             MapView.DrawLine(sb, new Vector2(xSize * j + offsetX, ySize * i + offsetY), new Vector2(xSize * j + offsetX, ySize * (i + 1) + offsetY), Color.Black);
                             MapView.DrawLine(sb, new Vector2(xSize * j + offsetX, ySize * i + offsetY), new Vector2(xSize * (j + 1) + offsetX, ySize * i + offsetY), Color.Black);
                             MapView.DrawLine(sb, new Vector2(xSize * (j + 1) + offsetX, ySize * i + offsetY), new Vector2(xSize * (j + 1) + offsetX, ySize * (i + 1) + offsetY), Color.Black);
                             MapView.DrawLine(sb, new Vector2(xSize * j + offsetX, ySize * (i + 1) + offsetY), new Vector2(xSize * (j + 1) + offsetX, ySize * (i + 1) + offsetY), Color.Black);
                             MapView.DrawText(sb, cardMove[i, j].ToString(), new Vector2(xSize * j + offsetX, ySize * i + offsetY));
 
-                            MapView.DrawLine(sb, new Vector2((int)loc.X + cardWidth * (j - 2), (int)loc.Y + cardHeight * (i - 2)), new Vector2((int)loc.X + cardWidth * (j - 2), (int)loc.Y + cardHeight * (i - 1)), Color.Orange);
-                            MapView.DrawLine(sb, new Vector2((int)loc.X + cardWidth * (j - 2), (int)loc.Y + cardHeight * (i - 2)), new Vector2((int)loc.X + cardWidth * (j - 1), (int)loc.Y + cardHeight * (i - 2)), Color.Orange);
-                            MapView.DrawLine(sb, new Vector2((int)loc.X + cardWidth * (j - 1), (int)loc.Y + cardHeight * (i - 2)), new Vector2((int)loc.X + cardWidth * (j - 1), (int)loc.Y + cardHeight * (i - 1)), Color.Orange);
-                            MapView.DrawLine(sb, new Vector2((int)loc.X + cardWidth * (j - 2), (int)loc.Y + cardHeight * (i - 1)), new Vector2((int)loc.X + cardWidth * (j - 1), (int)loc.Y + cardHeight * (i - 1)), Color.Orange);
+                            MapView.DrawLine(sb, origin, origin + hor, Color.Orange);
+                            MapView.DrawLine(sb, origin, origin + ver, Color.Orange);
+                            MapView.DrawLine(sb, origin + ver, origin + ver + hor, Color.Orange);
+                            MapView.DrawLine(sb, origin + hor, origin + hor + ver, Color.Orange);
 
                             if (type.texture != null)
                                 sb.Draw(type.texture, new Rectangle(originX + (width - CardClass.cardWidth) / 2, originX + (width - CardClass.cardWidth) / 2, cardWidth, cardHeight), (player == PlayerTurn.Player1 ? Color.Red : Color.LightBlue));

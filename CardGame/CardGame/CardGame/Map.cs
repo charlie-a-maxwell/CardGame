@@ -27,6 +27,7 @@ namespace CardGame
         PlayerTurn winner;
         bool over = false;
         int deploy = (2 * 3);
+        public static int spacing = 5;
 
         public MapView()
         {
@@ -62,10 +63,15 @@ namespace CardGame
 
         public static void DrawLine(SpriteBatch sb, Vector2 p1, Vector2 p2, Color c)
         {
+            DrawLine(sb, p1, p2, c, 2.0f);
+        }
+
+        public static void DrawLine(SpriteBatch sb, Vector2 p1, Vector2 p2, Color c, float width)
+        {
             float angle = (float)Math.Atan2(p2.Y - p1.Y, p2.X - p1.X);
             float length = Vector2.Distance(p1, p2);
 
-            sb.Draw(lineTex, p1, null, c, angle, Vector2.Zero, new Vector2(length, 2), SpriteEffects.None, 0.9f);
+            sb.Draw(lineTex, p1, null, c, angle, Vector2.Zero, new Vector2(length, width), SpriteEffects.None, 0.9f);
         }
 
         public static void DrawText(SpriteBatch sb, string s, Vector2 loc)
@@ -111,21 +117,30 @@ namespace CardGame
         {
             int maxCardWidth = CardClass.cardWidth * (map.GetLength(1)-2);
             int maxCardHeight = CardClass.cardHeight * (map.GetLength(0)-2);
+            Vector2 hor = new Vector2(CardClass.cardWidth, 0);
+            Vector2 ver = new Vector2(0, CardClass.cardHeight);
 
             Vector2 origin;
             for (int i = 0; i < map.GetLength(0); i++)
             {
                 for (int j = 0; j < map.GetLength(1); j++)
-                {
-                    DrawLine(sb, new Vector2(center.X + CardClass.cardWidth, CardClass.cardHeight * (i + 1) + center.Y), new Vector2(maxCardWidth + center.X + CardClass.cardWidth, CardClass.cardHeight * (i + 1) + center.Y), Color.Black);
-                    DrawLine(sb, new Vector2(CardClass.cardWidth * (j + 1) + center.X, center.Y + CardClass.cardHeight), new Vector2(CardClass.cardWidth * (j + 1) + center.X, maxCardHeight + center.Y + CardClass.cardHeight), Color.Black);
-                    
-                    origin = new Vector2(j*CardClass.cardWidth + center.X, i*CardClass.cardHeight + center.Y);
-                    if (i == 0 || j == 0 || i == map.GetLength(0) - 1 || j == map.GetLength(1) - 1)
-                        sb.Draw(WallTex, new Rectangle((int)origin.X, (int)origin.Y, CardClass.cardWidth, CardClass.cardHeight), Color.White);
-                    else 
+                {                    
+                    origin = new Vector2(j*(CardClass.cardWidth + spacing) + center.X, i*(CardClass.cardHeight + spacing) + center.Y);
+                    if (!(i == 0 || j == 0 || i == map.GetLength(0) - 1 || j == map.GetLength(1) - 1))
+                    {
+                        DrawLine(sb, origin, origin + hor, Color.Black, 0.8f);
+                        DrawLine(sb, origin, origin + ver, Color.Black, 0.8f);
+
+                        DrawLine(sb, origin + ver, origin + ver + hor, Color.Black, 0.8f);
+                        DrawLine(sb, origin + hor, origin + hor + ver, Color.Black, 0.8f);
+
+                    }
+
+
                     if (map[i, j] != null)
-                        map[i,j].Render(sb, false);
+                    {
+                        map[i, j].Render(sb, false, spacing);
+                    }
 
                     if (i == 0 && j == 3)
                         sb.Draw(Door2Tex, new Rectangle((int)origin.X, (int)origin.Y, CardClass.cardWidth, CardClass.cardHeight), Color.White);
@@ -135,10 +150,10 @@ namespace CardGame
                 }
             }
 
-            if (selectedCard != null)
-                selectedCard.Render(sb, true);               
+            if (selectedCard != null )
+                selectedCard.Render(sb, true, spacing);
 
-            DrawOutline(sb);
+            //DrawOutline(sb);
             if (over && winner == PlayerTurn.Player1)
             {
                 player1Hand.Render(sb, selectedCard);
@@ -200,7 +215,7 @@ namespace CardGame
                 Vector2 clear = ConvertScreenCoordToMap(card.GetLoc());
                 if (clear.Y >= 0 && clear.X >= 0)
                     map[(int)clear.Y, (int)clear.X] = null;
-                winner.SetLocation(center + new Vector2(x * CardClass.cardWidth, y * CardClass.cardHeight));
+                winner.SetLocation(center + new Vector2(x * (CardClass.cardWidth + spacing), y * (CardClass.cardHeight + spacing)));
 
                 if (card.player == PlayerTurn.Player1)
                     player1Hand.RemoveCard(card);
@@ -217,13 +232,13 @@ namespace CardGame
         {
             Vector2 mapLoc = new Vector2(-1, -1);
 
-            float maxMapX = center.X + CardClass.cardWidth * map.GetLength(1);
-            float maxMapY = center.Y + CardClass.cardHeight * map.GetLength(0);
+            float maxMapX = center.X + (CardClass.cardWidth + spacing) * map.GetLength(1);
+            float maxMapY = center.Y + (CardClass.cardHeight + spacing) * map.GetLength(0);
 
             if (pos.X > center.X && pos.X < maxMapX && pos.Y > center.Y && pos.Y < maxMapY)
             {
-                mapLoc.X = (int)((pos.X - center.X) / CardClass.cardWidth);
-                mapLoc.Y = (int)((pos.Y - center.Y) / CardClass.cardHeight);
+                mapLoc.X = (int)((pos.X - center.X) / (CardClass.cardWidth + spacing));
+                mapLoc.Y = (int)((pos.Y - center.Y) / (CardClass.cardHeight + spacing));
             }
 
             return mapLoc;
