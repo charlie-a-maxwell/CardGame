@@ -365,7 +365,10 @@ namespace CardGame
             if (card != null && card.player == owner)
             {
                 Vector2 offset = new Vector2(CardClass.cardWidth, 0);
-                card.SetLocation(renderLoc + offset*hand.Count);
+                if (owner == PlayerTurn.Player1)
+                    card.SetLocation(renderLoc + offset*hand.Count);
+                else
+                    card.SetLocation(renderLoc - offset * hand.Count);
                 hand.Add(card);
                 return true;
             }
@@ -394,7 +397,10 @@ namespace CardGame
                 }
                 else if (found)
                 {
-                    cc.SetLocation(renderLoc + offset * count);
+                    if (owner == PlayerTurn.Player1)
+                        cc.SetLocation(renderLoc + offset * count);
+                    else
+                        cc.SetLocation(renderLoc - offset * count);
                 }
                 count++;
             }
@@ -442,7 +448,7 @@ namespace CardGame
             for (int i = 0; i < hand.Count; i++ )
             {
                 card = hand[i];
-                card.Render(sb, card == selectedCard);
+                card.Render(sb, false);
             }
         }
     }

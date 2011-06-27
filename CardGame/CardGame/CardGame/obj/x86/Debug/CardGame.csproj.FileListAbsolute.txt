@@ -46,3 +46,4 @@ C:\gitproject\CardGame\CardGame\CardGame\obj\x86\Debug\ResolveAssemblyReference.
 C:\gitproject\CardGame\CardGame\CardGame\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
 C:\gitproject\CardGame\CardGame\CardGame\obj\x86\Debug\CardGame.exe.manifest
 C:\gitproject\CardGame\CardGame\CardGame\obj\x86\Debug\CardGame.application
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\MapBack.xnb

@@ -15,6 +15,7 @@ namespace CardGame
         Texture2D WallTex;
         Texture2D Door1Tex;
         Texture2D Door2Tex;
+        Texture2D MapBackground;
         Vector2 center = new Vector2(0,0);
         Vector2 selectedCardLoc;
         CardClass selectedCard;
@@ -52,6 +53,7 @@ namespace CardGame
             WallTex = c.Load<Texture2D>("Wall");
             Door1Tex = c.Load<Texture2D>("DoorPlayer1");
             Door2Tex = c.Load<Texture2D>("DoorPlayer2");
+            MapBackground = c.Load<Texture2D>("Mapback");
         }
 
         public void SetGraphics(GraphicsDevice gd)
@@ -93,11 +95,11 @@ namespace CardGame
         public void SetCenter(Vector2 cent)
         {
             center = cent;
-            player1Hand.SetRenderLoc(new Vector2(center.X + 30, center.Y + CardClass.cardHeight * map.GetLength(0) + 30));
-            player2Hand.SetRenderLoc(new Vector2(center.X + 30, 40));
+            player1Hand.SetRenderLoc(new Vector2(center.X - (map.GetLength(1) * CardClass.cardWidth) / 2.0f - 40, center.Y + (map.GetLength(0)*CardClass.cardHeight) - CardClass.cardHeight));
+            player2Hand.SetRenderLoc(new Vector2(center.X + (map.GetLength(1) * CardClass.cardWidth) - 20 + CardClass.cardWidth * 4, center.Y ));
 
-            player1Deck.SetLoc(new Vector2(center.X + CardClass.cardWidth * map.GetLength(1) + 30, center.Y + CardClass.cardHeight * map.GetLength(0) + 30));
-            player2Deck.SetLoc(new Vector2(center.X + CardClass.cardWidth * map.GetLength(1) + 30, 40));
+            player1Deck.SetLoc(new Vector2(center.X - (map.GetLength(1) * CardClass.cardWidth) / 2.0f, center.Y + (map.GetLength(0) * CardClass.cardHeight) - CardClass.cardHeight * 2));
+            player2Deck.SetLoc(new Vector2(center.X + (map.GetLength(1) * CardClass.cardWidth) - 20, center.Y));
         }
 
         public void DrawOutline(SpriteBatch sb)
@@ -113,14 +115,19 @@ namespace CardGame
 
         }
 
-        public void RenderMap(SpriteBatch sb)
+        public void RenderMap(SpriteBatch sb, GraphicsDevice device)
         {
             int maxCardWidth = CardClass.cardWidth * (map.GetLength(1)-2);
             int maxCardHeight = CardClass.cardHeight * (map.GetLength(0)-2);
             Vector2 hor = new Vector2(CardClass.cardWidth, 0);
             Vector2 ver = new Vector2(0, CardClass.cardHeight);
+            Color outlineColor = Color.Black;
 
             Vector2 origin;
+
+            if (MapBackground != null)
+                sb.Draw(MapBackground, new Rectangle((int)center.X, (int)center.Y, map.GetLength(0) * (CardClass.cardWidth + spacing), map.GetLength(1) * (CardClass.cardHeight + spacing)), Color.White);
+
             for (int i = 0; i < map.GetLength(0); i++)
             {
                 for (int j = 0; j < map.GetLength(1); j++)
@@ -128,11 +135,18 @@ namespace CardGame
                     origin = new Vector2(j*(CardClass.cardWidth + spacing) + center.X, i*(CardClass.cardHeight + spacing) + center.Y);
                     if (!(i == 0 || j == 0 || i == map.GetLength(0) - 1 || j == map.GetLength(1) - 1))
                     {
-                        DrawLine(sb, origin, origin + hor, Color.Black, 0.8f);
-                        DrawLine(sb, origin, origin + ver, Color.Black, 0.8f);
+                        if (i == map.GetLength(0) - 2)
+                            outlineColor = Color.Red;
+                        else if (i == 1)
+                            outlineColor = Color.Blue;
+                        else
+                            outlineColor = Color.Black;
 
-                        DrawLine(sb, origin + ver, origin + ver + hor, Color.Black, 0.8f);
-                        DrawLine(sb, origin + hor, origin + hor + ver, Color.Black, 0.8f);
+                        DrawLine(sb, origin, origin + hor, outlineColor, 0.8f);
+                        DrawLine(sb, origin, origin + ver, outlineColor, 0.8f);
+
+                        DrawLine(sb, origin + ver, origin + ver + hor, outlineColor, 0.8f);
+                        DrawLine(sb, origin + hor, origin + hor + ver, outlineColor, 0.8f);
 
                     }
 
@@ -150,40 +164,50 @@ namespace CardGame
                 }
             }
 
-            if (selectedCard != null )
-                selectedCard.Render(sb, true, spacing);
-
+            string text = "";
+            Color textColor = Color.Black;
             //DrawOutline(sb);
-            if (over && winner == PlayerTurn.Player1)
+            if (over)
             {
                 player1Hand.Render(sb, selectedCard);
                 player2Hand.Render(sb, selectedCard);
-                DrawText(sb, "Player 1 Wins!", new Vector2(center.X + maxCardWidth / 2, 10));
+                text = (winner == PlayerTurn.Player1 ? "Player 1" : "Player 2");
             }
-            else if (over && winner == PlayerTurn.Player2)
-            {
-                player1Hand.Render(sb, selectedCard);
-                player2Hand.Render(sb, selectedCard);
-                DrawText(sb, "Player 2 Wins!", new Vector2(center.X + maxCardWidth / 2, 10));
-            } 
             else if (currentTurn == PlayerTurn.Player1)
             {
                 player1Hand.Render(sb, selectedCard);
-                DrawText(sb, "Player 1 Turn", new Vector2(center.X + maxCardWidth / 2, 10));
+                text = "Player 1";
             }
             else
             {
                 player2Hand.Render(sb, selectedCard);
-                DrawText(sb, "Player 2 Turn", new Vector2(center.X + maxCardWidth / 2, 10));
+                text = "Player 2";
             }
 
-            if (deploy > 0)
+            if (over)
             {
-                DrawText(sb, "DEPLOYMENT PHASE", new Vector2(center.X + maxCardWidth / 2, center.Y - 25), Color.Red, 1.5f);
+                text += " wins!";
             }
+            else if (deploy > 0)
+            {
+                text += " deployment phase";
+                textColor = Color.Red;
+            }
+            else
+            {
+                text += " turn";
+            }
+
+            if (text.Length > 0)
+                DrawText(sb, text, new Vector2(center.X + maxCardWidth / 2, 10), textColor, 1.0f);
+
 
             player1Deck.Render(sb);
             player2Deck.Render(sb);
+
+            if (selectedCard != null)
+                selectedCard.Render(sb, true, spacing);
+
         }
 
         public bool PlaceCard(CardClass card, int x, int y)
@@ -437,10 +461,12 @@ namespace CardGame
             {
                 case PlayerTurn.Player1:
                     player1Deck = d;
+                    player1Deck.SetLoc(new Vector2(center.X - (map.GetLength(1) * CardClass.cardWidth) / 2.0f - 40, center.Y + (map.GetLength(0) * CardClass.cardHeight) - CardClass.cardHeight * 2 - 40));
                     break;
 
                 case PlayerTurn.Player2:
                     player2Deck = d;
+                    player2Deck.SetLoc(new Vector2(center.X + (map.GetLength(1) * CardClass.cardWidth) + CardClass.cardWidth * 4 - 30, center.Y + CardClass.cardHeight + 40));
                     break;
             }
         }
@@ -461,8 +487,8 @@ namespace CardGame
                 player2Hand.AddCard(player2Deck.GetTopCard());
             }
 
-            player1Deck.SetLoc(new Vector2(center.X + CardClass.cardWidth * map.GetLength(1) + 30, center.Y + CardClass.cardHeight * map.GetLength(0) + 30));
-            player2Deck.SetLoc(new Vector2(center.X + CardClass.cardWidth * map.GetLength(1) + 30, 40));
+            //player1Deck.SetLoc(new Vector2(center.X + CardClass.cardWidth * map.GetLength(1) + 30, center.Y + CardClass.cardHeight * map.GetLength(0) + 30));
+            //player2Deck.SetLoc(new Vector2(center.X + CardClass.cardWidth * map.GetLength(1) + 30, 40));
 
         }
     }

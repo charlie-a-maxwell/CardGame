@@ -180,7 +180,7 @@ namespace CardGame
             // TODO: Add your drawing code here
 
             spriteBatch.Begin();
-            map.RenderMap(spriteBatch);
+            map.RenderMap(spriteBatch, GraphicsDevice);
 
             mouseHandler.Render(spriteBatch);
             spriteBatch.End();
