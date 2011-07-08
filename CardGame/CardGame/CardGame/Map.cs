@@ -13,8 +13,8 @@ namespace CardGame
         ContentManager cm = null;
         static Texture2D lineTex;
         Texture2D WallTex;
-        Texture2D Door1Tex;
-        Texture2D Door2Tex;
+        Texture2D FireTex;
+        Texture2D CloudTex;
         Texture2D MapBackground;
         Vector2 center = new Vector2(0,0);
         Vector2 selectedCardLoc;
@@ -51,9 +51,9 @@ namespace CardGame
             cm = c;
             font = c.Load<SpriteFont>("CourierNew");
             WallTex = c.Load<Texture2D>("Wall");
-            Door1Tex = c.Load<Texture2D>("DoorPlayer1");
-            Door2Tex = c.Load<Texture2D>("DoorPlayer2");
-            MapBackground = c.Load<Texture2D>("Mapback");
+            FireTex = c.Load<Texture2D>("Fire");
+            CloudTex = c.Load<Texture2D>("Cloud");
+            MapBackground = c.Load<Texture2D>("MapBack");
         }
 
         public void SetGraphics(GraphicsDevice gd)
@@ -84,7 +84,7 @@ namespace CardGame
         public static void DrawText(SpriteBatch sb, string s, Vector2 loc, Color c, float scale)
         {
             Vector2 fontOrigin = font.MeasureString(s);
-            sb.DrawString(font, s, loc + fontOrigin, c, 0, fontOrigin, scale, SpriteEffects.None, 0.5f);
+            sb.DrawString(font, s, loc + fontOrigin /2, c, 0, fontOrigin / 2, scale, SpriteEffects.None,0.0f);
         }
 
         public static void FillColor(SpriteBatch sb,int originX, int originY, int width, int height, Color color)
@@ -128,6 +128,23 @@ namespace CardGame
             if (MapBackground != null)
                 sb.Draw(MapBackground, new Rectangle((int)center.X, (int)center.Y, map.GetLength(0) * (CardClass.cardWidth + spacing), map.GetLength(1) * (CardClass.cardHeight + spacing)), Color.White);
 
+            if (CloudTex != null)
+            {
+                origin = new Vector2((map.GetLength(0) - 3) * (CardClass.cardWidth + spacing) + center.X, (map.GetLength(1)-1) * (CardClass.cardHeight + spacing) + center.Y);
+                sb.Draw(CloudTex, origin, null, Color.White, 0f, new Vector2(0,0), 0.4f, SpriteEffects.None, 0);
+                origin = new Vector2(center.X, (map.GetLength(1) - 1) * (CardClass.cardHeight + spacing) + center.Y);
+                sb.Draw(CloudTex, origin, null, Color.White, 0f, new Vector2(0, 0), 0.4f, SpriteEffects.FlipHorizontally, 0);
+            }
+
+            if (FireTex != null)
+            {
+                origin = new Vector2((map.GetLength(0) - 3) * (CardClass.cardWidth + spacing) + 30 + center.X, center.Y  + spacing);
+                sb.Draw(FireTex, origin, null, Color.White, 0f, new Vector2(0, 0), 0.4f, SpriteEffects.FlipVertically, 0);
+                origin = new Vector2(center.X + 30, center.Y + spacing);
+                sb.Draw(FireTex, origin, null, Color.White, 0f, new Vector2(0, 0), 0.4f, SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically, 0);
+            }
+
+
             for (int i = 0; i < map.GetLength(0); i++)
             {
                 for (int j = 0; j < map.GetLength(1); j++)
@@ -157,9 +174,21 @@ namespace CardGame
                     }
 
                     if (i == 0 && j == 3)
-                        sb.Draw(Door2Tex, new Rectangle((int)origin.X, (int)origin.Y, CardClass.cardWidth, CardClass.cardHeight), Color.White);
+                    {
+                        DrawLine(sb, origin, origin + hor, outlineColor, 0.8f);
+                        DrawLine(sb, origin, origin + ver, outlineColor, 0.8f);
+
+                        DrawLine(sb, origin + ver, origin + ver + hor, outlineColor, 0.8f);
+                        DrawLine(sb, origin + hor, origin + hor + ver, outlineColor, 0.8f);
+                    }
                     if (i == map.GetLength(0) - 1 && j == 3)
-                        sb.Draw(Door1Tex, new Rectangle((int)origin.X, (int)origin.Y, CardClass.cardWidth, CardClass.cardHeight), Color.White);
+                    {
+                        DrawLine(sb, origin, origin + hor, outlineColor, 0.8f);
+                        DrawLine(sb, origin, origin + ver, outlineColor, 0.8f);
+
+                        DrawLine(sb, origin + ver, origin + ver + hor, outlineColor, 0.8f);
+                        DrawLine(sb, origin + hor, origin + hor + ver, outlineColor, 0.8f);
+                    }
 
                 }
             }

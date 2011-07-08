@@ -78,6 +78,8 @@ namespace CardGame
                     cc.LoadTexture(Content);
             }
 
+            CardClass.SetCircleText(Content.Load<Texture2D>("Circle"));
+
 
             // TODO: use this.Content to load your game content here
         }
