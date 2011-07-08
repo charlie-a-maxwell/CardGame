@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <string>Soldier</string>
+  <string>Soldier</string>
+  <string>Soldier</string>
+  <string>Soldier</string>
+  <string>Defender</string>
+  <string>Defender</string>
+  <string>Assassin</string>
+  <string>Assassin</string>
+  <string>Spear</string>
+  <string>Chariot</string>
+</ArrayOfString>

@@ -1,0 +1,15 @@
+C:\projects\OacPan\OacPan\OacPan\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\projects\OacPan\OacPan\OacPan\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\projects\OacPan\OacPan\OacPan\bin\x86\Debug\OacPan.exe
+C:\projects\OacPan\OacPan\OacPan\bin\x86\Debug\OacPan.pdb
+C:\projects\OacPan\OacPan\OacPan\obj\x86\Debug\OacPan.exe
+C:\projects\OacPan\OacPan\OacPan\obj\x86\Debug\OacPan.pdb
+C:\projects\OacPan\OacPan\OacPan\bin\x86\Debug\Content\Map.xnb
+C:\projects\OacPan\OacPan\OacPan\bin\x86\Debug\Content\PacMan.xnb
+C:\projects\OacPan\OacPan\OacPan\bin\x86\Debug\Content\Blinky.xnb
+C:\projects\OacPan\OacPan\OacPan\bin\x86\Debug\Content\Inky.xnb
+C:\projects\OacPan\OacPan\OacPan\bin\x86\Debug\Content\Pinky.xnb
+C:\projects\OacPan\OacPan\OacPan\bin\x86\Debug\Content\Clyde.xnb
+C:\projects\OacPan\OacPan\OacPan\bin\x86\Debug\Content\MainFont.xnb
+C:\projects\OacPan\OacPan\OacPan\bin\x86\Debug\Content\Dot.xnb
+C:\projects\OacPan\OacPan\OacPan\bin\x86\Debug\Content\BigDot.xnb
