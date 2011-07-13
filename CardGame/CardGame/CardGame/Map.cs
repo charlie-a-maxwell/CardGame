@@ -6,6 +6,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using System.Xml.Serialization;
 using System.IO;
+using Microsoft.Xna.Framework.Input;
+
 
 namespace CardGame
 {
@@ -30,6 +32,26 @@ namespace CardGame
         public static int spacing = 5;
         List<CardType> cardTypes;
 
+        public MapView(string n, GraphicsDevice gd) : base(n)
+        {
+            // This would be where to create the map of whatever size. We are starting with 5 by 5, but the gate is out of that.
+            // So we need an extra one on both sides. The other extras will just be marked as filled by something.
+            map = new CardClass[7, 7];
+            selectedCardLoc.X = -1;
+            selectedCardLoc.Y = -1;
+            player1Hand = new Hand(PlayerTurn.Player1);
+            player2Hand = new Hand(PlayerTurn.Player2);
+            player1Deck = new Deck(PlayerTurn.Player1);
+            player2Deck = new Deck(PlayerTurn.Player2);
+
+            cardTypes = new List<CardType>();
+
+
+            currentTurn = PlayerTurn.Player1;
+            winner = 0;
+
+            SetCenter(new Vector2((gd.Viewport.Width - CardClass.cardWidth * map.GetLength(1)) / 2, (gd.Viewport.Height - CardClass.cardHeight * map.GetLength(1)) / 2));
+        }
 
         public MapView() : base()
         {
@@ -98,12 +120,6 @@ namespace CardGame
             }
         }
 
-        public override void SetGraphics(GraphicsDevice gd)
-        {
-            base.SetGraphics(gd);
-            SetCenter(new Vector2((gd.Viewport.Width - CardClass.cardWidth * map.GetLength(1)) / 2, (gd.Viewport.Height - CardClass.cardHeight * map.GetLength(1)) / 2));
-        }
-
         public override void LoadContent(ContentManager cm)
         {
             base.LoadContent(cm);
@@ -115,8 +131,7 @@ namespace CardGame
             Texture2D deckTeck = cm.Load<Texture2D>("DeckBack");
 
             
-            player1Deck.SetTexure(deckTeck);
-            player2Deck.SetTexure(deckTeck);
+            Deck.SetTexure(deckTeck);
 
             foreach (CardType cc in cardTypes)
             {
@@ -248,7 +263,7 @@ namespace CardGame
 
             if (over)
             {
-                text += " wins!";
+                text += " wins! Press Esc to exit.";
             }
             else if (deploy > 0)
             {
@@ -504,6 +519,23 @@ namespace CardGame
 
         public void StartGame()
         {
+            for (int i = 0; i < map.GetLength(0); i++)
+            {
+                for (int j = 0; j < map.GetLength(1); j++)
+                {
+                    map[i, j] = null;
+                }
+            }
+
+            over = false;
+            
+            player1Hand = new Hand(PlayerTurn.Player1);
+            player2Hand = new Hand(PlayerTurn.Player2);
+            player1Hand.SetRenderLoc(new Vector2(center.X - (map.GetLength(1) * CardClass.cardWidth) / 2.0f - 40, center.Y + (map.GetLength(0) * CardClass.cardHeight) - CardClass.cardHeight));
+            player2Hand.SetRenderLoc(new Vector2(center.X + (map.GetLength(1) * CardClass.cardWidth) - 20 + CardClass.cardWidth * 4, center.Y));
+
+            LoadDecks();
+
             player1Deck.ShuffleCurrentDeck();
 
             for (int i = 0; i < 5; i++)
@@ -517,6 +549,9 @@ namespace CardGame
             {
                 player2Hand.AddCard(player2Deck.GetTopCard());
             }
+
+            Random rand = new Random();
+            currentTurn = (rand.Next(2) == 0 ? PlayerTurn.Player1 : PlayerTurn.Player2);
         }
 
 
@@ -527,9 +562,31 @@ namespace CardGame
             cardTypes = (List<CardType>)serializer.Deserialize(cardTypeFile);
             cardTypeFile.Close();
 
-            LoadDecks();
-
             return true;
+        }
+
+        public override void HandleKeydown(Keys[] k)
+        {
+            try
+            {
+                bool endProcessing = false;
+                foreach (Keys t in k)
+                {
+                    switch (t)
+                    {
+                        case Keys.Escape:
+                            if (over == true && manager != null)
+                            {
+                                manager.SetCurrentScreenByName("SplashScreen");
+                            }
+                            break;
+                    }
+
+                    if (endProcessing)
+                        break;
+                }
+            }
+            catch (Exception e) { }
         }
     }
 }

@@ -25,14 +25,16 @@ namespace CardGame
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        MapView map;
         MouseHandler mouseHandler;
+        ScreenManager sm;
+        private long lastKeyDown = 0;
+        private const long keyRefresh = 200;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            map = new MapView();
+            sm = new ScreenManager();
         }
 
         /// <summary>
@@ -43,10 +45,15 @@ namespace CardGame
         /// </summary>
         protected override void Initialize()
         {
+            Screen.SetGraphics(GraphicsDevice);
             mouseHandler = new MouseHandler();
-            mouseHandler.leftMouseDown += new MouseHandler.LeftMouseDown(leftMouseDown);
+            mouseHandler.leftMouseDown += new MouseHandler.LeftMouseDown(sm.HandleMouseClick);
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            map.Init();
+
+            sm.AddScreen(new MapView("Map", GraphicsDevice));
+            sm.AddScreen(new SplashScreen("SplashScreen"));
+
+            sm.InitAll();
 
             base.Initialize();
         }
@@ -56,9 +63,9 @@ namespace CardGame
         /// all of your content.
         /// </summary>
         protected override void LoadContent()
-        {           
-            map.SetGraphics(GraphicsDevice);
-            map.LoadContent(Content);
+        {
+            sm.LoadContentAll(Content);
+
             CardClass.SetCircleText(Content.Load<Texture2D>("Circle"));
             mouseHandler.SetTexture(Content.Load<Texture2D>("Cursor1"));
 
@@ -69,8 +76,9 @@ namespace CardGame
         protected override void BeginRun()
         {
             base.BeginRun();
+            sm.SetCurrentScreenByName("SplashScreen");
 
-            map.StartGame();
+            sm.GetCurrentScreen().Init();
         }
 
         /// <summary>
@@ -99,8 +107,17 @@ namespace CardGame
                 int y = Mouse.GetState().Y;
             }
 
+            if (lastKeyDown <= 0 && Keyboard.GetState().GetPressedKeys().Length > 0)
+            {
+                sm.HandleKeydown(Keyboard.GetState().GetPressedKeys());
+                lastKeyDown = keyRefresh;
+            }
+            else if (lastKeyDown > 0)
+                lastKeyDown -= (long)gameTime.ElapsedGameTime.TotalMilliseconds;
+
             // TODO: Add your update logic here
             mouseHandler.Update(gameTime);
+            sm.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -115,17 +132,12 @@ namespace CardGame
             // TODO: Add your drawing code here
 
             spriteBatch.Begin();
-            map.Render(spriteBatch, GraphicsDevice);
 
+            sm.Render(spriteBatch, GraphicsDevice);
             mouseHandler.Render(spriteBatch);
             spriteBatch.End();
 
             base.Draw(gameTime);
-        }
-
-        private void leftMouseDown(Vector2 pos)
-        {
-            map.HandleMouseClick(pos);
         }
     }
 

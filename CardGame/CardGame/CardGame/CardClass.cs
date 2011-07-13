@@ -221,7 +221,7 @@ namespace CardGame
                 int height = cardHeight * 3;
                 int xMargin = 5;
                 int yMargin = 5;
-                MoveLocation[,] cardMove = GetMove();
+                int[,] cardMove = type.GetMove();   //GetMove();
 
                 float xSize = (width - xMargin * 2) / cardMove.GetLength(1);
                 float ySize = (height - CardClass.cardHeight - yMargin * 2) / cardMove.GetLength(0);
@@ -238,6 +238,8 @@ namespace CardGame
                 Vector2 hor = new Vector2(CardClass.cardWidth, 0);
                 Vector2 ver = new Vector2(0, CardClass.cardHeight);
 
+                int stat = type.GetStat();
+
                 if (type.texture != null)
                     sb.Draw(type.texture, new Rectangle(originX, originX, width, height), null, (player == PlayerTurn.Player1 ? Color.Red : Color.LightBlue), 0.0f, new Vector2(0, 0), SpriteEffects.None, 0.5f);
 
@@ -246,15 +248,29 @@ namespace CardGame
                 {
                     for (int j = 0; j < cardMove.GetLength(1); j++)
                     {
-                        if (cardMove[i, j] != null)
+                        if (cardMove[i, j] != -999)
                         {
-                            origin = new Vector2(xSize * j + offsetX - 8, ySize * i + offsetY - 5);
+                            origin = new Vector2(xSize * j + offsetX - 2, ySize * i + offsetY - 5);
                             if ((i == cardMove.GetLength(0) / 2) && (j == cardMove.GetLength(1) / 2))
+                            {
                                 sb.Draw(circleTex, origin, null, Color.White, 0.0f, new Vector2(15, 15), 0.22f, SpriteEffects.None, 0.0f);
+                                Screen.DrawText(sb, cardMove[i, j].ToString(), origin + new Vector2(5, 4));
+                            }
                             else
+                            {
                                 sb.Draw(circleTex, origin, null, Color.White, 0.0f, new Vector2(0, 0), 0.18f, SpriteEffects.None, 0.0f);
-                            Screen.DrawText(sb, cardMove[i, j].ToString(), origin + new Vector2(5, 4));
+                                Screen.DrawText(sb, (cardMove[i, j] + stat).ToString(), origin + new Vector2(5, 4));
+                            }
+                        }
+                    }
+                }
 
+                for (int i = 0; i < moves.GetLength(0); i++)
+                {
+                    for (int j = 0; j < moves.GetLength(1); j++)
+                    {
+                        if (moves[i, j] != null)
+                        {
                             origin = new Vector2((int)loc.X + (cardWidth + space) * (j - 2), (int)loc.Y + (cardHeight + space) * (i - 2));
                             Screen.DrawLine(sb, origin, origin + hor, outlineColor);
                             Screen.DrawLine(sb, origin, origin + ver, outlineColor);
@@ -313,7 +329,7 @@ namespace CardGame
             {
                 for (int j = 0; j < temp.GetLength(1); j++)
                 {
-                    if (m[i, j] == 0)
+                    if (m[i, j] == -999)
                         temp[i, j] = null;
                     else
                     {
@@ -332,7 +348,7 @@ namespace CardGame
                         {
                             locX = (k % 3) - 1;
                             locY = (int)(k / 3) - 1;
-                            if ((locX + i >= 0 && locX + i < temp.GetLength(0)) && (locY + j >= 0 && locY + j < temp.GetLength(1)) && (m[locX + i, locY + j] != 0))
+                            if ((locX + i >= 0 && locX + i < temp.GetLength(0)) && (locY + j >= 0 && locY + j < temp.GetLength(1)) && (m[locX + i, locY + j] != -999))
                             {
                                 tempDist = (((locX + i) - midX) * ((locX + i) - midX)) + (((locY + j) - midY) * ((locY + j) -midY));
                                 if (tempDist < dist)
@@ -473,7 +489,7 @@ namespace CardGame
         PlayerTurn owner;
         static Random rand = new Random();
         Vector2 renderLoc;
-        Texture2D deckTex;
+        static Texture2D deckTex;
 
         public Deck(PlayerTurn player)
         {
@@ -481,7 +497,7 @@ namespace CardGame
             owner = player;
         }
 
-        public void SetTexure(Texture2D tex)
+        public static void SetTexure(Texture2D tex)
         {
             deckTex = tex;
         }
