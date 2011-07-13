@@ -4,14 +4,14 @@ using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace CardGame
 {
-    class MapView
+    class MapView : Screen
     {
         CardClass[,] map;
-        ContentManager cm = null;
-        static Texture2D lineTex;
         Texture2D WallTex;
         Texture2D FireTex;
         Texture2D CloudTex;
@@ -19,7 +19,6 @@ namespace CardGame
         Vector2 center = new Vector2(0,0);
         Vector2 selectedCardLoc;
         CardClass selectedCard;
-        static SpriteFont font;
         Hand player1Hand;
         Hand player2Hand;
         Deck player1Deck;
@@ -29,8 +28,10 @@ namespace CardGame
         bool over = false;
         int deploy = (2 * 3);
         public static int spacing = 5;
+        List<CardType> cardTypes;
 
-        public MapView()
+
+        public MapView() : base()
         {
             // This would be where to create the map of whatever size. We are starting with 5 by 5, but the gate is out of that.
             // So we need an extra one on both sides. The other extras will just be marked as filled by something.
@@ -42,54 +43,86 @@ namespace CardGame
             player1Deck = new Deck(PlayerTurn.Player1);
             player2Deck = new Deck(PlayerTurn.Player2);
 
+            cardTypes = new List<CardType>();
+
+
             currentTurn = PlayerTurn.Player1;
             winner = 0;
         }
 
-        public void SetContentManager(ContentManager c)
+        protected void LoadDecks()
         {
-            cm = c;
-            font = c.Load<SpriteFont>("CourierNew");
-            WallTex = c.Load<Texture2D>("Wall");
-            FireTex = c.Load<Texture2D>("Fire");
-            CloudTex = c.Load<Texture2D>("Cloud");
-            MapBackground = c.Load<Texture2D>("MapBack");
+
+            XmlSerializer serializer = new XmlSerializer(typeof(List<string>));
+            Stream deckstream = File.Open("Content/Deck1.xml", FileMode.Open);
+            List<string> list = (List<string>)serializer.Deserialize(deckstream);
+            deckstream.Close();
+
+            BuildPlayerDeck(list, PlayerTurn.Player1);
+
+            deckstream = File.Open("Content/Deck2.xml", FileMode.Open);
+            list = (List<string>)serializer.Deserialize(deckstream);
+            deckstream.Close();
+
+            BuildPlayerDeck(list, PlayerTurn.Player2);
         }
 
-        public void SetGraphics(GraphicsDevice gd)
+        protected void BuildPlayerDeck(List<string>list, PlayerTurn p)
         {
-            lineTex = new Texture2D(gd, 1, 1, 1, TextureUsage.None, SurfaceFormat.Color);
-            lineTex.SetData(new[] { Color.White });
+            Deck deck = new Deck(p);
+            CardType type;
+            foreach (string card in list)
+            {
+                type = cardTypes.Find(
+                            delegate(CardType t)
+                            {
+                                return t.typeName.ToLower() == card.ToLower();
+                            });
+                if (type != null)
+                {
+                    deck.AddCard(new CardClass(type, p));
+                }
+            }
+
+            switch (p)
+            {
+                case PlayerTurn.Player1:
+                    player1Deck = deck;
+                    player1Deck.SetLoc(new Vector2(center.X - (map.GetLength(1) * CardClass.cardWidth) / 2.0f - 40, center.Y + (map.GetLength(0) * CardClass.cardHeight) - CardClass.cardHeight * 2 - 40));
+                    break;
+
+                case PlayerTurn.Player2:
+                    player2Deck = deck;
+                    player2Deck.SetLoc(new Vector2(center.X + (map.GetLength(1) * CardClass.cardWidth) + CardClass.cardWidth * 4 - 30, center.Y + CardClass.cardHeight + 40));
+                    break;
+            }
+        }
+
+        public override void SetGraphics(GraphicsDevice gd)
+        {
+            base.SetGraphics(gd);
             SetCenter(new Vector2((gd.Viewport.Width - CardClass.cardWidth * map.GetLength(1)) / 2, (gd.Viewport.Height - CardClass.cardHeight * map.GetLength(1)) / 2));
         }
 
-        public static void DrawLine(SpriteBatch sb, Vector2 p1, Vector2 p2, Color c)
+        public override void LoadContent(ContentManager cm)
         {
-            DrawLine(sb, p1, p2, c, 2.0f);
-        }
+            base.LoadContent(cm);
 
-        public static void DrawLine(SpriteBatch sb, Vector2 p1, Vector2 p2, Color c, float width)
-        {
-            float angle = (float)Math.Atan2(p2.Y - p1.Y, p2.X - p1.X);
-            float length = Vector2.Distance(p1, p2);
+            WallTex = cm.Load<Texture2D>("Wall");
+            FireTex = cm.Load<Texture2D>("Fire");
+            CloudTex = cm.Load<Texture2D>("Cloud");
+            MapBackground = cm.Load<Texture2D>("MapBack");
+            Texture2D deckTeck = cm.Load<Texture2D>("DeckBack");
 
-            sb.Draw(lineTex, p1, null, c, angle, Vector2.Zero, new Vector2(length, width), SpriteEffects.None, 0.9f);
-        }
-
-        public static void DrawText(SpriteBatch sb, string s, Vector2 loc)
-        {
-            DrawText(sb, s, loc, Color.Black, 1.0f);
-        }
             
-        public static void DrawText(SpriteBatch sb, string s, Vector2 loc, Color c, float scale)
-        {
-            Vector2 fontOrigin = font.MeasureString(s);
-            sb.DrawString(font, s, loc + fontOrigin /2, c, 0, fontOrigin / 2, scale, SpriteEffects.None,0.0f);
-        }
+            player1Deck.SetTexure(deckTeck);
+            player2Deck.SetTexure(deckTeck);
 
-        public static void FillColor(SpriteBatch sb,int originX, int originY, int width, int height, Color color)
-        {
-            sb.Draw(lineTex, new Rectangle(originX, originY, width, height), color);
+            foreach (CardType cc in cardTypes)
+            {
+                if (cc != null)
+                    cc.LoadTexture(cm);
+            }
         }
 
         public void SetCenter(Vector2 cent)
@@ -115,7 +148,7 @@ namespace CardGame
 
         }
 
-        public void RenderMap(SpriteBatch sb, GraphicsDevice device)
+        public override void Render(SpriteBatch sb, GraphicsDevice device)
         {
             int maxCardWidth = CardClass.cardWidth * (map.GetLength(1)-2);
             int maxCardHeight = CardClass.cardHeight * (map.GetLength(0)-2);
@@ -249,9 +282,6 @@ namespace CardGame
         {
             if ( x >= 0 && y >= 0 && x < map.GetLength(1) && y < map.GetLength(0))
             {
-                if (cm != null)
-                    card.LoadTexture(cm);
-
                 CardClass replacedCard = map[y, x];
                 CardClass winner = card;
                 if (replacedCard != null && replacedCard.player != card.player)
@@ -457,22 +487,10 @@ namespace CardGame
             selectedCardLoc.Y = -1;
         }
 
-        public void HandleMouseClick(Vector2 pos)
+        public override void HandleMouseClick(Vector2 pos)
         {
             if (over)
                 return;
-
-            //if (currentTurn == PlayerTurn.Player1 && player1Deck.Intersect(pos))
-            //{
-            //    player1Hand.AddCard(player1Deck.GetTopCard());
-            //    SwitchTurns();
-            //}
-            //else if (currentTurn == PlayerTurn.Player2 && player2Deck.Intersect(pos))
-            //{
-            //    player2Hand.AddCard(player2Deck.GetTopCard());
-            //    SwitchTurns();
-            //}
-            //else 
                 
             if (selectedCard == null)
             {
@@ -481,22 +499,6 @@ namespace CardGame
             else
             {
                 MoveCard(pos);
-            }
-        }
-
-        public void SetPlayerDeck(Deck d, PlayerTurn pt)
-        {
-            switch (pt)
-            {
-                case PlayerTurn.Player1:
-                    player1Deck = d;
-                    player1Deck.SetLoc(new Vector2(center.X - (map.GetLength(1) * CardClass.cardWidth) / 2.0f - 40, center.Y + (map.GetLength(0) * CardClass.cardHeight) - CardClass.cardHeight * 2 - 40));
-                    break;
-
-                case PlayerTurn.Player2:
-                    player2Deck = d;
-                    player2Deck.SetLoc(new Vector2(center.X + (map.GetLength(1) * CardClass.cardWidth) + CardClass.cardWidth * 4 - 30, center.Y + CardClass.cardHeight + 40));
-                    break;
             }
         }
 
@@ -515,10 +517,19 @@ namespace CardGame
             {
                 player2Hand.AddCard(player2Deck.GetTopCard());
             }
+        }
 
-            //player1Deck.SetLoc(new Vector2(center.X + CardClass.cardWidth * map.GetLength(1) + 30, center.Y + CardClass.cardHeight * map.GetLength(0) + 30));
-            //player2Deck.SetLoc(new Vector2(center.X + CardClass.cardWidth * map.GetLength(1) + 30, 40));
 
+        public override bool Init()
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(List<CardType>));
+            Stream cardTypeFile = File.Open("Content/CardTypes.xml", FileMode.Open);
+            cardTypes = (List<CardType>)serializer.Deserialize(cardTypeFile);
+            cardTypeFile.Close();
+
+            LoadDecks();
+
+            return true;
         }
     }
 }

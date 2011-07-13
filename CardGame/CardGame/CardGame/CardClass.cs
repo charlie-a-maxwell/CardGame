@@ -209,7 +209,7 @@ namespace CardGame
 
             sb.Draw(circleTex, loc + new Vector2((cardWidth / 2.0f) - 15, (player == PlayerTurn.Player1 ? cardHeight - 30 : 0)), null, Color.White, 0.0f, new Vector2(0, 0), 0.18f, SpriteEffects.None, 0.0f);
 
-            MapView.DrawText(sb, type.GetStat().ToString(), loc + new Vector2((cardWidth / 2.0f) - 9, (player == PlayerTurn.Player1 ? cardHeight - 30 : 0) + 4));
+            Screen.DrawText(sb, type.GetStat().ToString(), loc + new Vector2((cardWidth / 2.0f) - 9, (player == PlayerTurn.Player1 ? cardHeight - 30 : 0) + 4));
 
 
             if (selected)
@@ -253,13 +253,13 @@ namespace CardGame
                                 sb.Draw(circleTex, origin, null, Color.White, 0.0f, new Vector2(15, 15), 0.22f, SpriteEffects.None, 0.0f);
                             else
                                 sb.Draw(circleTex, origin, null, Color.White, 0.0f, new Vector2(0, 0), 0.18f, SpriteEffects.None, 0.0f);
-                            MapView.DrawText(sb, cardMove[i, j].ToString(), origin + new Vector2(5, 4));
+                            Screen.DrawText(sb, cardMove[i, j].ToString(), origin + new Vector2(5, 4));
 
-                            origin = new Vector2((int)loc.X + (cardWidth + space) * (j - 2), (int)loc.Y + (cardHeight + space) * (i - 2)); 
-                            MapView.DrawLine(sb, origin, origin + hor, outlineColor);
-                            MapView.DrawLine(sb, origin, origin + ver, outlineColor);
-                            MapView.DrawLine(sb, origin + ver, origin + ver + hor, outlineColor);
-                            MapView.DrawLine(sb, origin + hor, origin + hor + ver, outlineColor);
+                            origin = new Vector2((int)loc.X + (cardWidth + space) * (j - 2), (int)loc.Y + (cardHeight + space) * (i - 2));
+                            Screen.DrawLine(sb, origin, origin + hor, outlineColor);
+                            Screen.DrawLine(sb, origin, origin + ver, outlineColor);
+                            Screen.DrawLine(sb, origin + ver, origin + ver + hor, outlineColor);
+                            Screen.DrawLine(sb, origin + hor, origin + hor + ver, outlineColor);
                         }
                     }
                 }

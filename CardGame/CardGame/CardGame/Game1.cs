@@ -27,13 +27,11 @@ namespace CardGame
         SpriteBatch spriteBatch;
         MapView map;
         MouseHandler mouseHandler;
-        List<CardType> cardTypes;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            cardTypes = new List<CardType>();
             map = new MapView();
         }
 
@@ -47,6 +45,8 @@ namespace CardGame
         {
             mouseHandler = new MouseHandler();
             mouseHandler.leftMouseDown += new MouseHandler.LeftMouseDown(leftMouseDown);
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            map.Init();
 
             base.Initialize();
         }
@@ -56,29 +56,11 @@ namespace CardGame
         /// all of your content.
         /// </summary>
         protected override void LoadContent()
-        {
-            // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-
+        {           
             map.SetGraphics(GraphicsDevice);
-            map.SetContentManager(Content);
-
-            XmlSerializer serializer = new XmlSerializer(typeof(List<CardType>));
-            Stream cardTypeFile = File.Open("Content/CardTypes.xml", FileMode.Open);
-            cardTypes = (List<CardType>)serializer.Deserialize(cardTypeFile);
-            cardTypeFile.Close();
-
-            LoadDecks();
-            
-            mouseHandler.SetTexture(Content.Load<Texture2D>("Cursor1"));
-
-            foreach (CardType cc in cardTypes)
-            {
-                if (cc != null)
-                    cc.LoadTexture(Content);
-            }
-
+            map.LoadContent(Content);
             CardClass.SetCircleText(Content.Load<Texture2D>("Circle"));
+            mouseHandler.SetTexture(Content.Load<Texture2D>("Cursor1"));
 
 
             // TODO: use this.Content to load your game content here
@@ -89,55 +71,6 @@ namespace CardGame
             base.BeginRun();
 
             map.StartGame();
-        }
-
-        protected void LoadDecks()
-        {
-            Texture2D deckTeck = Content.Load<Texture2D>("DeckBack");
-
-            XmlSerializer serializer = new XmlSerializer(typeof(List<string>));
-            Stream deckstream = File.Open("Content/Deck1.xml", FileMode.Open);
-            List<string> list = (List<string>)serializer.Deserialize(deckstream);
-            deckstream.Close();
-
-            Deck deck = new Deck(PlayerTurn.Player1);
-            CardType type;
-            foreach (string card in list)
-            {
-                type = cardTypes.Find(
-                            delegate(CardType t)
-                            {
-                                return t.typeName.ToLower() == card.ToLower();
-                            });
-                if (type != null)
-                {
-                    deck.AddCard(new CardClass(type, PlayerTurn.Player1));
-                }
-            }
-
-            deck.SetTexure(deckTeck);
-            map.SetPlayerDeck(deck, PlayerTurn.Player1);
-
-            deckstream = File.Open("Content/Deck2.xml", FileMode.Open);
-            list = (List<string>)serializer.Deserialize(deckstream);
-            deckstream.Close();
-
-            Deck deck2 = new Deck(PlayerTurn.Player2);
-            foreach (string card in list)
-            {
-                type = cardTypes.Find(
-                            delegate(CardType t)
-                            {
-                                return t.typeName.ToLower() == card.ToLower();
-                            });
-                if (type != null)
-                {
-                    deck2.AddCard(new CardClass(type, PlayerTurn.Player2));
-                }
-            }
-
-            deck2.SetTexure(deckTeck);
-            map.SetPlayerDeck(deck2, PlayerTurn.Player2);
         }
 
         /// <summary>
@@ -177,12 +110,12 @@ namespace CardGame
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.DarkSlateGray);
 
             // TODO: Add your drawing code here
 
             spriteBatch.Begin();
-            map.RenderMap(spriteBatch, GraphicsDevice);
+            map.Render(spriteBatch, GraphicsDevice);
 
             mouseHandler.Render(spriteBatch);
             spriteBatch.End();
