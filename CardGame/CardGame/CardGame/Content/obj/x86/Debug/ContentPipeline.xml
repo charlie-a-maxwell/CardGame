@@ -89,7 +89,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Fire.xnb</Output>
-      <Time>2011-07-03T09:51:50.383-05:00</Time>
+      <Time>2011-07-12T22:01:03.928-05:00</Time>
     </Item>
     <Item>
       <Source>Card1.png</Source>
@@ -144,6 +144,15 @@
       <Options>None</Options>
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Circle.xnb</Output>
       <Time>2011-07-03T14:52:02.326-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Effect.fx</Source>
+      <Name>Effect</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Effect.xnb</Output>
+      <Time>2011-07-14T21:57:08.5264-05:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>

@@ -29,6 +29,11 @@ namespace CardGame
         ScreenManager sm;
         private long lastKeyDown = 0;
         private const long keyRefresh = 200;
+        Effect effect;
+        RenderTarget2D cloudsRenderTarget;
+        Texture2D cloudMap;
+        Texture2D cloudStaticMap;
+
 
         public Game1()
         {
@@ -69,8 +74,26 @@ namespace CardGame
             CardClass.SetCircleText(Content.Load<Texture2D>("Circle"));
             mouseHandler.SetTexture(Content.Load<Texture2D>("Cursor1"));
 
+            effect = Content.Load<Effect>("Effect");
 
+            cloudsRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight, 1, GraphicsDevice.PresentationParameters.BackBufferFormat);
+            cloudStaticMap = CreateStaticMap(32);
+            cloudMap = new Texture2D(GraphicsDevice, cloudsRenderTarget.Width, cloudsRenderTarget.Height, 1, TextureUsage.None, cloudsRenderTarget.Format);
+            
             // TODO: use this.Content to load your game content here
+        }
+
+        private Texture2D CreateStaticMap(int resolution)
+        {
+            Random rand = new Random();
+            Color[] noisyColors = new Color[resolution * resolution];
+            for (int x = 0; x < resolution; x++)
+                for (int y = 0; y < resolution; y++)
+                    noisyColors[x + y * resolution] = new Color(new Vector3((float)rand.Next(1000) / 1000.0f, 0, 0));
+
+            Texture2D noiseImage = new Texture2D(GraphicsDevice, resolution, resolution, 1, TextureUsage.None, SurfaceFormat.Color);
+            noiseImage.SetData(noisyColors);
+            return noiseImage;
         }
 
         protected override void BeginRun()
@@ -127,17 +150,45 @@ namespace CardGame
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.DarkSlateGray);
-
             // TODO: Add your drawing code here
+            float time = (float)gameTime.TotalGameTime.TotalMilliseconds / 100.0f;
+            GeneratePerlinNoise(time);
+
+            GraphicsDevice.Clear(Color.White);
 
             spriteBatch.Begin();
-
+            spriteBatch.Draw(cloudMap, Vector2.Zero, Color.White);
             sm.Render(spriteBatch, GraphicsDevice);
             mouseHandler.Render(spriteBatch);
             spriteBatch.End();
-
+            
             base.Draw(gameTime);
+        }
+
+        private void GeneratePerlinNoise(float time)
+        {
+            GraphicsDevice.SetRenderTarget(0, cloudsRenderTarget);
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
+
+            effect.CurrentTechnique = effect.Techniques["PerlinNoise"];
+            effect.Parameters["xTexture"].SetValue(cloudStaticMap);
+            effect.Parameters["xOvercast"].SetValue(1.1f);
+            effect.Parameters["xTime"].SetValue(time / 1000.0f);
+            effect.Begin();
+            spriteBatch.Begin(SpriteBlendMode.None, SpriteSortMode.Immediate, SaveStateMode.None, Matrix.Identity);
+            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+            {
+                pass.Begin();
+                spriteBatch.Draw(cloudMap, Vector2.Zero, Color.White);
+                pass.End();
+            }
+            spriteBatch.End();
+            effect.End();
+
+
+            GraphicsDevice.SetRenderTarget(0, null);
+            cloudMap = cloudsRenderTarget.GetTexture();
+
         }
     }
 

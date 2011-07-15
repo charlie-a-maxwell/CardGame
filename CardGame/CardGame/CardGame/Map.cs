@@ -416,11 +416,11 @@ namespace CardGame
             if (selectedCard != null && selectedCardLoc.X == -1 && selectedCardLoc.Y == -1)
             { 
                 // placing a new card.
-                if (currentTurn == PlayerTurn.Player1 && mapLoc.Y == map.GetLength(1) - 2 && mapLoc.X > 0 && mapLoc.X < map.GetLength(0)-1 && PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y))
+                if (currentTurn == PlayerTurn.Player1 && mapLoc.Y == map.GetLength(1) - 2 && mapLoc.X > 0 && mapLoc.X < map.GetLength(0)-1 && map[(int)mapLoc.Y, (int)mapLoc.X] == null && PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y))
                 {
                     SwitchTurns();
                 }
-                else if (currentTurn == PlayerTurn.Player2 && mapLoc.Y == 1 && mapLoc.X > 0 && mapLoc.X < map.GetLength(0)-1 && PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y))
+                else if (currentTurn == PlayerTurn.Player2 && mapLoc.Y == 1 && mapLoc.X > 0 && mapLoc.X < map.GetLength(0) - 1 && map[(int)mapLoc.Y, (int)mapLoc.X] == null && PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y))
                 {
                     SwitchTurns();
                 }

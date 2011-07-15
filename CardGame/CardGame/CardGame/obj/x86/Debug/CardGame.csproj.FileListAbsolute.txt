@@ -50,3 +50,4 @@ C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card3.xnb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card4.xnb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card5.xnb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Circle.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Effect.xnb
