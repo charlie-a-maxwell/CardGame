@@ -33,7 +33,7 @@ namespace CardGame
         RenderTarget2D cloudsRenderTarget;
         Texture2D cloudMap;
         Texture2D cloudStaticMap;
-
+        Texture2D background;
 
         public Game1()
         {
@@ -76,10 +76,10 @@ namespace CardGame
 
             effect = Content.Load<Effect>("Effect");
 
-            cloudsRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight, 1, GraphicsDevice.PresentationParameters.BackBufferFormat);
+            cloudsRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight, 1, SurfaceFormat.Vector4);
             cloudStaticMap = CreateStaticMap(32);
             cloudMap = new Texture2D(GraphicsDevice, cloudsRenderTarget.Width, cloudsRenderTarget.Height, 1, TextureUsage.None, cloudsRenderTarget.Format);
-            
+            background = Content.Load<Texture2D>("Cloud");
             // TODO: use this.Content to load your game content here
         }
 
@@ -154,10 +154,15 @@ namespace CardGame
             float time = (float)gameTime.TotalGameTime.TotalMilliseconds / 100.0f;
             GeneratePerlinNoise(time);
 
-            GraphicsDevice.Clear(Color.White);
+
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Blue, 1.0f, 0);
+
+            spriteBatch.Begin(SpriteBlendMode.AlphaBlend);
+            Screen.FillColor(spriteBatch, 0, 0, GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height, Color.DarkSlateGray);
+            spriteBatch.Draw(cloudMap, Vector2.Zero, Color.White);
+            spriteBatch.End();
 
             spriteBatch.Begin();
-            spriteBatch.Draw(cloudMap, Vector2.Zero, Color.White);
             sm.Render(spriteBatch, GraphicsDevice);
             mouseHandler.Render(spriteBatch);
             spriteBatch.End();
@@ -168,18 +173,17 @@ namespace CardGame
         private void GeneratePerlinNoise(float time)
         {
             GraphicsDevice.SetRenderTarget(0, cloudsRenderTarget);
-            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.White, 1.0f, 0);
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Green, 1.0f, 0);
 
             effect.CurrentTechnique = effect.Techniques["PerlinNoise"];
-            effect.Parameters["xTexture"].SetValue(cloudStaticMap);
-            effect.Parameters["xOvercast"].SetValue(1.1f);
-            effect.Parameters["xTime"].SetValue(time / 1000.0f);
-            effect.Begin();
+            effect.Parameters["xOvercast"].SetValue(1.7f);
+            effect.Parameters["xTime"].SetValue(time / 500.0f);
             spriteBatch.Begin(SpriteBlendMode.None, SpriteSortMode.Immediate, SaveStateMode.None, Matrix.Identity);
+            effect.Begin();
             foreach (EffectPass pass in effect.CurrentTechnique.Passes)
             {
                 pass.Begin();
-                spriteBatch.Draw(cloudMap, Vector2.Zero, Color.White);
+                spriteBatch.Draw(cloudStaticMap, new Rectangle(0,0,GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height) , Color.White);
                 pass.End();
             }
             spriteBatch.End();
@@ -188,7 +192,6 @@ namespace CardGame
 
             GraphicsDevice.SetRenderTarget(0, null);
             cloudMap = cloudsRenderTarget.GetTexture();
-
         }
     }
 

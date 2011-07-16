@@ -156,8 +156,8 @@ namespace CardGame
 
         public override void Render(SpriteBatch sb, GraphicsDevice device)
         {
-            DrawText(sb, "Test Splash Screen", new Vector2(device.Viewport.Width / 2 - 40, device.Viewport.Height / 2), Color.White, 2.0f);
-            DrawText(sb, "Click or press Enter to start.", new Vector2(device.Viewport.Width / 2 - 130, device.Viewport.Height / 2 + 20), Color.White, 2.0f);
+            DrawText(sb, "Test Splash Screen", new Vector2(device.Viewport.Width / 2 - 40, device.Viewport.Height / 2), Color.Black, 2.0f);
+            DrawText(sb, "Click or press Enter to start.", new Vector2(device.Viewport.Width / 2 - 130, device.Viewport.Height / 2 + 20), Color.Black, 2.0f);
         }
     }
 

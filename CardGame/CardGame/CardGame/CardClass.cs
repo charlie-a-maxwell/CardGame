@@ -265,6 +265,7 @@ namespace CardGame
                     }
                 }
 
+                Color border = outlineColor;
                 for (int i = 0; i < moves.GetLength(0); i++)
                 {
                     for (int j = 0; j < moves.GetLength(1); j++)
@@ -272,10 +273,15 @@ namespace CardGame
                         if (moves[i, j] != null)
                         {
                             origin = new Vector2((int)loc.X + (cardWidth + space) * (j - 2), (int)loc.Y + (cardHeight + space) * (i - 2));
-                            Screen.DrawLine(sb, origin, origin + hor, outlineColor);
-                            Screen.DrawLine(sb, origin, origin + ver, outlineColor);
-                            Screen.DrawLine(sb, origin + ver, origin + ver + hor, outlineColor);
-                            Screen.DrawLine(sb, origin + hor, origin + hor + ver, outlineColor);
+
+                            if (origin == oldLoc)
+                                border = Color.DarkRed;
+                            else
+                                border = outlineColor;
+                            Screen.DrawLine(sb, origin, origin + hor, border);
+                            Screen.DrawLine(sb, origin, origin + ver, border);
+                            Screen.DrawLine(sb, origin + ver, origin + ver + hor, border);
+                            Screen.DrawLine(sb, origin + hor, origin + hor + ver, border);
                         }
                     }
                 }
