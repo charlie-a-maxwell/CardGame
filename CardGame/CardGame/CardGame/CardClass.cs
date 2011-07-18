@@ -205,7 +205,7 @@ namespace CardGame
         {
 
             if (type.texture != null)
-                sb.Draw(type.texture, new Rectangle((int)loc.X, (int)loc.Y, cardWidth, cardHeight), null, (player == PlayerTurn.Player1 ? Color.Red : Color.LightBlue), 0.0f, new Vector2(0, 0), (player == PlayerTurn.Player1 ? SpriteEffects.None : SpriteEffects.FlipVertically), 0.5f);
+                sb.Draw(type.texture, new Rectangle((int)loc.X, (int)loc.Y, cardWidth, cardHeight), null, Color.White, 0.0f, new Vector2(0, 0), (player == PlayerTurn.Player1 ? SpriteEffects.None : SpriteEffects.FlipVertically), 0.5f);
 
             sb.Draw(circleTex, loc + new Vector2((cardWidth / 2.0f) - 15, (player == PlayerTurn.Player1 ? cardHeight - 30 : 0)), null, Color.White, 0.0f, new Vector2(0, 0), 0.18f, SpriteEffects.None, 0.0f);
 
@@ -241,7 +241,7 @@ namespace CardGame
                 int stat = type.GetStat();
 
                 if (type.texture != null)
-                    sb.Draw(type.texture, new Rectangle(originX, originX, width, height), null, (player == PlayerTurn.Player1 ? Color.Red : Color.LightBlue), 0.0f, new Vector2(0, 0), SpriteEffects.None, 0.5f);
+                    sb.Draw(type.texture, new Rectangle(originX, originX, width, height), null, Color.White, 0.0f, new Vector2(0, 0), SpriteEffects.None, 0.5f);
 
 
                 for (int i = 0; i < cardMove.GetLength(0); i++)
@@ -541,7 +541,7 @@ namespace CardGame
         public void Render(SpriteBatch sb)
         {
             if (deckTex != null && deck.Count > 0)
-                sb.Draw(deckTex, new Rectangle((int)renderLoc.X, (int)renderLoc.Y, CardClass.cardWidth, CardClass.cardHeight), (owner == PlayerTurn.Player1 ? Color.Red : Color.LightBlue));
+                sb.Draw(deckTex, new Rectangle((int)renderLoc.X, (int)renderLoc.Y, CardClass.cardWidth, CardClass.cardHeight), (owner == PlayerTurn.Player1 ? Color.LightBlue : Color.Red ));
         }
 
         public bool Intersect(Vector2 point)

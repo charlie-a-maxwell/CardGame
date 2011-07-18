@@ -186,9 +186,9 @@ namespace CardGame
 
             if (FireTex != null)
             {
-                origin = new Vector2((map.GetLength(0) - 3) * (CardClass.cardWidth + spacing) + 30 + center.X, center.Y  + spacing);
+                origin = new Vector2((map.GetLength(0) - 3) * (CardClass.cardWidth + spacing) + 30 + center.X, center.Y  + spacing + 20);
                 sb.Draw(FireTex, origin, null, Color.White, 0f, new Vector2(0, 0), 0.4f, SpriteEffects.FlipVertically, 0);
-                origin = new Vector2(center.X + 30, center.Y + spacing);
+                origin = new Vector2(center.X + 30, center.Y + spacing + 20);
                 sb.Draw(FireTex, origin, null, Color.White, 0f, new Vector2(0, 0), 0.4f, SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically, 0);
             }
 

@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Storage;
 using System.Xml.Serialization;
 using System.IO;
 
+
 namespace CardGame
 {
     /// <summary>
@@ -20,6 +21,25 @@ namespace CardGame
     /// 
 
     public enum PlayerTurn { Player1, Player2 };
+
+    public class GameOptions
+    {
+        public float cloudSpeed;
+        public Vector2 cloudDir;
+        public float cloudIntensity;
+        public Color cloudBackColor;
+        public Color cloudForeColor;
+
+        
+        public GameOptions()
+        {
+            cloudSpeed = 500.0f;
+            cloudDir = new Vector2(0, 1);
+            cloudIntensity = 1.7f;
+            cloudBackColor = Color.DarkSlateGray;
+            cloudForeColor = Color.White;
+        }
+    }
 
     public class Game1 : Microsoft.Xna.Framework.Game
     {
@@ -33,13 +53,14 @@ namespace CardGame
         RenderTarget2D cloudsRenderTarget;
         Texture2D cloudMap;
         Texture2D cloudStaticMap;
-        Texture2D background;
+        GameOptions go;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             sm = new ScreenManager();
+            go = new GameOptions();
         }
 
         /// <summary>
@@ -58,9 +79,32 @@ namespace CardGame
             sm.AddScreen(new MapView("Map", GraphicsDevice));
             sm.AddScreen(new SplashScreen("SplashScreen"));
 
+            if (File.Exists("Content/GameOptions.xml"))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(GameOptions));
+                Stream options = File.Open("Content/GameOptions.xml", FileMode.Open);
+                go = (GameOptions)serializer.Deserialize(options);
+                options.Close();
+            }
+
             sm.InitAll();
 
             base.Initialize();
+        }
+
+        protected override void OnExiting(object sender, EventArgs args)
+        {
+            base.OnExiting(sender, args);
+
+            XmlSerializer serializer = new XmlSerializer(typeof(GameOptions));
+            Stream options = null;
+            if (!File.Exists("Content/GameOptions.xml"))
+                options = File.Create("Content/GameOptions.xml");
+            else
+                options = File.Open("Content/GameOptions.xml", FileMode.Open);
+            serializer.Serialize(options, go);
+            options.Close();
+            
         }
 
         /// <summary>
@@ -79,7 +123,6 @@ namespace CardGame
             cloudsRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight, 1, SurfaceFormat.Vector4);
             cloudStaticMap = CreateStaticMap(32);
             cloudMap = new Texture2D(GraphicsDevice, cloudsRenderTarget.Width, cloudsRenderTarget.Height, 1, TextureUsage.None, cloudsRenderTarget.Format);
-            background = Content.Load<Texture2D>("Cloud");
             // TODO: use this.Content to load your game content here
         }
 
@@ -158,8 +201,8 @@ namespace CardGame
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Blue, 1.0f, 0);
 
             spriteBatch.Begin(SpriteBlendMode.AlphaBlend);
-            Screen.FillColor(spriteBatch, 0, 0, GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height, Color.DarkSlateGray);
-            spriteBatch.Draw(cloudMap, Vector2.Zero, Color.White);
+            Screen.FillColor(spriteBatch, 0, 0, GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height, go.cloudBackColor);
+            spriteBatch.Draw(cloudMap, Vector2.Zero, go.cloudForeColor);
             spriteBatch.End();
 
             spriteBatch.Begin();
@@ -176,8 +219,9 @@ namespace CardGame
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Green, 1.0f, 0);
 
             effect.CurrentTechnique = effect.Techniques["PerlinNoise"];
-            effect.Parameters["xOvercast"].SetValue(1.7f);
-            effect.Parameters["xTime"].SetValue(time / 500.0f);
+            effect.Parameters["xOvercast"].SetValue(go.cloudIntensity);
+            effect.Parameters["xTime"].SetValue(time / go.cloudSpeed);
+            effect.Parameters["xDir"].SetValue(go.cloudDir);
             spriteBatch.Begin(SpriteBlendMode.None, SpriteSortMode.Immediate, SaveStateMode.None, Matrix.Identity);
             effect.Begin();
             foreach (EffectPass pass in effect.CurrentTechnique.Passes)

@@ -3,6 +3,7 @@ float4x4 View;
 float4x4 Projection;
 float xOvercast;
 float xTime;
+float2 xDir;
 
 Texture xTexture;
 
@@ -32,7 +33,7 @@ sampler TextureSampler = sampler_state
  {
      PNPixelToFrame Output = (PNPixelToFrame)0;    
      
-     float2 move = float2(1,0);
+     float2 move = xDir;
      float4 perlin = tex2D(TextureSampler, (PSIn.TextureCoords)+xTime*move)/2;
      perlin += tex2D(TextureSampler, (PSIn.TextureCoords)*2+xTime*move)/4;
      perlin += tex2D(TextureSampler, (PSIn.TextureCoords)*4+xTime*move)/8;

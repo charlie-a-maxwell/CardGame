@@ -1,2 +1,2 @@
-C:\projects\CardGame\CardGame\CardGame\Content\obj\x86\Debug\ResolveAssemblyReference.cache
 C:\gitproject\CardGame\CardGame\CardGame\Content\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\projects\CardGame\CardGame\CardGame\Content\obj\x86\Debug\ResolveAssemblyReference.cache
