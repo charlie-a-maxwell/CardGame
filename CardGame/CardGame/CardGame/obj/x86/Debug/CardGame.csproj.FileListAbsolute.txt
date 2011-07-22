@@ -56,3 +56,4 @@ C:\projects\CardGame\CardGame\CardGame\obj\x86\Debug\CardGame.application
 C:\projects\CardGame\CardGame\CardGame\obj\x86\Debug\CardGame.exe
 C:\projects\CardGame\CardGame\CardGame\obj\x86\Debug\CardGame.pdb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DeckBack.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\SplashScreen.xnb

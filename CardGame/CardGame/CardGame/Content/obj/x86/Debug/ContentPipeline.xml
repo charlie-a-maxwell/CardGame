@@ -179,7 +179,7 @@
       <Processor>FontDescriptionProcessor</Processor>
       <Options>None</Options>
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\CourierNew.xnb</Output>
-      <Time>2011-04-28T20:59:48.698-05:00</Time>
+      <Time>2011-07-18T06:48:51.876-05:00</Time>
     </Item>
     <Item>
       <Source>Effect.fx</Source>
@@ -198,6 +198,15 @@
       <Options>None</Options>
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DeckBack.xnb</Output>
       <Time>2011-05-24T21:07:55.372-05:00</Time>
+    </Item>
+    <Item>
+      <Source>SplashScreen.png</Source>
+      <Name>SplashScreen</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\SplashScreen.xnb</Output>
+      <Time>2011-07-18T21:02:05.066-05:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>

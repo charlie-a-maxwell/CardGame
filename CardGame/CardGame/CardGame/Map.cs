@@ -320,7 +320,7 @@ namespace CardGame
                 else if (card.player == PlayerTurn.Player2)
                     player2Hand.RemoveCard(card);
 
-                return (winner == card);
+                return true;
             }
 
             return false;
@@ -444,7 +444,7 @@ namespace CardGame
                 // Check for movement into the gates
                 if (mapLoc.Y == 0)
                 {
-                    if (currentTurn == PlayerTurn.Player1 && mapLoc.X == 3 && transY == 2)
+                    if (currentTurn == PlayerTurn.Player1 && mapLoc.X == 3 && transX == 2)
                     {
                         PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX].modifier);
                         SwitchTurns();
@@ -455,7 +455,7 @@ namespace CardGame
                 // Check for movement into the gates
                 if (mapLoc.Y == map.GetLength(1)-1)
                 {
-                    if (currentTurn == PlayerTurn.Player2 && mapLoc.X == 3 && transY == 2)
+                    if (currentTurn == PlayerTurn.Player2 && mapLoc.X == 3 && transX == 2)
                     {
                         PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX].modifier);
                         SwitchTurns();
@@ -467,8 +467,12 @@ namespace CardGame
                 // Check for the actual move.
                 if (transX >= 0 && transY >= 0 && transX < moveOption.GetLength(0) && transY < moveOption.GetLength(1) && moveOption[transY, transX] != null)
                 {
-                    RecursiveCardMovement(moveOption[transY, transX], moveOption, transX, transY);
-                    SwitchTurns();
+                    bool good = false;
+                    RecursiveCardMovement(moveOption[transY, transX], moveOption, transX, transY, out good);
+                    if (good)
+                    {
+                        SwitchTurns();
+                    }
                 }
                 else
                 {
@@ -481,18 +485,23 @@ namespace CardGame
             }
         }
 
-        private bool RecursiveCardMovement(MoveLocation currentLoc, MoveLocation[,] map, int transX, int transY)
+        private bool RecursiveCardMovement(MoveLocation currentLoc, MoveLocation[,] map, int transX, int transY, out bool recurse)
         {
             if (transX == 2 && transY == 2)
+            {
+                recurse = true;
                 return true;
+            }
 
             if (currentLoc.x >= 0 && currentLoc.y >= 0 && !(currentLoc.x == 2 && currentLoc.y == 2))
             {
-                if (!RecursiveCardMovement(map[currentLoc.x, currentLoc.y], map, currentLoc.y, currentLoc.x))
-                    return false;
+                if (!RecursiveCardMovement(map[currentLoc.x, currentLoc.y], map, currentLoc.y, currentLoc.x, out recurse))
+                    return recurse;
             }
             //PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX].modifier)
-            return PlaceCard(selectedCard, (int)selectedCardLoc.X + transX - 2, (int)selectedCardLoc.Y + transY - 2, currentLoc.modifier);
+            bool place = PlaceCard(selectedCard, (int)selectedCardLoc.X + transX - 2, (int)selectedCardLoc.Y + transY - 2, currentLoc.modifier);
+            recurse = place;
+            return place;
         }
 
         private void ResetSelectedCard()

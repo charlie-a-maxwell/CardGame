@@ -27,8 +27,72 @@ namespace CardGame
         public float cloudSpeed;
         public Vector2 cloudDir;
         public float cloudIntensity;
+        [XmlIgnore]
         public Color cloudBackColor;
+        [XmlIgnore]
         public Color cloudForeColor;
+
+        public string CloudBackColor
+        {
+            get
+            {
+                return cloudBackColor.R + "|" + cloudBackColor.G + "|" + cloudBackColor.B + "|" + cloudBackColor.A;
+            }
+            set
+            {
+                string test = value;
+                string[] parts = test.Split('|');
+                if (parts.Length == 4)
+                {
+                    byte temp = (Byte.TryParse(parts[0], out temp) ? temp : (byte)0);
+                    cloudBackColor.R = (temp > 255 ? (byte)255 : (temp < 0 ? (byte)0 : temp));
+
+                    temp = (Byte.TryParse(parts[1], out temp) ? temp : (byte)0);
+                    cloudBackColor.G = (temp > 255 ? (byte)255 : (temp < 0 ? (byte)0 : temp));
+
+                    temp = (Byte.TryParse(parts[2], out temp) ? temp : (byte)0);
+                    cloudBackColor.B = (temp > 255 ? (byte)255 : (temp < 0 ? (byte)0 : temp));
+
+                    temp = (Byte.TryParse(parts[3], out temp) ? temp : (byte)0);
+                    cloudBackColor.A = (temp > 255 ? (byte)255 : (temp < 0 ? (byte)0 : temp));
+                }
+                else
+                {
+                    cloudBackColor = Color.DarkSlateGray;
+                }
+            }
+        }
+
+        public string CloudForeColor
+        {
+            get
+            {
+                return cloudForeColor.R + "|" + cloudForeColor.G + "|" + cloudForeColor.B + "|" + cloudForeColor.A;
+            }
+            set
+            {
+                string test = value;
+                string[] parts = test.Split('|');
+                if (parts.Length == 4)
+                {
+                    byte temp = (Byte.TryParse(parts[0], out temp) ? temp : (byte)0);
+                    cloudForeColor.R = (temp > 255 ? (byte)255 : (temp < 0 ? (byte)0 : temp));
+
+                    temp = (Byte.TryParse(parts[1], out temp) ? temp : (byte)0);
+                    cloudForeColor.G = (temp > 255 ? (byte)255 : (temp < 0 ? (byte)0 : temp));
+
+                    temp = (Byte.TryParse(parts[2], out temp) ? temp : (byte)0);
+                    cloudForeColor.B = (temp > 255 ? (byte)255 : (temp < 0 ? (byte)0 : temp));
+
+                    temp = (Byte.TryParse(parts[3], out temp) ? temp : (byte)0);
+                    cloudForeColor.A = (temp > 255 ? (byte)255 : (temp < 0 ? (byte)0 : temp));
+                }
+                else
+                {
+                    cloudForeColor = Color.White;
+                }
+            }
+        }
 
         
         public GameOptions()
