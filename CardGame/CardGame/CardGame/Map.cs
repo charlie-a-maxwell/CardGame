@@ -313,7 +313,7 @@ namespace CardGame
                 Vector2 clear = ConvertScreenCoordToMap(card.GetLoc());
                 if (clear.Y >= 0 && clear.X >= 0)
                     map[(int)clear.Y, (int)clear.X] = null;
-                winner.SetLocation(center + new Vector2(x * (CardClass.cardWidth + spacing), y * (CardClass.cardHeight + spacing)));
+                winner.SetLocation(center + new Vector2(x * (CardClass.cardWidth + spacing), y * (CardClass.cardHeight + spacing)), true);
 
                 if (card.player == PlayerTurn.Player1)
                     player1Hand.RemoveCard(card);

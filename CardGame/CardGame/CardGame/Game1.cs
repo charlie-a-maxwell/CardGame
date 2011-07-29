@@ -310,6 +310,9 @@ namespace CardGame
         private long lastMouseDown;
         private const long mouseRefresh = 200;
         public delegate void LeftMouseDown(Vector2 pos);
+        public Rectangle renderSize = new Rectangle(0, 0, 60, 60);
+
+        public Vector2 offset = new Vector2(0, 0);
 
         public LeftMouseDown leftMouseDown = null;
 
@@ -343,9 +346,7 @@ namespace CardGame
         public void Render(SpriteBatch sb)
         {
             if (tex != null)
-                sb.Draw(tex, pos, Color.White);
-            //               sb.Draw(tex, pos, null, Color.White, 0.0f, new Vector2(0, 0), 1.0f, SpriteEffects.None, 1.0f);
-      
+                sb.Draw(tex, new Rectangle((int)pos.X, (int)pos.Y, renderSize.Width, renderSize.Height), Color.White);
         }
     }
 }
