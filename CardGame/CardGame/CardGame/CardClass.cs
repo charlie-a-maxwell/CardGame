@@ -138,6 +138,7 @@ namespace CardGame
         private MoveLocation[,] _moves = null;
         static Color outlineColor = Color.Yellow;
         static Texture2D circleTex = null;
+        private bool placed = false;
 
         public static void SetCircleText(Texture2D tex)
         {
@@ -191,25 +192,31 @@ namespace CardGame
             oldLoc = new Vector2(-1, -1);
         }
 
-        public void Render(SpriteBatch sb)
+        public void Render(SpriteBatch sb, GameTime gt)
         {
-            Render(sb, false, 0);
+            Render(sb, gt, false, 0);
         }
 
-        public void Render(SpriteBatch sb, bool selected)
+        public void Render(SpriteBatch sb, GameTime gt, bool selected)
         {
-            Render(sb, selected, 0);
+            Render(sb, gt, selected, 0);
         }
 
-        public void Render(SpriteBatch sb, bool selected, int space)
+        public void Render(SpriteBatch sb, GameTime gt, bool selected, int space)
         {
+            SpriteEffects effect = SpriteEffects.None;
+            Color textColor = (player == PlayerTurn.Player1 ? Color.Black : Color.DarkRed) ;
+
+            if (placed && player == PlayerTurn.Player2)
+                effect = SpriteEffects.FlipVertically;
 
             if (type.texture != null)
-                sb.Draw(type.texture, new Rectangle((int)loc.X, (int)loc.Y, cardWidth, cardHeight), null, Color.White, 0.0f, new Vector2(0, 0), (player == PlayerTurn.Player1 ? SpriteEffects.None : SpriteEffects.FlipVertically), 0.5f);
+                sb.Draw(type.texture, new Rectangle((int)loc.X, (int)loc.Y, cardWidth, cardHeight), null, Color.White, 0.0f, new Vector2(0, 0), effect, 0.5f);
 
-            sb.Draw(circleTex, loc + new Vector2((cardWidth / 2.0f) - 15, (player == PlayerTurn.Player1 ? cardHeight - 30 : 0)), null, Color.White, 0.0f, new Vector2(0, 0), 0.18f, SpriteEffects.None, 0.0f);
+            sb.Draw(circleTex, loc + new Vector2((cardWidth / 2.0f) - 15, (player == PlayerTurn.Player1 || !placed ? cardHeight - 30 : 0)), null, Color.White, 0.0f, new Vector2(0, 0), 0.18f, SpriteEffects.None, 0.0f);
 
-            Screen.DrawText(sb, type.GetStat().ToString(), loc + new Vector2((cardWidth / 2.0f) - 9, (player == PlayerTurn.Player1 ? cardHeight - 30 : 0) + 4));
+            Screen.DrawText(sb, type.GetStat().ToString(), loc + new Vector2((cardWidth / 2.0f) - 9, (player == PlayerTurn.Player1 || !placed ? cardHeight - 30 : 0) + 4), textColor, 1.0f, effect);
+
 
 
             if (selected)
@@ -254,12 +261,12 @@ namespace CardGame
                             if ((i == cardMove.GetLength(0) / 2) && (j == cardMove.GetLength(1) / 2))
                             {
                                 sb.Draw(circleTex, origin, null, Color.White, 0.0f, new Vector2(15, 15), 0.22f, SpriteEffects.None, 0.0f);
-                                Screen.DrawText(sb, cardMove[i, j].ToString(), origin + new Vector2(5, 4));
+                                Screen.DrawText(sb, cardMove[i, j].ToString(), origin + new Vector2(5, 4), textColor, 1.0f);
                             }
                             else
                             {
                                 sb.Draw(circleTex, origin, null, Color.White, 0.0f, new Vector2(0, 0), 0.18f, SpriteEffects.None, 0.0f);
-                                Screen.DrawText(sb, (cardMove[i, j] + stat).ToString(), origin + new Vector2(5, 4));
+                                Screen.DrawText(sb, (cardMove[i, j] + stat).ToString(), origin + new Vector2(5, 4), textColor, 1.0f);
                             }
                         }
                     }
@@ -306,7 +313,10 @@ namespace CardGame
         public void SetLocation(Vector2 l, bool updateLoc)
         {
             if (updateLoc)
+            {
                 oldLoc = loc;
+                placed = true;
+            }
             loc = l;
         }
 
@@ -472,23 +482,23 @@ namespace CardGame
             return found;
         }
 
-        public void Render(SpriteBatch sb)
+        public void Render(SpriteBatch sb, GameTime gt)
         {
-            Render(sb, renderLoc, null);
+            Render(sb, renderLoc, null, gt);
         }
 
-        public void Render(SpriteBatch sb, CardClass selectedCard)
+        public void Render(SpriteBatch sb, CardClass selectedCard, GameTime gt)
         {
-            Render(sb, renderLoc, selectedCard);
+            Render(sb, renderLoc, selectedCard, gt);
         }
 
-        public void Render(SpriteBatch sb, Vector2 origin, CardClass selectedCard)
+        public void Render(SpriteBatch sb, Vector2 origin, CardClass selectedCard, GameTime gt)
         {
             CardClass card;
             for (int i = 0; i < hand.Count; i++ )
             {
                 card = hand[i];
-                card.Render(sb, false);
+                card.Render(sb, gt, false);
             }
         }
     }
@@ -542,7 +552,7 @@ namespace CardGame
             deck = new Stack<CardClass>(deckArray);
         }
 
-        public void Render(SpriteBatch sb)
+        public void Render(SpriteBatch sb, GameTime gt)
         {
             if (deckTex != null && deck.Count > 0)
                 sb.Draw(deckTex, new Rectangle((int)renderLoc.X, (int)renderLoc.Y, CardClass.cardWidth, CardClass.cardHeight), (owner == PlayerTurn.Player1 ? Color.LightBlue : Color.Red ));

@@ -58,14 +58,19 @@ namespace CardGame
 
         public static void DrawText(SpriteBatch sb, string s, Vector2 loc)
         {
-            DrawText(sb, s, loc, Color.Black, 1.0f);
+            DrawText(sb, s, loc, Color.Black, 1.0f, SpriteEffects.None);
         }
 
         public static void DrawText(SpriteBatch sb, string s, Vector2 loc, Color c, float scale)
         {
+            DrawText(sb, s, loc, c, scale, SpriteEffects.None);
+        }
+
+        public static void DrawText(SpriteBatch sb, string s, Vector2 loc, Color c, float scale, SpriteEffects effect)
+        {
             if (font == null) return;
             Vector2 fontOrigin = font.MeasureString(s);
-            sb.DrawString(font, s, loc + fontOrigin / 2, c, 0, fontOrigin / 2, scale, SpriteEffects.None, 0.0f);
+            sb.DrawString(font, s, loc + fontOrigin / 2, c, 0, fontOrigin / 2, scale, effect, 0.0f);
         }
 
         public static void FillColor(SpriteBatch sb, int originX, int originY, int width, int height, Color color)
@@ -74,7 +79,7 @@ namespace CardGame
             sb.Draw(lineTex, new Rectangle(originX, originY, width, height), color);
         }
 
-        public virtual void Render(SpriteBatch sb, GraphicsDevice device)
+        public virtual void Render(SpriteBatch sb, GraphicsDevice device, GameTime gt)
         {
         }
 
@@ -156,7 +161,7 @@ namespace CardGame
             tex = cm.Load<Texture2D>("SplashScreen");
         }
 
-        public override void Render(SpriteBatch sb, GraphicsDevice device)
+        public override void Render(SpriteBatch sb, GraphicsDevice device, GameTime gt)
         {
             sb.Draw(tex, new Vector2(device.Viewport.Width / 2, device.Viewport.Height / 2), null, Color.White, 0.0f, new Vector2(tex.Width / 2.0f, tex.Height / 2.0f), 1.0f, SpriteEffects.None, 0.0f);
             DrawText(sb, "Click on the screen or press Enter to start.", new Vector2(device.Viewport.Width / 2 - 130, device.Viewport.Height / 2 + tex.Height /2.0f + 20), Color.Black, 2.0f);
@@ -174,10 +179,10 @@ namespace CardGame
             currentScreen = null;
         }
 
-        public void Render(SpriteBatch sb, GraphicsDevice device)
+        public void Render(SpriteBatch sb, GraphicsDevice device, GameTime gt)
         {
             if (currentScreen != null)
-                currentScreen.Render(sb, device);
+                currentScreen.Render(sb, device, gt);
         }
 
         public void Update(GameTime gt)

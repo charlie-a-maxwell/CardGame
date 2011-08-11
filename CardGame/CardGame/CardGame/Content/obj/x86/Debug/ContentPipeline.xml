@@ -2,18 +2,6 @@
 <XnaContent xmlns:Pipeline="Microsoft.Xna.Framework.Content.Pipeline">
   <Asset Type="Pipeline:BuildItemCollection">
     <Item>
-      <Source>Cursor1.bmp</Source>
-      <Name>Cursor1</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <Parameters>
-        <Data Key="ColorKeyColor">255, 255, 255, 255</Data>
-      </Parameters>
-      <Options>None</Options>
-      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Cursor1.xnb</Output>
-      <Time>2011-04-18T21:02:44.304-05:00</Time>
-    </Item>
-    <Item>
       <Source>Wall.bmp</Source>
       <Name>Wall</Name>
       <Importer>TextureImporter</Importer>
@@ -21,30 +9,6 @@
       <Options>None</Options>
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Wall.xnb</Output>
       <Time>2011-05-01T12:10:43.544-05:00</Time>
-    </Item>
-    <Item>
-      <Source>DoorPlayer2.bmp</Source>
-      <Name>DoorPlayer2</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <Parameters>
-        <Data Key="ColorKeyColor">255, 255, 255, 255</Data>
-      </Parameters>
-      <Options>None</Options>
-      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DoorPlayer2.xnb</Output>
-      <Time>2011-05-12T21:01:33.104-05:00</Time>
-    </Item>
-    <Item>
-      <Source>DoorPlayer1.bmp</Source>
-      <Name>DoorPlayer1</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <Parameters>
-        <Data Key="ColorKeyColor">255, 255, 255, 255</Data>
-      </Parameters>
-      <Options>None</Options>
-      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DoorPlayer1.xnb</Output>
-      <Time>2011-05-12T20:57:47.328-05:00</Time>
     </Item>
     <Item>
       <Source>Cloud.png</Source>
@@ -71,7 +35,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Circle.xnb</Output>
-      <Time>2011-07-03T14:52:02.326-05:00</Time>
+      <Time>2011-08-09T20:55:10.962-05:00</Time>
     </Item>
     <Item>
       <Source>Card1A.png</Source>
@@ -188,7 +152,7 @@
       <Processor>EffectProcessor</Processor>
       <Options>None</Options>
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Effect.xnb</Output>
-      <Time>2011-07-17T21:31:59.774-05:00</Time>
+      <Time>2011-08-09T21:52:02.507-05:00</Time>
     </Item>
     <Item>
       <Source>DeckBack.bmp</Source>
@@ -207,6 +171,33 @@
       <Options>None</Options>
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\SplashScreen.xnb</Output>
       <Time>2011-07-18T21:02:05.066-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Cursor1.png</Source>
+      <Name>Cursor1</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Cursor1.xnb</Output>
+      <Time>2011-07-26T20:18:01.172-05:00</Time>
+    </Item>
+    <Item>
+      <Source>DoorPlayer1.png</Source>
+      <Name>DoorPlayer1</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DoorPlayer1.xnb</Output>
+      <Time>2011-07-17T21:06:45.061-05:00</Time>
+    </Item>
+    <Item>
+      <Source>DoorPlayer2.png</Source>
+      <Name>DoorPlayer2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DoorPlayer2.xnb</Output>
+      <Time>2011-08-09T21:26:39.963-05:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>

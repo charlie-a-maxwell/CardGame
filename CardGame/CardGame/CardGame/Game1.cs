@@ -270,7 +270,7 @@ namespace CardGame
             spriteBatch.End();
 
             spriteBatch.Begin();
-            sm.Render(spriteBatch, GraphicsDevice);
+            sm.Render(spriteBatch, GraphicsDevice, gameTime);
             mouseHandler.Render(spriteBatch);
             spriteBatch.End();
             

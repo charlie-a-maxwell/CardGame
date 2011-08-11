@@ -18,6 +18,8 @@ namespace CardGame
         Texture2D FireTex;
         Texture2D CloudTex;
         Texture2D MapBackground;
+        Texture2D Gate1;
+        Texture2D Gate2;
         Vector2 center = new Vector2(0,0);
         Vector2 selectedCardLoc;
         CardClass selectedCard;
@@ -128,6 +130,8 @@ namespace CardGame
             FireTex = cm.Load<Texture2D>("Fire");
             CloudTex = cm.Load<Texture2D>("Cloud");
             MapBackground = cm.Load<Texture2D>("MapBack");
+            Gate1 = cm.Load<Texture2D>("DoorPlayer1");
+            Gate2 = cm.Load<Texture2D>("DoorPlayer2");
             Texture2D deckTeck = cm.Load<Texture2D>("DeckBack");
 
             
@@ -163,7 +167,7 @@ namespace CardGame
 
         }
 
-        public override void Render(SpriteBatch sb, GraphicsDevice device)
+        public override void Render(SpriteBatch sb, GraphicsDevice device, GameTime gt)
         {
             int maxCardWidth = CardClass.cardWidth * (map.GetLength(1)-2);
             int maxCardHeight = CardClass.cardHeight * (map.GetLength(0)-2);
@@ -174,7 +178,7 @@ namespace CardGame
             Vector2 origin;
 
             if (MapBackground != null)
-                sb.Draw(MapBackground, new Rectangle((int)center.X, (int)center.Y, map.GetLength(0) * (CardClass.cardWidth + spacing), map.GetLength(1) * (CardClass.cardHeight + spacing)), Color.White);
+                sb.Draw(MapBackground, new Rectangle((int)center.X, (int)center.Y-10, map.GetLength(0) * (CardClass.cardWidth + spacing), map.GetLength(1) * (CardClass.cardHeight + spacing) + 15), Color.White);
 
             if (CloudTex != null)
             {
@@ -192,7 +196,7 @@ namespace CardGame
                 sb.Draw(FireTex, origin, null, Color.White, 0f, new Vector2(0, 0), 0.4f, SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically, 0);
             }
 
-
+            Color trans = new Color(Color.LightGray, 0.3f);
             for (int i = 0; i < map.GetLength(0); i++)
             {
                 for (int j = 0; j < map.GetLength(1); j++)
@@ -200,12 +204,12 @@ namespace CardGame
                     origin = new Vector2(j*(CardClass.cardWidth + spacing) + center.X, i*(CardClass.cardHeight + spacing) + center.Y);
                     if (!(i == 0 || j == 0 || i == map.GetLength(0) - 1 || j == map.GetLength(1) - 1))
                     {
-                        if (i == map.GetLength(0) - 2)
-                            outlineColor = Color.Red;
-                        else if (i == 1)
-                            outlineColor = Color.Blue;
-                        else
-                            outlineColor = Color.Black;
+                        outlineColor = Color.Black;
+
+                        if (i == map.GetLength(0) - 2 || i == 1)
+                        {
+                            FillColor(sb, (int)origin.X, (int)origin.Y, CardClass.cardWidth, CardClass.cardHeight, trans);
+                        }
 
                         DrawLine(sb, origin, origin + hor, outlineColor, 0.8f);
                         DrawLine(sb, origin, origin + ver, outlineColor, 0.8f);
@@ -215,27 +219,40 @@ namespace CardGame
 
                     }
 
-
                     if (map[i, j] != null)
                     {
-                        map[i, j].Render(sb, false, spacing);
+                        map[i, j].Render(sb, gt, false, spacing);
                     }
 
                     if (i == 0 && j == 3)
                     {
-                        DrawLine(sb, origin, origin + hor, outlineColor, 0.8f);
-                        DrawLine(sb, origin, origin + ver, outlineColor, 0.8f);
+                        if (Gate1 != null)
+                        {
+                            sb.Draw(Gate1, new Rectangle((int)origin.X, (int)origin.Y, CardClass.cardWidth, CardClass.cardHeight), Color.White);
+                        }
+                        else
+                        {
+                            DrawLine(sb, origin, origin + hor, outlineColor, 0.8f);
+                            DrawLine(sb, origin, origin + ver, outlineColor, 0.8f);
 
-                        DrawLine(sb, origin + ver, origin + ver + hor, outlineColor, 0.8f);
-                        DrawLine(sb, origin + hor, origin + hor + ver, outlineColor, 0.8f);
+                            DrawLine(sb, origin + ver, origin + ver + hor, outlineColor, 0.8f);
+                            DrawLine(sb, origin + hor, origin + hor + ver, outlineColor, 0.8f);
+                        }
                     }
                     if (i == map.GetLength(0) - 1 && j == 3)
                     {
-                        DrawLine(sb, origin, origin + hor, outlineColor, 0.8f);
-                        DrawLine(sb, origin, origin + ver, outlineColor, 0.8f);
+                        if (Gate2 != null)
+                        {
+                            sb.Draw(Gate2, new Rectangle((int)origin.X, (int)origin.Y, CardClass.cardWidth, CardClass.cardHeight), Color.White);
+                        }
+                        else
+                        {
+                            DrawLine(sb, origin, origin + hor, outlineColor, 0.8f);
+                            DrawLine(sb, origin, origin + ver, outlineColor, 0.8f);
 
-                        DrawLine(sb, origin + ver, origin + ver + hor, outlineColor, 0.8f);
-                        DrawLine(sb, origin + hor, origin + hor + ver, outlineColor, 0.8f);
+                            DrawLine(sb, origin + ver, origin + ver + hor, outlineColor, 0.8f);
+                            DrawLine(sb, origin + hor, origin + hor + ver, outlineColor, 0.8f);
+                        }
                     }
 
                 }
@@ -246,18 +263,18 @@ namespace CardGame
             //DrawOutline(sb);
             if (over)
             {
-                player1Hand.Render(sb, selectedCard);
-                player2Hand.Render(sb, selectedCard);
+                player1Hand.Render(sb, selectedCard, gt);
+                player2Hand.Render(sb, selectedCard, gt);
                 text = (winner == PlayerTurn.Player1 ? "Player 1" : "Player 2");
             }
             else if (currentTurn == PlayerTurn.Player1)
             {
-                player1Hand.Render(sb, selectedCard);
+                player1Hand.Render(sb, selectedCard, gt);
                 text = "Player 1";
             }
             else
             {
-                player2Hand.Render(sb, selectedCard);
+                player2Hand.Render(sb, selectedCard, gt);
                 text = "Player 2";
             }
 
@@ -279,11 +296,11 @@ namespace CardGame
                 DrawText(sb, text, new Vector2(center.X + maxCardWidth / 2, 10), textColor, 1.0f);
 
 
-            player1Deck.Render(sb);
-            player2Deck.Render(sb);
+            player1Deck.Render(sb, gt);
+            player2Deck.Render(sb, gt);
 
             if (selectedCard != null)
-                selectedCard.Render(sb, true, spacing);
+                selectedCard.Render(sb, gt, true, spacing);
 
         }
 
