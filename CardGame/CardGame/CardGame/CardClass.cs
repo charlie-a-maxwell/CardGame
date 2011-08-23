@@ -192,17 +192,17 @@ namespace CardGame
             oldLoc = new Vector2(-1, -1);
         }
 
-        public void Render(SpriteBatch sb, GameTime gt)
+        public void Render(SpriteBatch sb)
         {
-            Render(sb, gt, false, 0);
+            Render(sb, false, 0);
         }
 
-        public void Render(SpriteBatch sb, GameTime gt, bool selected)
+        public void Render(SpriteBatch sb, bool selected)
         {
-            Render(sb, gt, selected, 0);
+            Render(sb, selected, 0);
         }
 
-        public void Render(SpriteBatch sb, GameTime gt, bool selected, int space)
+        public void Render(SpriteBatch sb, bool selected, int space)
         {
             SpriteEffects effect = SpriteEffects.None;
             Color textColor = (player == PlayerTurn.Player1 ? Color.Black : Color.DarkRed) ;
@@ -482,23 +482,23 @@ namespace CardGame
             return found;
         }
 
-        public void Render(SpriteBatch sb, GameTime gt)
+        public void Render(SpriteBatch sb)
         {
-            Render(sb, renderLoc, null, gt);
+            Render(sb, renderLoc, null);
         }
 
-        public void Render(SpriteBatch sb, CardClass selectedCard, GameTime gt)
+        public void Render(SpriteBatch sb, CardClass selectedCard)
         {
-            Render(sb, renderLoc, selectedCard, gt);
+            Render(sb, renderLoc, selectedCard);
         }
 
-        public void Render(SpriteBatch sb, Vector2 origin, CardClass selectedCard, GameTime gt)
+        public void Render(SpriteBatch sb, Vector2 origin, CardClass selectedCard)
         {
             CardClass card;
             for (int i = 0; i < hand.Count; i++ )
             {
                 card = hand[i];
-                card.Render(sb, gt, false);
+                card.Render(sb, false);
             }
         }
     }
@@ -552,7 +552,7 @@ namespace CardGame
             deck = new Stack<CardClass>(deckArray);
         }
 
-        public void Render(SpriteBatch sb, GameTime gt)
+        public void Render(SpriteBatch sb)
         {
             if (deckTex != null && deck.Count > 0)
                 sb.Draw(deckTex, new Rectangle((int)renderLoc.X, (int)renderLoc.Y, CardClass.cardWidth, CardClass.cardHeight), (owner == PlayerTurn.Player1 ? Color.LightBlue : Color.Red ));

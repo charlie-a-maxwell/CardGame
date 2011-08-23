@@ -4,9 +4,8 @@ float4x4 Projection;
 float xOvercast;
 float xTime;
 float2 xDir;
-float wave;                // pi/.75 is a good default
-float distortion;        // 1 is a good default
 float2 centerCoord;        // 0.5,0.5 is the screen center
+
 
 Texture xTexture;
 
@@ -35,30 +34,26 @@ sampler TextureSampler = sampler_state
  PNPixelToFrame PerlinPS(PNVertexToPixel PSIn) : COLOR0
  {
      PNPixelToFrame Output = (PNPixelToFrame)0;   
-    
-    float2 distance = abs(PSIn.TextureCoords - centerCoord);
-    float scalar = length(distance);
+     
+   // PSIn.TextureCoords.x = clamp(PSIn.TextureCoords.x, 0, 1);
+   // PSIn.TextureCoords.y = clamp(PSIn.TextureCoords.y, 0, 1);
 
-    // invert the scale so 1 is centerpoint
-    scalar = abs(1 - scalar);
-        
-    // calculate how far to distort for this pixel    
-    float sinoffset = sin(wave / scalar);
-    sinoffset = clamp(sinoffset, 0, 1);
+    float2 distance = PSIn.TextureCoords - centerCoord;  
+    float wave = atan2(distance.y, distance.x)+ 3.1415;
+    float len = length(distance);
+    float sine = sin(wave);
+    float cosine = cos(wave);
     
-    // calculate which direction to distort
-    float sinsign = cos(wave / scalar);    
-    
-    // reduce the distortion effect
-    sinoffset = sinoffset * distortion/32;
-    
-     float2 move = float2(xDir.x * sinoffset, xDir.y * sinsign);
-     float4 perlin = tex2D(TextureSampler, (PSIn.TextureCoords)+xTime*move)/2;
-     perlin += tex2D(TextureSampler, (PSIn.TextureCoords)*2+xTime*move)/4;
-     perlin += tex2D(TextureSampler, (PSIn.TextureCoords)*4+xTime*move)/8;
-     perlin += tex2D(TextureSampler, (PSIn.TextureCoords)*8+xTime*move)/16;
-     perlin += tex2D(TextureSampler, (PSIn.TextureCoords)*16+xTime*move)/32;
-     perlin += tex2D(TextureSampler, (PSIn.TextureCoords)*32+xTime*move)/32;
+    float x = len % 0.7847;    
+      
+     float2 rotate = float2(cosine - x*sine, sine + x*cosine)/10;
+     float2 move = (xDir) * xTime ;
+     float4 perlin = tex2D(TextureSampler, (PSIn.TextureCoords+rotate)+move)/2;
+     perlin += tex2D(TextureSampler, (PSIn.TextureCoords+rotate)*2+move)/4;
+     perlin += tex2D(TextureSampler, (PSIn.TextureCoords+rotate)*4+move)/8;
+     perlin += tex2D(TextureSampler, (PSIn.TextureCoords+rotate)*8+move)/16;
+     perlin += tex2D(TextureSampler, (PSIn.TextureCoords+rotate)*16+move)/32;
+     perlin += tex2D(TextureSampler, (PSIn.TextureCoords+rotate)*32+move)/32;
 
      Output.Color.rgb = 1;
      Output.Color.a =1.0f-pow(perlin.r, xOvercast)*2.0f;
@@ -70,6 +65,6 @@ sampler TextureSampler = sampler_state
  {
      pass Pass0
      {
-         PixelShader = compile ps_2_0 PerlinPS();
+         PixelShader = compile ps_3_0 PerlinPS();
      }
  }

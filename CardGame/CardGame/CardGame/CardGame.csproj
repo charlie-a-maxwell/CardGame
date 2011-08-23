@@ -85,6 +85,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CardClass.cs" />
+    <Compile Include="CloudEntity.cs" />
+    <Compile Include="Entity.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />

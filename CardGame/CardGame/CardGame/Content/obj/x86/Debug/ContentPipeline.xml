@@ -152,7 +152,7 @@
       <Processor>EffectProcessor</Processor>
       <Options>None</Options>
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Effect.xnb</Output>
-      <Time>2011-08-09T21:52:02.507-05:00</Time>
+      <Time>2011-08-19T06:57:33.98-05:00</Time>
     </Item>
     <Item>
       <Source>DeckBack.bmp</Source>
@@ -198,6 +198,33 @@
       <Options>None</Options>
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DoorPlayer2.xnb</Output>
       <Time>2011-08-09T21:26:39.963-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Cloud0.png</Source>
+      <Name>Cloud0</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Cloud0.xnb</Output>
+      <Time>2011-08-22T20:34:56.666-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Cloud1.png</Source>
+      <Name>Cloud1</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Cloud1.xnb</Output>
+      <Time>2011-08-22T20:35:06.244-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Cloud2.png</Source>
+      <Name>Cloud2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Cloud2.xnb</Output>
+      <Time>2011-08-22T20:35:19.903-05:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>

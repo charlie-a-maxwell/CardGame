@@ -167,7 +167,7 @@ namespace CardGame
 
         }
 
-        public override void Render(SpriteBatch sb, GraphicsDevice device, GameTime gt)
+        public override void Render(SpriteBatch sb, GraphicsDevice device)
         {
             int maxCardWidth = CardClass.cardWidth * (map.GetLength(1)-2);
             int maxCardHeight = CardClass.cardHeight * (map.GetLength(0)-2);
@@ -221,7 +221,7 @@ namespace CardGame
 
                     if (map[i, j] != null)
                     {
-                        map[i, j].Render(sb, gt, false, spacing);
+                        map[i, j].Render(sb, false, spacing);
                     }
 
                     if (i == 0 && j == 3)
@@ -263,18 +263,18 @@ namespace CardGame
             //DrawOutline(sb);
             if (over)
             {
-                player1Hand.Render(sb, selectedCard, gt);
-                player2Hand.Render(sb, selectedCard, gt);
+                player1Hand.Render(sb, selectedCard);
+                player2Hand.Render(sb, selectedCard);
                 text = (winner == PlayerTurn.Player1 ? "Player 1" : "Player 2");
             }
             else if (currentTurn == PlayerTurn.Player1)
             {
-                player1Hand.Render(sb, selectedCard, gt);
+                player1Hand.Render(sb, selectedCard);
                 text = "Player 1";
             }
             else
             {
-                player2Hand.Render(sb, selectedCard, gt);
+                player2Hand.Render(sb, selectedCard);
                 text = "Player 2";
             }
 
@@ -296,11 +296,11 @@ namespace CardGame
                 DrawText(sb, text, new Vector2(center.X + maxCardWidth / 2, 10), textColor, 1.0f);
 
 
-            player1Deck.Render(sb, gt);
-            player2Deck.Render(sb, gt);
+            player1Deck.Render(sb);
+            player2Deck.Render(sb);
 
             if (selectedCard != null)
-                selectedCard.Render(sb, gt, true, spacing);
+                selectedCard.Render(sb, true, spacing);
 
         }
 

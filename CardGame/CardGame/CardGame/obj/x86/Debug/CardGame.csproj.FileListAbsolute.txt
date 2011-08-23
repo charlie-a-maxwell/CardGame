@@ -57,3 +57,6 @@ C:\projects\CardGame\CardGame\CardGame\obj\x86\Debug\CardGame.exe
 C:\projects\CardGame\CardGame\CardGame\obj\x86\Debug\CardGame.pdb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DeckBack.xnb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\SplashScreen.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Cloud0.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Cloud1.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Cloud2.xnb

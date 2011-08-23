@@ -79,7 +79,7 @@ namespace CardGame
             sb.Draw(lineTex, new Rectangle(originX, originY, width, height), color);
         }
 
-        public virtual void Render(SpriteBatch sb, GraphicsDevice device, GameTime gt)
+        public virtual void Render(SpriteBatch sb, GraphicsDevice device)
         {
         }
 
@@ -161,7 +161,7 @@ namespace CardGame
             tex = cm.Load<Texture2D>("SplashScreen");
         }
 
-        public override void Render(SpriteBatch sb, GraphicsDevice device, GameTime gt)
+        public override void Render(SpriteBatch sb, GraphicsDevice device)
         {
             sb.Draw(tex, new Vector2(device.Viewport.Width / 2, device.Viewport.Height / 2), null, Color.White, 0.0f, new Vector2(tex.Width / 2.0f, tex.Height / 2.0f), 1.0f, SpriteEffects.None, 0.0f);
             DrawText(sb, "Click on the screen or press Enter to start.", new Vector2(device.Viewport.Width / 2 - 130, device.Viewport.Height / 2 + tex.Height /2.0f + 20), Color.Black, 2.0f);
@@ -182,7 +182,7 @@ namespace CardGame
         public void Render(SpriteBatch sb, GraphicsDevice device, GameTime gt)
         {
             if (currentScreen != null)
-                currentScreen.Render(sb, device, gt);
+                currentScreen.Render(sb, device);
         }
 
         public void Update(GameTime gt)

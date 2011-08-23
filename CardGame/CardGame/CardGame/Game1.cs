@@ -118,6 +118,7 @@ namespace CardGame
         Texture2D cloudMap;
         Texture2D cloudStaticMap;
         GameOptions go;
+        List<Entity> entities;
 
         public Game1()
         {
@@ -125,6 +126,7 @@ namespace CardGame
             Content.RootDirectory = "Content";
             sm = new ScreenManager();
             go = new GameOptions();
+            entities = new List<Entity>(110);
         }
 
         /// <summary>
@@ -153,6 +155,13 @@ namespace CardGame
 
             sm.InitAll();
 
+            Random rand = new Random();
+            Vector2 loc = new Vector2((float)(GraphicsDevice.Viewport.Width / 2.0f), (float)(GraphicsDevice.Viewport.Height / 2.0f));
+            for (int i = 0; i < entities.Capacity; i++)
+            {
+                entities.Add(new CloudEntity(loc));
+            }
+
             base.Initialize();
         }
 
@@ -177,7 +186,7 @@ namespace CardGame
         /// </summary>
         protected override void LoadContent()
         {
-            sm.LoadContentAll(Content);
+            sm.LoadContentAll(Content); 
 
             CardClass.SetCircleText(Content.Load<Texture2D>("Circle"));
             mouseHandler.SetTexture(Content.Load<Texture2D>("Cursor1"));
@@ -187,6 +196,10 @@ namespace CardGame
             cloudsRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight, 1, SurfaceFormat.Vector4);
             cloudStaticMap = CreateStaticMap(32);
             cloudMap = new Texture2D(GraphicsDevice, cloudsRenderTarget.Width, cloudsRenderTarget.Height, 1, TextureUsage.None, cloudsRenderTarget.Format);
+
+            foreach (Entity e in entities)
+                e.LoadTexture(Content);
+            
             // TODO: use this.Content to load your game content here
         }
 
@@ -249,6 +262,9 @@ namespace CardGame
             mouseHandler.Update(gameTime);
             sm.Update(gameTime);
             base.Update(gameTime);
+
+            foreach (Entity e in entities)
+                e.Update(gameTime);
         }
 
         /// <summary>
@@ -265,11 +281,13 @@ namespace CardGame
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Blue, 1.0f, 0);
 
             spriteBatch.Begin(SpriteBlendMode.AlphaBlend);
-            Screen.FillColor(spriteBatch, 0, 0, GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height, go.cloudBackColor);
+            Screen.FillColor(spriteBatch, 0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, go.cloudBackColor);
             spriteBatch.Draw(cloudMap, Vector2.Zero, go.cloudForeColor);
             spriteBatch.End();
 
             spriteBatch.Begin();
+            foreach (Entity e in entities)
+                e.Render(spriteBatch);
             sm.Render(spriteBatch, GraphicsDevice, gameTime);
             mouseHandler.Render(spriteBatch);
             spriteBatch.End();
@@ -286,12 +304,14 @@ namespace CardGame
             effect.Parameters["xOvercast"].SetValue(go.cloudIntensity);
             effect.Parameters["xTime"].SetValue(time / go.cloudSpeed);
             effect.Parameters["xDir"].SetValue(go.cloudDir);
+            effect.Parameters["centerCoord"].SetValue(new Vector2(0.5f, 0.5f));
+
             spriteBatch.Begin(SpriteBlendMode.None, SpriteSortMode.Immediate, SaveStateMode.None, Matrix.Identity);
             effect.Begin();
             foreach (EffectPass pass in effect.CurrentTechnique.Passes)
             {
                 pass.Begin();
-                spriteBatch.Draw(cloudStaticMap, new Rectangle(0,0,GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height) , Color.White);
+                spriteBatch.Draw(cloudStaticMap, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), Color.White);
                 pass.End();
             }
             spriteBatch.End();
