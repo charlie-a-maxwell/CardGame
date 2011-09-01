@@ -117,12 +117,14 @@ namespace CardGame
         RenderTarget2D cloudsRenderTarget;
         Texture2D cloudMap;
         Texture2D cloudStaticMap;
+        Texture2D background;
         GameOptions go;
         List<Entity> entities;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
             Content.RootDirectory = "Content";
             sm = new ScreenManager();
             go = new GameOptions();
@@ -193,12 +195,14 @@ namespace CardGame
 
             effect = Content.Load<Effect>("Effect");
 
-            cloudsRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight, 1, SurfaceFormat.Vector4);
-            cloudStaticMap = CreateStaticMap(32);
-            cloudMap = new Texture2D(GraphicsDevice, cloudsRenderTarget.Width, cloudsRenderTarget.Height, 1, TextureUsage.None, cloudsRenderTarget.Format);
+            //cloudsRenderTarget = new RenderTarget2D(GraphicsDevice, GraphicsDevice.PresentationParameters.BackBufferWidth, GraphicsDevice.PresentationParameters.BackBufferHeight, 1, SurfaceFormat.Vector4);
+            //cloudStaticMap = CreateStaticMap(32);
+            //cloudMap = new Texture2D(GraphicsDevice, cloudsRenderTarget.Width, cloudsRenderTarget.Height, 1, TextureUsage.None, cloudsRenderTarget.Format);
 
             foreach (Entity e in entities)
                 e.LoadTexture(Content);
+
+            background = Content.Load<Texture2D>("Background");
             
             // TODO: use this.Content to load your game content here
         }
@@ -275,19 +279,29 @@ namespace CardGame
         {
             // TODO: Add your drawing code here
             float time = (float)gameTime.TotalGameTime.TotalMilliseconds / 100.0f;
-            GeneratePerlinNoise(time);
+            //GeneratePerlinNoise(time);
 
 
-            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.Blue, 1.0f, 0);
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer | ClearOptions.Stencil, Color.Tan, 1.0f, 0);
 
-            spriteBatch.Begin(SpriteBlendMode.AlphaBlend);
-            Screen.FillColor(spriteBatch, 0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, go.cloudBackColor);
-            spriteBatch.Draw(cloudMap, Vector2.Zero, go.cloudForeColor);
-            spriteBatch.End();
+            //spriteBatch.Begin(SpriteBlendMode.AlphaBlend);
+            //Screen.FillColor(spriteBatch, 0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, go.cloudBackColor);
+            //spriteBatch.Draw(cloudMap, Vector2.Zero, go.cloudForeColor);
+            //spriteBatch.End();
 
             spriteBatch.Begin();
+            spriteBatch.Draw(background, GraphicsDevice.Viewport.TitleSafeArea, Color.White);
+
+            GraphicsDevice.RenderState.StencilEnable = true;
+            GraphicsDevice.RenderState.StencilFunction = CompareFunction.GreaterEqual;
+            GraphicsDevice.RenderState.StencilPass = StencilOperation.Replace;
+            GraphicsDevice.RenderState.ReferenceStencil = 0;
+
             foreach (Entity e in entities)
                 e.Render(spriteBatch);
+
+            GraphicsDevice.RenderState.StencilEnable = false;
+
             sm.Render(spriteBatch, GraphicsDevice, gameTime);
             mouseHandler.Render(spriteBatch);
             spriteBatch.End();

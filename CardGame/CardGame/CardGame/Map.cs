@@ -177,24 +177,24 @@ namespace CardGame
 
             Vector2 origin;
 
-            if (MapBackground != null)
-                sb.Draw(MapBackground, new Rectangle((int)center.X, (int)center.Y-10, map.GetLength(0) * (CardClass.cardWidth + spacing), map.GetLength(1) * (CardClass.cardHeight + spacing) + 15), Color.White);
+            //if (MapBackground != null)
+            //    sb.Draw(MapBackground, new Rectangle((int)center.X, (int)center.Y-10, map.GetLength(0) * (CardClass.cardWidth + spacing), map.GetLength(1) * (CardClass.cardHeight + spacing) + 15), Color.White);
 
-            if (CloudTex != null)
-            {
-                origin = new Vector2((map.GetLength(0) - 3) * (CardClass.cardWidth + spacing) + center.X, (map.GetLength(1)-1) * (CardClass.cardHeight + spacing) + center.Y);
-                sb.Draw(CloudTex, origin, null, Color.White, 0f, new Vector2(0,0), 0.4f, SpriteEffects.None, 0);
-                origin = new Vector2(center.X, (map.GetLength(1) - 1) * (CardClass.cardHeight + spacing) + center.Y);
-                sb.Draw(CloudTex, origin, null, Color.White, 0f, new Vector2(0, 0), 0.4f, SpriteEffects.FlipHorizontally, 0);
-            }
+            //if (CloudTex != null)
+            //{
+            //    origin = new Vector2((map.GetLength(0) - 3) * (CardClass.cardWidth + spacing) + center.X, (map.GetLength(1)-1) * (CardClass.cardHeight + spacing) + center.Y);
+            //    sb.Draw(CloudTex, origin, null, Color.White, 0f, new Vector2(0,0), 0.4f, SpriteEffects.None, 0);
+            //    origin = new Vector2(center.X, (map.GetLength(1) - 1) * (CardClass.cardHeight + spacing) + center.Y);
+            //    sb.Draw(CloudTex, origin, null, Color.White, 0f, new Vector2(0, 0), 0.4f, SpriteEffects.FlipHorizontally, 0);
+            //}
 
-            if (FireTex != null)
-            {
-                origin = new Vector2((map.GetLength(0) - 3) * (CardClass.cardWidth + spacing) + 30 + center.X, center.Y  + spacing + 20);
-                sb.Draw(FireTex, origin, null, Color.White, 0f, new Vector2(0, 0), 0.4f, SpriteEffects.FlipVertically, 0);
-                origin = new Vector2(center.X + 30, center.Y + spacing + 20);
-                sb.Draw(FireTex, origin, null, Color.White, 0f, new Vector2(0, 0), 0.4f, SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically, 0);
-            }
+            //if (FireTex != null)
+            //{
+            //    origin = new Vector2((map.GetLength(0) - 3) * (CardClass.cardWidth + spacing) + 30 + center.X, center.Y  + spacing + 20);
+            //    sb.Draw(FireTex, origin, null, Color.White, 0f, new Vector2(0, 0), 0.4f, SpriteEffects.FlipVertically, 0);
+            //    origin = new Vector2(center.X + 30, center.Y + spacing + 20);
+            //    sb.Draw(FireTex, origin, null, Color.White, 0f, new Vector2(0, 0), 0.4f, SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically, 0);
+            //}
 
             Color trans = new Color(Color.LightGray, 0.3f);
             for (int i = 0; i < map.GetLength(0); i++)

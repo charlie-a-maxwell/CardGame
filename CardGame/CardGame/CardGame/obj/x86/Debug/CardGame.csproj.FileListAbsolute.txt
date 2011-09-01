@@ -60,3 +60,6 @@ C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\SplashScreen.xnb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Cloud0.xnb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Cloud1.xnb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Cloud2.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Background.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\CloudT1.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\CloudT2.xnb

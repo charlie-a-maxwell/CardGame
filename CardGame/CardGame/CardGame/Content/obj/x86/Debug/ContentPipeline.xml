@@ -226,6 +226,33 @@
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Cloud2.xnb</Output>
       <Time>2011-08-22T20:35:19.903-05:00</Time>
     </Item>
+    <Item>
+      <Source>Background.png</Source>
+      <Name>Background</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Background.xnb</Output>
+      <Time>2011-08-28T09:54:45.666-05:00</Time>
+    </Item>
+    <Item>
+      <Source>CloudT1.png</Source>
+      <Name>CloudT1</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\CloudT1.xnb</Output>
+      <Time>2011-08-28T09:49:51.608-05:00</Time>
+    </Item>
+    <Item>
+      <Source>CloudT2.png</Source>
+      <Name>CloudT2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\CloudT2.xnb</Output>
+      <Time>2011-08-28T09:50:00.824-05:00</Time>
+    </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
       <TargetPlatform>Windows</TargetPlatform>
