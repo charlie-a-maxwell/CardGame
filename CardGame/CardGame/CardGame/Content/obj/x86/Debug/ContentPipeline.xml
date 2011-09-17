@@ -2,6 +2,15 @@
 <XnaContent xmlns:Pipeline="Microsoft.Xna.Framework.Content.Pipeline">
   <Asset Type="Pipeline:BuildItemCollection">
     <Item>
+      <Source>CourierNew.spritefont</Source>
+      <Name>CourierNew</Name>
+      <Importer>FontDescriptionImporter</Importer>
+      <Processor>FontDescriptionProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\CourierNew.xnb</Output>
+      <Time>2011-07-18T06:48:51.876-05:00</Time>
+    </Item>
+    <Item>
       <Source>Wall.bmp</Source>
       <Name>Wall</Name>
       <Importer>TextureImporter</Importer>
@@ -137,24 +146,6 @@
       <Time>2011-07-17T21:07:09.194-05:00</Time>
     </Item>
     <Item>
-      <Source>CourierNew.spritefont</Source>
-      <Name>CourierNew</Name>
-      <Importer>FontDescriptionImporter</Importer>
-      <Processor>FontDescriptionProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\CourierNew.xnb</Output>
-      <Time>2011-07-18T06:48:51.876-05:00</Time>
-    </Item>
-    <Item>
-      <Source>Effect.fx</Source>
-      <Name>Effect</Name>
-      <Importer>EffectImporter</Importer>
-      <Processor>EffectProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Effect.xnb</Output>
-      <Time>2011-08-19T06:57:33.98-05:00</Time>
-    </Item>
-    <Item>
       <Source>DeckBack.bmp</Source>
       <Name>DeckBack</Name>
       <Importer>TextureImporter</Importer>
@@ -240,9 +231,13 @@
       <Name>CloudT1</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
+      <Parameters>
+        <Data Key="ColorKeyColor">255, 0, 234, 0</Data>
+        <Data Key="ColorKeyEnabled">False</Data>
+      </Parameters>
       <Options>None</Options>
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\CloudT1.xnb</Output>
-      <Time>2011-08-28T09:49:51.608-05:00</Time>
+      <Time>2011-09-08T21:10:47.221-05:00</Time>
     </Item>
     <Item>
       <Source>CloudT2.png</Source>
@@ -252,6 +247,15 @@
       <Options>None</Options>
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\CloudT2.xnb</Output>
       <Time>2011-08-28T09:50:00.824-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Effect.fx</Source>
+      <Name>Effect</Name>
+      <Importer>EffectImporter</Importer>
+      <Processor>EffectProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Effect.xnb</Output>
+      <Time>2011-09-16T20:22:48.155-05:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>

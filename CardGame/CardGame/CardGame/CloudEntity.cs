@@ -20,8 +20,8 @@ namespace CardGame
 
         public CloudEntity(Vector2 l) : base(l) 
         {
-            rot = rand.NextDouble() * Math.PI * 2;
-            rotSpeed = (rand.NextDouble() + 0.1) / 300.0f;
+            rot = rand.NextDouble() * (Math.PI * 2);
+            rotSpeed = (rand.NextDouble() + 0.1) / 1000.0f;
             spinSpeed = (float)(rand.NextDouble() + 0.1) / 500.0f;
             rendLoc = new Vector2(0, 0);
             dis = rand.Next(130, 300);
@@ -30,9 +30,9 @@ namespace CardGame
 
         public override void LoadTexture(ContentManager cm)
         {
-            int r = rand.Next(2)+1;
+            int r = rand.Next(1)+1;
 
-            tex = cm.Load<Texture2D>("Cloud" + r);
+            tex = cm.Load<Texture2D>("CloudT" + r);
 
             int maxDis;
             maxDis = (tex.Width > tex.Height ? tex.Width : tex.Height);
@@ -46,15 +46,6 @@ namespace CardGame
             rot += rotSpeed;
             if (rot > Math.PI * 2)
                 rot = rot % (Math.PI * 2);
-
-            // EQUATION
-            // r = l / (1 + e * cos(theta))
-            // l = (b*b)/a  
-            // e = sqrt(1 - (b*b)/(a*a))
-
-            //double l = (dis * dis) / dis2;
-            //double e = Math.Sqrt(1 - (dis * dis) / (dis2 * dis2));
-            //double r = l / (1 + e * Math.Cos(rot));
 
             rendLoc.X = loc.X + (float)(dis * Math.Cos(rot));
             rendLoc.Y = loc.Y + (float)(dis2 * Math.Sin(rot));

@@ -19,6 +19,8 @@ sampler TextureSampler = sampler_state
 	AddressV = mirror;
 };
 
+sampler2D texSample;
+
 //------- Technique: PerlinNoise --------
  struct PNVertexToPixel
  {    
@@ -61,10 +63,75 @@ sampler TextureSampler = sampler_state
      return Output;
  }
  
+ PNPixelToFrame CloudBlendPS(PNVertexToPixel PSIn)
+ {
+     PNPixelToFrame Output = (PNPixelToFrame)0;   
+     
+     float4 c = tex2D(texSample, PSIn.TextureCoords);
+
+     Output.Color.rgb = c;
+    if (c.r == 1.0f && c.b == 1.0f && c.g == 0.0f)
+		 Output.Color.a = 0;
+	else 
+		Output.Color.a = 1-c.a-0.2f;
+ 
+     return Output;
+ }
+ 
+ PNPixelToFrame CloudColorBlendPS(PNVertexToPixel PSIn)
+ {
+     PNPixelToFrame Output = (PNPixelToFrame)0;   
+     
+     float4 c = tex2D(texSample, PSIn.TextureCoords);
+
+     Output.Color.rgba = c;
+     if (c.r == 1.0f && c.b == 1.0f && c.g == 0.0f)
+		 Output.Color.a = 0;
+	else if (c.a == 0)
+		Output.Color.a = 0.1;
+ 
+     return Output;
+ }
+ 
  technique PerlinNoise
  {
      pass Pass0
      {
          PixelShader = compile ps_3_0 PerlinPS();
      }
+ }
+ 
+ technique CloudBlend
+ {
+	pass Pass0
+	{
+		AlphaBlendEnable = True;
+		SrcBlend = Zero;
+		DestBlend = One;
+		StencilEnable = True;
+		StencilFunc = Always;
+		StencilPass = Incr;
+		StencilFail = Incr;
+		StencilRef = 1;
+		
+		PixelShader = compile ps_2_0 CloudBlendPS();
+	}
+ }
+ 
+  
+ technique CloudColorBlend
+ {
+	pass Pass0
+	{
+		AlphaBlendEnable = True;
+		SrcBlend = One;
+		DestBlend = Zero;
+		StencilEnable = True;
+		StencilFunc = Greater;
+		StencilFail = Decr;
+		StencilPass = Keep;
+		StencilRef = 1;
+		
+		PixelShader = compile ps_2_0 CloudColorBlendPS();
+	}
  }

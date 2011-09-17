@@ -289,19 +289,47 @@ namespace CardGame
             //spriteBatch.Draw(cloudMap, Vector2.Zero, go.cloudForeColor);
             //spriteBatch.End();
 
+            GraphicsDevice.RenderState.StencilEnable = false;
             spriteBatch.Begin();
             spriteBatch.Draw(background, GraphicsDevice.Viewport.TitleSafeArea, Color.White);
+            spriteBatch.End();
 
             GraphicsDevice.RenderState.StencilEnable = true;
-            GraphicsDevice.RenderState.StencilFunction = CompareFunction.GreaterEqual;
-            GraphicsDevice.RenderState.StencilPass = StencilOperation.Replace;
-            GraphicsDevice.RenderState.ReferenceStencil = 0;
+            GraphicsDevice.RenderState.AlphaBlendEnable = true;
 
-            foreach (Entity e in entities)
-                e.Render(spriteBatch);
+            spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.None);
+            effect.CurrentTechnique = effect.Techniques["CloudBlend"];
+            effect.Begin();
+            effect.CurrentTechnique.Passes[0].Begin();
+            Entity ent;
+            for (int i = 0; i < entities.Count; i++)
+            {
+                ent = entities[i];
+                ent.Render(spriteBatch);
+            }
+            spriteBatch.End();
+            effect.CurrentTechnique.Passes[0].End();
+            effect.End();
+
+            spriteBatch.Begin(SpriteBlendMode.AlphaBlend, SpriteSortMode.Immediate, SaveStateMode.None);
+            effect.CurrentTechnique = effect.Techniques["CloudColorBlend"];
+            effect.Begin();
+            effect.CurrentTechnique.Passes[0].Begin();
+
+            for (int i = entities.Count-1; i >= 0 ; i--)
+            {
+                ent = entities[i];
+                ent.Render(spriteBatch);
+            }
+
+            spriteBatch.End();
+            effect.CurrentTechnique.Passes[0].End();
+            effect.End();
+
 
             GraphicsDevice.RenderState.StencilEnable = false;
 
+            spriteBatch.Begin();
             sm.Render(spriteBatch, GraphicsDevice, gameTime);
             mouseHandler.Render(spriteBatch);
             spriteBatch.End();
