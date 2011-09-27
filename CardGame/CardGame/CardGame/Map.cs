@@ -320,8 +320,29 @@ namespace CardGame
                     // Check to see which one wins in this battle.
                     winner = replacedCard.GetCardType().GetStat() <= card.GetCardType().GetStat() + modifier ? card : replacedCard;
                 else if (replacedCard != null)
-                    // tried to move onto own card.
-                    return false;
+                {
+                    string type = card.GetCardType().typeName.Substring(0, card.GetCardType().typeName.Length - 1);
+                    string replaceType = card.GetCardType().typeName.Substring(0, card.GetCardType().typeName.Length - 1);
+                    string lastLetter = card.GetCardType().typeName.Substring(card.GetCardType().typeName.Length - 1);
+                    if (type.Equals("Soldier") && replaceType.Equals("Soldier"))
+                    {
+                        foreach (CardType ct in cardTypes)
+                        {
+                            if (ct.typeName.ToLower().ToString().Equals("stack" + lastLetter.ToLower()))
+                            {
+                                winner = new CardClass(ct, card.player);
+                                winner.SetLocation(card.GetLoc(), true);
+                                break;
+                            }
+                        }
+
+                        if (winner == null)
+                            return false;
+                    }
+                    else
+                        // tried to move onto own card.
+                        return false;
+                }
                 Vector2 oldLoc = ConvertScreenCoordToMap(card.GetPrevLocation());
                 // Cards can't move into their old position.
                 if ((int)oldLoc.X == x && (int)oldLoc.Y == y)
