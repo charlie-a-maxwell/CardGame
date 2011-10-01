@@ -92,6 +92,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Screen.cs" />
+    <Compile Include="Turn.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />

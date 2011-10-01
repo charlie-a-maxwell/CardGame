@@ -14,20 +14,14 @@ namespace CardGame
     class MapView : Screen
     {
         CardClass[,] map;
-        Texture2D WallTex;
-        Texture2D FireTex;
-        Texture2D CloudTex;
         Texture2D MapBackground;
         Texture2D Gate1;
         Texture2D Gate2;
         Vector2 center = new Vector2(0,0);
         Vector2 selectedCardLoc;
         CardClass selectedCard;
-        Hand player1Hand;
-        Hand player2Hand;
-        Deck player1Deck;
-        Deck player2Deck;
-        PlayerTurn currentTurn;
+        List<Turn> turns = new List<Turn>(2);
+        Turn activeTurn;
         PlayerTurn winner;
         bool over = false;
         int deploy = (2 * 3);
@@ -41,15 +35,13 @@ namespace CardGame
             map = new CardClass[7, 7];
             selectedCardLoc.X = -1;
             selectedCardLoc.Y = -1;
-            player1Hand = new Hand(PlayerTurn.Player1);
-            player2Hand = new Hand(PlayerTurn.Player2);
-            player1Deck = new Deck(PlayerTurn.Player1);
-            player2Deck = new Deck(PlayerTurn.Player2);
+
+            turns.Add(new Turn1(map.GetLength(1), map.GetLength(0)));
+            turns.Add(new Turn2(map.GetLength(1), map.GetLength(0)));
 
             cardTypes = new List<CardType>();
 
-
-            currentTurn = PlayerTurn.Player1;
+            activeTurn = turns[0];
             winner = 0;
 
             SetCenter(new Vector2((gd.Viewport.Width - CardClass.cardWidth * map.GetLength(1)) / 2, (gd.Viewport.Height - CardClass.cardHeight * map.GetLength(1)) / 2));
@@ -62,15 +54,13 @@ namespace CardGame
             map = new CardClass[7,7];
             selectedCardLoc.X = -1;
             selectedCardLoc.Y = -1;
-            player1Hand = new Hand(PlayerTurn.Player1);
-            player2Hand = new Hand(PlayerTurn.Player2);
-            player1Deck = new Deck(PlayerTurn.Player1);
-            player2Deck = new Deck(PlayerTurn.Player2);
+
+            turns[0] = new Turn1(map.GetLength(0), map.GetLength(1));
+            turns[1] = new Turn2(map.GetLength(0), map.GetLength(1));
 
             cardTypes = new List<CardType>();
 
-
-            currentTurn = PlayerTurn.Player1;
+            activeTurn = turns[0];
             winner = 0;
         }
 
@@ -82,60 +72,57 @@ namespace CardGame
             List<string> list = (List<string>)serializer.Deserialize(deckstream);
             deckstream.Close();
 
-            BuildPlayerDeck(list, PlayerTurn.Player1);
+            turns[0].BuildDeck(list, cardTypes);
+            //BuildPlayerDeck(list, PlayerTurn.Player1);
 
             deckstream = File.Open("Content/Deck2.xml", FileMode.Open);
             list = (List<string>)serializer.Deserialize(deckstream);
             deckstream.Close();
 
-            BuildPlayerDeck(list, PlayerTurn.Player2);
+            turns[1].BuildDeck(list, cardTypes);
+            //BuildPlayerDeck(list, PlayerTurn.Player2);
         }
 
-        protected void BuildPlayerDeck(List<string>list, PlayerTurn p)
-        {
-            Deck deck = new Deck(p);
-            CardType type;
-            foreach (string card in list)
-            {
-                type = cardTypes.Find(
-                            delegate(CardType t)
-                            {
-                                return t.typeName.ToLower() == card.ToLower();
-                            });
-                if (type != null)
-                {
-                    deck.AddCard(new CardClass(type, p));
-                }
-            }
+        //protected void BuildPlayerDeck(List<string>list, Turn turn)
+        //{
+        //    CardType type;
+        //    foreach (string card in list)
+        //    {
+        //        type = cardTypes.Find(
+        //                    delegate(CardType t)
+        //                    {
+        //                        return t.typeName.ToLower() == card.ToLower();
+        //                    });
+        //        if (type != null)
+        //        {
+        //            deck.AddCard(new CardClass(type, p));
+        //        }
+        //    }
 
-            switch (p)
-            {
-                case PlayerTurn.Player1:
-                    player1Deck = deck;
-                    player1Deck.SetLoc(new Vector2(center.X - (map.GetLength(1) * CardClass.cardWidth) / 2.0f - 40, center.Y + (map.GetLength(0) * CardClass.cardHeight) - CardClass.cardHeight * 2 - 40));
-                    break;
+        //    switch (p)
+        //    {
+        //        case PlayerTurn.Player1:
+        //            player1Deck = deck;
+        //            player1Deck.SetLoc(new Vector2(center.X - (map.GetLength(1) * CardClass.cardWidth) / 2.0f - 40, center.Y + (map.GetLength(0) * CardClass.cardHeight) - CardClass.cardHeight * 2 - 40));
+        //            break;
 
-                case PlayerTurn.Player2:
-                    player2Deck = deck;
-                    player2Deck.SetLoc(new Vector2(center.X + (map.GetLength(1) * CardClass.cardWidth) + CardClass.cardWidth * 4 - 30, center.Y + CardClass.cardHeight + 40));
-                    break;
-            }
-        }
+        //        case PlayerTurn.Player2:
+        //            player2Deck = deck;
+        //            player2Deck.SetLoc(new Vector2(center.X + (map.GetLength(1) * CardClass.cardWidth) + CardClass.cardWidth * 4 - 30, center.Y + CardClass.cardHeight + 40));
+        //            break;
+        //    }
+        //}
 
         public override void LoadContent(ContentManager cm)
         {
             base.LoadContent(cm);
 
-            WallTex = cm.Load<Texture2D>("Wall");
-            FireTex = cm.Load<Texture2D>("Fire");
-            CloudTex = cm.Load<Texture2D>("Cloud");
             MapBackground = cm.Load<Texture2D>("MapBack");
             Gate1 = cm.Load<Texture2D>("DoorPlayer1");
             Gate2 = cm.Load<Texture2D>("DoorPlayer2");
-            Texture2D deckTeck = cm.Load<Texture2D>("DeckBack");
 
-            
-            Deck.SetTexure(deckTeck);
+            foreach (Turn t in turns)
+                t.LoadTexture(cm);
 
             foreach (CardType cc in cardTypes)
             {
@@ -147,11 +134,9 @@ namespace CardGame
         public void SetCenter(Vector2 cent)
         {
             center = cent;
-            player1Hand.SetRenderLoc(new Vector2(center.X - (map.GetLength(1) * CardClass.cardWidth) / 2.0f - 40, center.Y + (map.GetLength(0)*CardClass.cardHeight) - CardClass.cardHeight));
-            player2Hand.SetRenderLoc(new Vector2(center.X + (map.GetLength(1) * CardClass.cardWidth) - 20 + CardClass.cardWidth * 4, center.Y ));
-
-            player1Deck.SetLoc(new Vector2(center.X - (map.GetLength(1) * CardClass.cardWidth) / 2.0f, center.Y + (map.GetLength(0) * CardClass.cardHeight) - CardClass.cardHeight * 2));
-            player2Deck.SetLoc(new Vector2(center.X + (map.GetLength(1) * CardClass.cardWidth) - 20, center.Y));
+            foreach (Turn t in turns)
+                t.SetCenterLoc(cent, map.GetLength(1), map.GetLength(0));
+            
         }
 
         public void DrawOutline(SpriteBatch sb)
@@ -176,26 +161,6 @@ namespace CardGame
             Color outlineColor = Color.Black;
 
             Vector2 origin;
-
-            //if (MapBackground != null)
-            //    sb.Draw(MapBackground, new Rectangle((int)center.X, (int)center.Y-10, map.GetLength(0) * (CardClass.cardWidth + spacing), map.GetLength(1) * (CardClass.cardHeight + spacing) + 15), Color.White);
-
-            //if (CloudTex != null)
-            //{
-            //    origin = new Vector2((map.GetLength(0) - 3) * (CardClass.cardWidth + spacing) + center.X, (map.GetLength(1)-1) * (CardClass.cardHeight + spacing) + center.Y);
-            //    sb.Draw(CloudTex, origin, null, Color.White, 0f, new Vector2(0,0), 0.4f, SpriteEffects.None, 0);
-            //    origin = new Vector2(center.X, (map.GetLength(1) - 1) * (CardClass.cardHeight + spacing) + center.Y);
-            //    sb.Draw(CloudTex, origin, null, Color.White, 0f, new Vector2(0, 0), 0.4f, SpriteEffects.FlipHorizontally, 0);
-            //}
-
-            //if (FireTex != null)
-            //{
-            //    origin = new Vector2((map.GetLength(0) - 3) * (CardClass.cardWidth + spacing) + 30 + center.X, center.Y  + spacing + 20);
-            //    sb.Draw(FireTex, origin, null, Color.White, 0f, new Vector2(0, 0), 0.4f, SpriteEffects.FlipVertically, 0);
-            //    origin = new Vector2(center.X + 30, center.Y + spacing + 20);
-            //    sb.Draw(FireTex, origin, null, Color.White, 0f, new Vector2(0, 0), 0.4f, SpriteEffects.FlipHorizontally | SpriteEffects.FlipVertically, 0);
-            //}
-
             Color trans = new Color(Color.LightGray, 0.3f);
             for (int i = 0; i < map.GetLength(0); i++)
             {
@@ -263,19 +228,14 @@ namespace CardGame
             //DrawOutline(sb);
             if (over)
             {
-                player1Hand.Render(sb, selectedCard);
-                player2Hand.Render(sb, selectedCard);
+                foreach (Turn t in turns)
+                    t.Render(sb);
                 text = (winner == PlayerTurn.Player1 ? "Player 1" : "Player 2");
             }
-            else if (currentTurn == PlayerTurn.Player1)
+            else 
             {
-                player1Hand.Render(sb, selectedCard);
-                text = "Player 1";
-            }
-            else
-            {
-                player2Hand.Render(sb, selectedCard);
-                text = "Player 2";
+                activeTurn.RenderHand(sb);
+                text = activeTurn.GetPlayerTurn().ToString();
             }
 
             if (over)
@@ -296,8 +256,8 @@ namespace CardGame
                 DrawText(sb, text, new Vector2(center.X + maxCardWidth / 2, 10), textColor, 1.0f);
 
 
-            player1Deck.Render(sb);
-            player2Deck.Render(sb);
+            foreach (Turn t in turns)
+                t.RenderDeck(sb);
 
             if (selectedCard != null)
                 selectedCard.Render(sb, true, spacing);
@@ -322,7 +282,7 @@ namespace CardGame
                 else if (replacedCard != null)
                 {
                     string type = card.GetCardType().typeName.Substring(0, card.GetCardType().typeName.Length - 1);
-                    string replaceType = card.GetCardType().typeName.Substring(0, card.GetCardType().typeName.Length - 1);
+                    string replaceType = replacedCard.GetCardType().typeName.Substring(0, replacedCard.GetCardType().typeName.Length - 1);
                     string lastLetter = card.GetCardType().typeName.Substring(card.GetCardType().typeName.Length - 1);
                     if (type.Equals("Soldier") && replaceType.Equals("Soldier"))
                     {
@@ -354,9 +314,9 @@ namespace CardGame
                 winner.SetLocation(center + new Vector2(x * (CardClass.cardWidth + spacing), y * (CardClass.cardHeight + spacing)), true);
 
                 if (card.player == PlayerTurn.Player1)
-                    player1Hand.RemoveCard(card);
+                    turns[0].RemoveCardFromHand(card);
                 else if (card.player == PlayerTurn.Player2)
-                    player2Hand.RemoveCard(card);
+                    turns[1].RemoveCardFromHand(card);
 
                 return true;
             }
@@ -394,28 +354,25 @@ namespace CardGame
 
             if (selectedCard == null)
             {
-                if (currentTurn == PlayerTurn.Player1)
-                    selectedCard = player1Hand.SelectCard(pos);
-                else
-                    selectedCard = player2Hand.SelectCard(pos);
+                selectedCard = activeTurn.SelectCard(pos);
                 selectedCardLoc.X = -1;
                 selectedCardLoc.Y = -1;
             }
+
+            if (selectedCard != null)
+                selectedCard.Select();
         }
 
         private void SwitchTurns()
         {
             CheckWin();
-            if (currentTurn == PlayerTurn.Player1 && player1Hand.Count < 3)
-                player1Hand.AddCard(player1Deck.GetTopCard());
-
-            if (currentTurn == PlayerTurn.Player2 && player2Hand.Count < 3)
-                player2Hand.AddCard(player2Deck.GetTopCard());
+            if (activeTurn.HandCount() < 3)
+                activeTurn.AddToHand();
 
             if (deploy > 0)
                 deploy--;
 
-            currentTurn = (currentTurn == PlayerTurn.Player1 ? PlayerTurn.Player2 : PlayerTurn.Player1);
+            activeTurn = (turns[0] == activeTurn ? turns[1] : turns[0]);
             ResetSelectedCard();
         }
 
@@ -432,14 +389,14 @@ namespace CardGame
 
         private void CheckWin()
         {
-            if ((player1Hand.Count == 0 && !PlayerCardsLeft(PlayerTurn.Player1)) || map[map.GetLength(0)-1, 3] != null)
+            if ((turns[0].HandCount() == 0 && !PlayerCardsLeft(PlayerTurn.Player1)) || map[map.GetLength(0) - 1, 3] != null)
             {
                 // player 2 wins by kill!
                 winner = PlayerTurn.Player2;
                 over = true;
             }
 
-            if ((player2Hand.Count == 0 && !PlayerCardsLeft(PlayerTurn.Player2)) || map[0, 3] != null)
+            if ((turns[1].HandCount() == 0 && !PlayerCardsLeft(PlayerTurn.Player2)) || map[0, 3] != null)
             {
                 // player 1 wins by kill!
                 winner = PlayerTurn.Player1;
@@ -450,50 +407,36 @@ namespace CardGame
         public void MoveCard(Vector2 pos)
         {
             Vector2 mapLoc = ConvertScreenCoordToMap(pos);
+
+            // Can't move to the sides.
+            if (mapLoc.X == 0 || mapLoc.X == map.GetLength(0) - 1)
+                return;
+
+
             // Handle first card placement.
             if (selectedCard != null && selectedCardLoc.X == -1 && selectedCardLoc.Y == -1)
             { 
                 // placing a new card.
-                if (currentTurn == PlayerTurn.Player1 && mapLoc.Y == map.GetLength(1) - 2 && mapLoc.X > 0 && mapLoc.X < map.GetLength(0)-1 && map[(int)mapLoc.Y, (int)mapLoc.X] == null && PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y))
-                {
+                if (activeTurn.InDeploymentZone(mapLoc) && map[(int)mapLoc.Y, (int)mapLoc.X] == null && PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y))
                     SwitchTurns();
-                }
-                else if (currentTurn == PlayerTurn.Player2 && mapLoc.Y == 1 && mapLoc.X > 0 && mapLoc.X < map.GetLength(0) - 1 && map[(int)mapLoc.Y, (int)mapLoc.X] == null && PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y))
-                {
-                    SwitchTurns();
-                }
                 else
-                {
                     ResetSelectedCard();
-                }
             }
             // Handle card movement.
-            else if (deploy == 0 && mapLoc.X >= 0 && mapLoc.Y >= 0 && mapLoc.X < map.GetLength(0) && mapLoc.Y < map.GetLength(1) && selectedCard != null && selectedCard.player == currentTurn)
+            else if (deploy == 0 && mapLoc.X >= 0 && mapLoc.Y >= 0 && mapLoc.X < map.GetLength(0) && mapLoc.Y < map.GetLength(1) && selectedCard != null && selectedCard.player == activeTurn.GetPlayerTurn())
             {
                 MoveLocation[,] moveOption = selectedCard.GetMove();
                 int transX = (int)(mapLoc.X - selectedCardLoc.X) + 2;
                 int transY = (int)(mapLoc.Y - selectedCardLoc.Y) + 2;
 
-                if (transX == 2 && transY == 2) // center of the move map
+                if (transX == 2 && transY == 2) // center of the move map IE Early out
                     return;
 
-                if (mapLoc.X == 0 || mapLoc.X == map.GetLength(0) - 1)
-                    return;
                 // Check for movement into the gates
-                if (mapLoc.Y == 0)
+                Turn other = turns.Find(delegate(Turn t) { return t != activeTurn; });
+                if (other != null && mapLoc.Y == other.GateLane())
                 {
-                    if (currentTurn == PlayerTurn.Player1 && mapLoc.X == 3 && transX == 2)
-                    {
-                        PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX].modifier);
-                        SwitchTurns();
-                    }
-
-                    return;
-                }
-                // Check for movement into the gates
-                if (mapLoc.Y == map.GetLength(1)-1)
-                {
-                    if (currentTurn == PlayerTurn.Player2 && mapLoc.X == 3 && transX == 2)
+                    if (mapLoc.X == 3 && transX == 2)
                     {
                         PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX].modifier);
                         SwitchTurns();
@@ -574,31 +517,33 @@ namespace CardGame
                 }
             }
 
+            deploy = 6;
             over = false;
-            
-            player1Hand = new Hand(PlayerTurn.Player1);
-            player2Hand = new Hand(PlayerTurn.Player2);
-            player1Hand.SetRenderLoc(new Vector2(center.X - (map.GetLength(1) * CardClass.cardWidth) / 2.0f - 40, center.Y + (map.GetLength(0) * CardClass.cardHeight) - CardClass.cardHeight));
-            player2Hand.SetRenderLoc(new Vector2(center.X + (map.GetLength(1) * CardClass.cardWidth) - 20 + CardClass.cardWidth * 4, center.Y));
+
+            //turns[0] = new Turn1(map.GetLength(1), map.GetLength(0));
+            //turns[1] = new Turn2(map.GetLength(1), map.GetLength(0));
+            //player1Hand = new Hand(PlayerTurn.Player1);
+            //player2Hand = new Hand(PlayerTurn.Player2);
+            //player1Hand.SetRenderLoc(new Vector2(center.X - (map.GetLength(1) * CardClass.cardWidth) / 2.0f - 40, center.Y + (map.GetLength(0) * CardClass.cardHeight) - CardClass.cardHeight));
+            //player2Hand.SetRenderLoc(new Vector2(center.X + (map.GetLength(1) * CardClass.cardWidth) - 20 + CardClass.cardWidth * 4, center.Y));
+
+            SetCenter(center);
+
 
             LoadDecks();
 
-            player1Deck.ShuffleCurrentDeck();
-
-            for (int i = 0; i < 5; i++)
+            foreach (Turn t in turns)
             {
-                player1Hand.AddCard(player1Deck.GetTopCard());
-            }
+                t.ShuffleDeck();
 
-            player2Deck.ShuffleCurrentDeck();
-
-            for (int i = 0; i < 5; i++)
-            {
-                player2Hand.AddCard(player2Deck.GetTopCard());
+                for (int i = 0; i < 5; i++)
+                {
+                    t.AddToHand();
+                }
             }
 
             Random rand = new Random();
-            currentTurn = (rand.Next(2) == 0 ? PlayerTurn.Player1 : PlayerTurn.Player2);
+            activeTurn = turns[rand.Next(turns.Count -1)];
         }
 
 

@@ -40,6 +40,7 @@ namespace CardGame
         public string typeName;
         public string textureName;
         public Texture2D texture;
+        public Texture2D textureLarge;
         [XmlIgnore]
         private int[,] moveOptions;
         
@@ -122,6 +123,7 @@ namespace CardGame
             if (textureName != null && textureName.Length > 0 && texture == null)
             {
                 texture = cm.Load<Texture2D>(textureName);
+                textureLarge = cm.Load<Texture2D>(textureName+"L");
             }
         }
     }
@@ -139,6 +141,17 @@ namespace CardGame
         static Color outlineColor = Color.Yellow;
         static Texture2D circleTex = null;
         private bool placed = false;
+        private bool selected = false;
+
+        public void Select()
+        {
+            selected = true;
+        }
+
+        public void UnSelect()
+        {
+            selected = false;
+        }
 
         public static void SetCircleText(Texture2D tex)
         {
@@ -224,53 +237,56 @@ namespace CardGame
                 // Incoming Magic numbers!
                 int originX = 30;
                 int originY = 30;
+
+                // TEST OF NEW AND IMPROVED TEXTURE LARGES!
+
                 int width = cardWidth * 3;
                 int height = cardHeight * 3;
                 int xMargin = 5;
                 int yMargin = 5;
-                int[,] cardMove = type.GetMove();   //GetMove();
+                //int[,] cardMove = type.GetMove();   //GetMove();
 
-                float xSize = (width - xMargin * 2) / cardMove.GetLength(1);
-                float ySize = (height - CardClass.cardHeight - yMargin * 2) / cardMove.GetLength(0);
-                float offsetX = xMargin + originX;
-                float offsetY = originY + CardClass.cardHeight + yMargin * 2;
+                //float xSize = (width - xMargin * 2) / cardMove.GetLength(1);
+                //float ySize = (height - CardClass.cardHeight - yMargin * 2) / cardMove.GetLength(0);
+                //float offsetX = xMargin + originX;
+                //float offsetY = originY + CardClass.cardHeight + yMargin * 2;
 
-                //MapView.FillColor(sb, originX, originY, width, height, Color.White);
-                //MapView.DrawLine(sb, new Vector2(originX, originY), new Vector2(originX, originY + height), Color.Black);
-                //MapView.DrawLine(sb, new Vector2(originX, originY), new Vector2(originX + width, originY), Color.Black);
-                //MapView.DrawLine(sb, new Vector2(originX + width, originY), new Vector2(originX + width, originY + height), Color.Black);
-                //MapView.DrawLine(sb, new Vector2(originX, originY + height), new Vector2(originX + width, originY + height), Color.Black);
+                ////MapView.FillColor(sb, originX, originY, width, height, Color.White);
+                ////MapView.DrawLine(sb, new Vector2(originX, originY), new Vector2(originX, originY + height), Color.Black);
+                ////MapView.DrawLine(sb, new Vector2(originX, originY), new Vector2(originX + width, originY), Color.Black);
+                ////MapView.DrawLine(sb, new Vector2(originX + width, originY), new Vector2(originX + width, originY + height), Color.Black);
+                ////MapView.DrawLine(sb, new Vector2(originX, originY + height), new Vector2(originX + width, originY + height), Color.Black);
 
                 Vector2 origin = new Vector2();
                 Vector2 hor = new Vector2(CardClass.cardWidth, 0);
                 Vector2 ver = new Vector2(0, CardClass.cardHeight);
 
-                int stat = type.GetStat();
+                //int stat = type.GetStat();
 
-                if (type.texture != null)
-                    sb.Draw(type.texture, new Rectangle(originX, originX, width, height), null, Color.White, 0.0f, new Vector2(0, 0), SpriteEffects.None, 0.5f);
+                if (type.textureLarge != null)
+                    sb.Draw(type.textureLarge, new Rectangle(originX, originX, width, height), null, Color.White, 0.0f, new Vector2(0, 0), SpriteEffects.None, 0.5f);
 
 
-                for (int i = 0; i < cardMove.GetLength(0); i++)
-                {
-                    for (int j = 0; j < cardMove.GetLength(1); j++)
-                    {
-                        if (cardMove[i, j] != -999)
-                        {
-                            origin = new Vector2(xSize * j + offsetX - 2, ySize * i + offsetY - 5);
-                            if ((i == cardMove.GetLength(0) / 2) && (j == cardMove.GetLength(1) / 2))
-                            {
-                                sb.Draw(circleTex, origin, null, Color.White, 0.0f, new Vector2(15, 15), 0.22f, SpriteEffects.None, 0.0f);
-                                Screen.DrawText(sb, cardMove[i, j].ToString(), origin + new Vector2(5, 4), textColor, 1.0f);
-                            }
-                            else
-                            {
-                                sb.Draw(circleTex, origin, null, Color.White, 0.0f, new Vector2(0, 0), 0.18f, SpriteEffects.None, 0.0f);
-                                Screen.DrawText(sb, (cardMove[i, j] + stat).ToString(), origin + new Vector2(5, 4), textColor, 1.0f);
-                            }
-                        }
-                    }
-                }
+                //for (int i = 0; i < cardMove.GetLength(0); i++)
+                //{
+                //    for (int j = 0; j < cardMove.GetLength(1); j++)
+                //    {
+                //        if (cardMove[i, j] != -999)
+                //        {
+                //            origin = new Vector2(xSize * j + offsetX - 2, ySize * i + offsetY - 5);
+                //            if ((i == cardMove.GetLength(0) / 2) && (j == cardMove.GetLength(1) / 2))
+                //            {
+                //                sb.Draw(circleTex, origin, null, Color.White, 0.0f, new Vector2(15, 15), 0.22f, SpriteEffects.None, 0.0f);
+                //                Screen.DrawText(sb, cardMove[i, j].ToString(), origin + new Vector2(5, 4), textColor, 1.0f);
+                //            }
+                //            else
+                //            {
+                //                sb.Draw(circleTex, origin, null, Color.White, 0.0f, new Vector2(0, 0), 0.18f, SpriteEffects.None, 0.0f);
+                //                Screen.DrawText(sb, (cardMove[i, j] + stat).ToString(), origin + new Vector2(5, 4), textColor, 1.0f);
+                //            }
+                //        }
+                //    }
+                //}
 
                 if (oldLoc.X != -1 && oldLoc.Y != -1)
                 {
@@ -509,7 +525,7 @@ namespace CardGame
         PlayerTurn owner;
         static Random rand = new Random();
         Vector2 renderLoc;
-        static Texture2D deckTex;
+        Texture2D deckTex;
 
         public Deck(PlayerTurn player)
         {
@@ -517,7 +533,7 @@ namespace CardGame
             owner = player;
         }
 
-        public static void SetTexure(Texture2D tex)
+        public void SetTexure(Texture2D tex)
         {
             deckTex = tex;
         }
@@ -579,6 +595,11 @@ namespace CardGame
         public void SendToGraveYard()
         {
 
+        }
+
+        public void ClearDeck()
+        {
+            deck.Clear();
         }
     }
 }
