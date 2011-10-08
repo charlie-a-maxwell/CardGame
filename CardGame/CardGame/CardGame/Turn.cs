@@ -136,7 +136,7 @@ namespace CardGame
         public override void SetCenterLoc(Vector2 center, int maxX, int maxY)
         {
             hand.SetRenderLoc(new Vector2(center.X + (maxX * CardClass.cardWidth) - 20 + CardClass.cardWidth * 4, center.Y));
-            deck.SetLoc(new Vector2(center.X + (maxX * CardClass.cardWidth) - 20, center.Y));
+            deck.SetLoc(new Vector2(center.X + (maxX * CardClass.cardWidth) - 20, center.Y + CardClass.cardHeight));
         }
 
         public override int GateLane()

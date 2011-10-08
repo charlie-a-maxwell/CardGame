@@ -146,15 +146,6 @@
       <Time>2011-07-17T21:07:09.194-05:00</Time>
     </Item>
     <Item>
-      <Source>DeckBack.bmp</Source>
-      <Name>DeckBack</Name>
-      <Importer>TextureImporter</Importer>
-      <Processor>TextureProcessor</Processor>
-      <Options>None</Options>
-      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DeckBack.xnb</Output>
-      <Time>2011-05-24T21:07:55.372-05:00</Time>
-    </Item>
-    <Item>
       <Source>SplashScreen.png</Source>
       <Name>SplashScreen</Name>
       <Importer>TextureImporter</Importer>
@@ -170,7 +161,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Cursor1.xnb</Output>
-      <Time>2011-07-26T20:18:01.172-05:00</Time>
+      <Time>2011-09-30T20:18:12-05:00</Time>
     </Item>
     <Item>
       <Source>DoorPlayer1.png</Source>
@@ -179,7 +170,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DoorPlayer1.xnb</Output>
-      <Time>2011-07-17T21:06:45.061-05:00</Time>
+      <Time>2011-10-07T21:10:53.694-05:00</Time>
     </Item>
     <Item>
       <Source>DoorPlayer2.png</Source>
@@ -188,7 +179,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DoorPlayer2.xnb</Output>
-      <Time>2011-08-09T21:26:39.963-05:00</Time>
+      <Time>2011-10-07T21:10:39.059-05:00</Time>
     </Item>
     <Item>
       <Source>Cloud0.png</Source>
@@ -255,7 +246,151 @@
       <Processor>EffectProcessor</Processor>
       <Options>None</Options>
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Effect.xnb</Output>
-      <Time>2011-09-16T20:22:48.155-05:00</Time>
+      <Time>2011-09-16T20:40:02.76-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Card1AL.png</Source>
+      <Name>Card1AL</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card1AL.xnb</Output>
+      <Time>2011-09-30T20:17:18-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Card1DL.png</Source>
+      <Name>Card1DL</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card1DL.xnb</Output>
+      <Time>2011-09-30T20:18:12-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Card2AL.png</Source>
+      <Name>Card2AL</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card2AL.xnb</Output>
+      <Time>2011-10-07T21:09:57.196-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Card2DL.png</Source>
+      <Name>Card2DL</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card2DL.xnb</Output>
+      <Time>2011-10-07T21:09:42.614-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Card3AL.png</Source>
+      <Name>Card3AL</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card3AL.xnb</Output>
+      <Time>2011-09-30T20:16:18-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Card3DL.png</Source>
+      <Name>Card3DL</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card3DL.xnb</Output>
+      <Time>2011-09-30T20:17:52-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Card4AL.png</Source>
+      <Name>Card4AL</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card4AL.xnb</Output>
+      <Time>2011-09-30T20:17:18-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Card4DL.png</Source>
+      <Name>Card4DL</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card4DL.xnb</Output>
+      <Time>2011-09-30T20:18:12-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Card5AL.png</Source>
+      <Name>Card5AL</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card5AL.xnb</Output>
+      <Time>2011-09-30T20:17:18-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Card5DL.png</Source>
+      <Name>Card5DL</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card5DL.xnb</Output>
+      <Time>2011-09-30T20:17:54-05:00</Time>
+    </Item>
+    <Item>
+      <Source>DeckBackA.png</Source>
+      <Name>DeckBackA</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DeckBackA.xnb</Output>
+      <Time>2011-10-01T17:23:22.903-05:00</Time>
+    </Item>
+    <Item>
+      <Source>DeckBackD.png</Source>
+      <Name>DeckBackD</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DeckBackD.xnb</Output>
+      <Time>2011-10-01T17:23:44.505-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Card6A.png</Source>
+      <Name>Card6A</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card6A.xnb</Output>
+      <Time>2011-10-07T21:07:07.347-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Card6D.png</Source>
+      <Name>Card6D</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card6D.xnb</Output>
+      <Time>2011-10-07T21:10:22.318-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Card6AL.png</Source>
+      <Name>Card6AL</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card6AL.xnb</Output>
+      <Time>2011-09-30T20:16:18-05:00</Time>
+    </Item>
+    <Item>
+      <Source>Card6DL.png</Source>
+      <Name>Card6DL</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card6DL.xnb</Output>
+      <Time>2011-09-30T20:17:54-05:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
