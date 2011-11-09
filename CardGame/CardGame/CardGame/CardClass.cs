@@ -42,6 +42,28 @@ namespace CardGame
         public Texture2D texture;
         public Texture2D textureLarge;
         [XmlIgnore]
+        private PlayerTurn _player;
+        [XmlIgnore]
+        private bool turnSet = false;
+        [XmlIgnore]
+        public PlayerTurn player
+        {
+            get
+            {
+                if (!turnSet)
+                {
+                    if (typeName[typeName.Length - 1] == 'A')
+                        _player = PlayerTurn.Player1;
+                    else
+                        _player = PlayerTurn.Player2;
+                    turnSet = true;
+                }
+
+                return _player;
+            }
+        }
+
+        [XmlIgnore]
         private int[,] moveOptions;
         
         public string moveString
@@ -77,6 +99,40 @@ namespace CardGame
                     j = 0;
                     i++;
                 }
+            }
+        }
+        [XmlIgnore]
+        private MoveLocation[,] _moves = null;
+
+        [XmlIgnore]
+        public MoveLocation[,] moves
+        {
+            get
+            {
+                if (_moves == null)
+                {
+                    int[,] tempMoves;
+                    if (player == PlayerTurn.Player1)
+                    {
+                        tempMoves = moveOptions;
+                    }
+                    else
+                    {
+                        tempMoves = new int[moveOptions.GetLength(0), moveOptions.GetLength(1)];
+
+                        for (int i = 0; i < tempMoves.GetLength(0); i++)
+                        {
+                            for (int j = 0; j < tempMoves.GetLength(1); j++)
+                            {
+                                tempMoves[tempMoves.GetLength(0) - i - 1, j] = moveOptions[i, j];
+                            }
+                        }
+                    }
+
+                    _moves = ParseIntMoves(tempMoves);
+                }
+
+                return _moves;
             }
         }
 
@@ -126,6 +182,55 @@ namespace CardGame
                 textureLarge = cm.Load<Texture2D>(textureName+"L");
             }
         }
+
+        private MoveLocation[,] ParseIntMoves(int[,] m)
+        {
+            MoveLocation[,] temp = new MoveLocation[m.GetLength(0), m.GetLength(1)];
+            for (int i = 0; i < temp.GetLength(0); i++)
+            {
+                for (int j = 0; j < temp.GetLength(1); j++)
+                {
+                    if (m[i, j] == -999)
+                        temp[i, j] = null;
+                    else
+                    {
+                        int tempX = -1;
+                        int tempY = -1;
+                        int locX = 0;
+                        int locY = 0;
+                        int dist = int.MaxValue;
+                        int tempDist = 0;
+                        int midX = temp.GetLength(0) / 2;
+                        int midY = temp.GetLength(1) / 2;
+
+
+                        temp[i, j] = new MoveLocation(m[i, j]);
+                        for (int k = 0; k < 9; k++)
+                        {
+                            locX = (k % 3) - 1;
+                            locY = (int)(k / 3) - 1;
+                            if ((locX + i >= 0 && locX + i < temp.GetLength(0)) && (locY + j >= 0 && locY + j < temp.GetLength(1)) && (m[locX + i, locY + j] != -999))
+                            {
+                                tempDist = (((locX + i) - midX) * ((locX + i) - midX)) + (((locY + j) - midY) * ((locY + j) -midY));
+                                if (tempDist < dist)
+                                {
+                                    tempX = locX + i;
+                                    tempY = locY + j;
+                                    dist = tempDist;
+                                }
+                            }
+                        }
+
+                        if (tempX != -1 && tempY != -1)
+                        {
+                            temp[i, j].x = tempX;
+                            temp[i, j].y = tempY;
+                        }
+                    }
+                }
+            }
+            return temp;
+        }
     }
 
     public class CardClass
@@ -134,64 +239,29 @@ namespace CardGame
 
         public const int cardWidth = 50;
         public const int cardHeight = 75;
-        public PlayerTurn player;
+        public PlayerTurn player
+        {
+            get
+            {
+                return type.player;
+            }
+        }
         Vector2 loc;
         Vector2 oldLoc;
-        private MoveLocation[,] _moves = null;
         static Color outlineColor = Color.Yellow;
         static Texture2D circleTex = null;
         private bool placed = false;
-        private bool selected = false;
-
-        public void Select()
-        {
-            selected = true;
-        }
-
-        public void UnSelect()
-        {
-            selected = false;
-        }
+        public bool Selected = false;
 
         public static void SetCircleText(Texture2D tex)
         {
             circleTex = tex;
         }
 
-        protected MoveLocation[,] moves
-        {
-            get
-            {
-                if (_moves == null)
-                {
-                    int[,] tempMoves;
-                    if (player == PlayerTurn.Player1)
-                    {
-                        tempMoves = type.GetMove();
-                    }
-                    else
-                    {
-                        tempMoves = new int[type.GetMove().GetLength(0), type.GetMove().GetLength(1)];
 
-                        for (int i = 0; i < tempMoves.GetLength(0); i++)
-                        {
-                            for (int j = 0; j < tempMoves.GetLength(1); j++)
-                            {
-                                tempMoves[tempMoves.GetLength(0) - i - 1, j] = type.GetMove()[i, j];
-                            }
-                        }
-                    }
-
-                    _moves = ParseIntMoves(tempMoves);
-                }
-
-                return _moves;
-            }
-        }
 
         public CardClass(CardType t)
         {
-            player = PlayerTurn.Player1;
             type = t;
             loc = new Vector2(-1, -1);
             oldLoc = new Vector2(-1, -1);
@@ -199,7 +269,6 @@ namespace CardGame
 
         public CardClass(CardType t, PlayerTurn pt)
         {
-            player = pt;
             type = t;
             loc = new Vector2(-1, -1);
             oldLoc = new Vector2(-1, -1);
@@ -207,18 +276,13 @@ namespace CardGame
 
         public void Render(SpriteBatch sb)
         {
-            Render(sb, false, 0);
+            Render(sb, 0);
         }
 
-        public void Render(SpriteBatch sb, bool selected)
-        {
-            Render(sb, selected, 0);
-        }
-
-        public void Render(SpriteBatch sb, bool selected, int space)
+        public void Render(SpriteBatch sb, int space)
         {
             SpriteEffects effect = SpriteEffects.None;
-            Color textColor = (player == PlayerTurn.Player1 ? Color.Black : Color.DarkRed) ;
+            Color textColor = (player == PlayerTurn.Player1 ? Color.Black : Color.DarkRed);
 
             if (placed && player == PlayerTurn.Player2)
                 effect = SpriteEffects.FlipVertically;
@@ -232,7 +296,7 @@ namespace CardGame
 
 
 
-            if (selected)
+            if (Selected)
             {
                 // Incoming Magic numbers!
                 int originX = 30;
@@ -291,11 +355,11 @@ namespace CardGame
                 if (oldLoc.X != -1 && oldLoc.Y != -1)
                 {
                     Color border = outlineColor;
-                    for (int i = 0; i < moves.GetLength(0); i++)
+                    for (int i = 0; i < type.moves.GetLength(0); i++)
                     {
-                        for (int j = 0; j < moves.GetLength(1); j++)
+                        for (int j = 0; j < type.moves.GetLength(1); j++)
                         {
-                            if (moves[i, j] != null)
+                            if (type.moves[i, j] != null)
                             {
                                 origin = new Vector2((int)loc.X + (cardWidth + space) * (j - 2), (int)loc.Y + (cardHeight + space) * (i - 2));
 
@@ -355,56 +419,7 @@ namespace CardGame
 
         public MoveLocation[,] GetMove()
         {
-            return moves;
-        }
-
-        private MoveLocation[,] ParseIntMoves(int[,] m)
-        {
-            MoveLocation[,] temp = new MoveLocation[m.GetLength(0), m.GetLength(1)];
-            for (int i = 0; i < temp.GetLength(0); i++)
-            {
-                for (int j = 0; j < temp.GetLength(1); j++)
-                {
-                    if (m[i, j] == -999)
-                        temp[i, j] = null;
-                    else
-                    {
-                        int tempX = -1;
-                        int tempY = -1;
-                        int locX = 0;
-                        int locY = 0;
-                        int dist = int.MaxValue;
-                        int tempDist = 0;
-                        int midX = temp.GetLength(0) / 2;
-                        int midY = temp.GetLength(1) / 2;
-
-
-                        temp[i, j] = new MoveLocation(m[i, j]);
-                        for (int k = 0; k < 9; k++)
-                        {
-                            locX = (k % 3) - 1;
-                            locY = (int)(k / 3) - 1;
-                            if ((locX + i >= 0 && locX + i < temp.GetLength(0)) && (locY + j >= 0 && locY + j < temp.GetLength(1)) && (m[locX + i, locY + j] != -999))
-                            {
-                                tempDist = (((locX + i) - midX) * ((locX + i) - midX)) + (((locY + j) - midY) * ((locY + j) -midY));
-                                if (tempDist < dist)
-                                {
-                                    tempX = locX + i;
-                                    tempY = locY + j;
-                                    dist = tempDist;
-                                }
-                            }
-                        }
-
-                        if (tempX != -1 && tempY != -1)
-                        {
-                            temp[i, j].x = tempX;
-                            temp[i, j].y = tempY;
-                        }
-                    }
-                }
-            }
-            return temp;
+            return type.moves;
         }
     }
 
@@ -498,6 +513,22 @@ namespace CardGame
             return found;
         }
 
+        public CardClass GetSelectedCard()
+        {
+            CardClass found = null;
+
+            foreach (CardClass card in hand)
+            {
+                if (card.Selected)
+                {
+                    found = card;
+                    break;
+                }
+            }
+
+            return found;
+        }
+
         public void Render(SpriteBatch sb)
         {
             Render(sb, renderLoc, null);
@@ -514,8 +545,13 @@ namespace CardGame
             for (int i = 0; i < hand.Count; i++ )
             {
                 card = hand[i];
-                card.Render(sb, false);
+                card.Render(sb);
             }
+        }
+
+        public void Clear()
+        {
+            hand.Clear();
         }
     }
 

@@ -84,6 +84,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AITurn.cs" />
     <Compile Include="CardClass.cs" />
     <Compile Include="CloudEntity.cs" />
     <Compile Include="Entity.cs" />

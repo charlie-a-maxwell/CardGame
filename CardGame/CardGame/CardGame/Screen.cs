@@ -96,7 +96,7 @@ namespace CardGame
             return true;
         }
 
-        public void Update(GameTime gt)
+        public virtual void Update(GameTime gt)
         {
 
         }

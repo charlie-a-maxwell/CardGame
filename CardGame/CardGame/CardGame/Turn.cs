@@ -69,6 +69,11 @@ namespace CardGame
             hand.AddCard(deck.GetTopCard());
         }
 
+        public void ClearHand()
+        {
+            hand.Clear();
+        }
+
         public bool InDeploymentZone(Vector2 mapLoc)
         {
             return (mapLoc.Y == deployment.Y);
@@ -98,6 +103,11 @@ namespace CardGame
         }
 
         public abstract int GateLane();
+
+        public CardClass GetSelectedCard()
+        {
+            return hand.GetSelectedCard();
+        }
     }
 
     class Turn1 : Turn

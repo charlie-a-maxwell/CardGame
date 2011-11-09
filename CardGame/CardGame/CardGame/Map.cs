@@ -13,18 +13,16 @@ namespace CardGame
 {
     class MapView : Screen
     {
-        CardClass[,] map;
+        public CardClass[,] map;
         Texture2D MapBackground;
         Texture2D Gate1;
         Texture2D Gate2;
         Vector2 center = new Vector2(0,0);
-        Vector2 selectedCardLoc;
-        CardClass selectedCard;
         List<Turn> turns = new List<Turn>(2);
         Turn activeTurn;
         PlayerTurn winner;
         bool over = false;
-        int deploy = (2 * 3);
+        public int deploy = (2 * 3);
         public static int spacing = 5;
         List<CardType> cardTypes;
 
@@ -33,11 +31,9 @@ namespace CardGame
             // This would be where to create the map of whatever size. We are starting with 5 by 5, but the gate is out of that.
             // So we need an extra one on both sides. The other extras will just be marked as filled by something.
             map = new CardClass[7, 7];
-            selectedCardLoc.X = -1;
-            selectedCardLoc.Y = -1;
 
             turns.Add(new Turn1(map.GetLength(1), map.GetLength(0)));
-            turns.Add(new Turn2(map.GetLength(1), map.GetLength(0)));
+            turns.Add(new AITurn(map.GetLength(1), map.GetLength(0), this));
 
             cardTypes = new List<CardType>();
 
@@ -52,11 +48,9 @@ namespace CardGame
             // This would be where to create the map of whatever size. We are starting with 5 by 5, but the gate is out of that.
             // So we need an extra one on both sides. The other extras will just be marked as filled by something.
             map = new CardClass[7,7];
-            selectedCardLoc.X = -1;
-            selectedCardLoc.Y = -1;
 
             turns[0] = new Turn1(map.GetLength(0), map.GetLength(1));
-            turns[1] = new Turn2(map.GetLength(0), map.GetLength(1));
+            turns[1] = new AITurn(map.GetLength(0), map.GetLength(1), this);
 
             cardTypes = new List<CardType>();
 
@@ -186,7 +180,7 @@ namespace CardGame
 
                     if (map[i, j] != null)
                     {
-                        map[i, j].Render(sb, false, spacing);
+                        map[i, j].Render(sb, spacing);
                     }
 
                     if (i == 0 && j == 3)
@@ -258,10 +252,6 @@ namespace CardGame
 
             foreach (Turn t in turns)
                 t.RenderDeck(sb);
-
-            if (selectedCard != null)
-                selectedCard.Render(sb, true, spacing);
-
         }
 
         public bool PlaceCard(CardClass card, int x, int y)
@@ -324,7 +314,7 @@ namespace CardGame
             return false;
         }
 
-        private Vector2 ConvertScreenCoordToMap(Vector2 pos)
+        public Vector2 ConvertScreenCoordToMap(Vector2 pos)
         {
             Vector2 mapLoc = new Vector2(-1, -1);
 
@@ -342,25 +332,24 @@ namespace CardGame
 
         public void ScreenCardSelect(Vector2 pos)
         {
+            bool cardFound = false;
             foreach(CardClass card in map)
             {
                 if (card != null && card.Intersect(pos))
                 {
-                    selectedCard = card;
-                    selectedCardLoc = ConvertScreenCoordToMap(pos);
+                    card.Selected = true;
+                    cardFound = true;
+                    ConvertScreenCoordToMap(pos);
                     break;
                 }
             }
 
-            if (selectedCard == null)
+            if (!cardFound)
             {
-                selectedCard = activeTurn.SelectCard(pos);
-                selectedCardLoc.X = -1;
-                selectedCardLoc.Y = -1;
+                CardClass c = activeTurn.SelectCard(pos);
+                if (c != null)
+                    c.Selected = true;
             }
-
-            if (selectedCard != null)
-                selectedCard.Select();
         }
 
         private void SwitchTurns()
@@ -404,30 +393,39 @@ namespace CardGame
             }
         }
 
-        public void MoveCard(Vector2 pos)
+        public void MoveCard(CardClass card, Vector2 pos)
         {
             Vector2 mapLoc = ConvertScreenCoordToMap(pos);
+            MoveCard(card, (int)mapLoc.X, (int)mapLoc.Y);
+        }
 
+        public void MoveCard(CardClass card, int x, int y)
+        {
+            Vector2 mapLoc = new Vector2(x, y);
             // Can't move to the sides.
             if (mapLoc.X == 0 || mapLoc.X == map.GetLength(0) - 1)
                 return;
 
+            if (card == null)
+                return;
+
+            Vector2 cardLoc = ConvertScreenCoordToMap(card.GetLoc());
 
             // Handle first card placement.
-            if (selectedCard != null && selectedCardLoc.X == -1 && selectedCardLoc.Y == -1)
+            if (cardLoc.X == -1 && cardLoc.Y == -1)
             { 
                 // placing a new card.
-                if (activeTurn.InDeploymentZone(mapLoc) && map[(int)mapLoc.Y, (int)mapLoc.X] == null && PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y))
+                if (activeTurn.InDeploymentZone(mapLoc) && map[(int)mapLoc.Y, (int)mapLoc.X] == null && PlaceCard(card, (int)mapLoc.X, (int)mapLoc.Y))
                     SwitchTurns();
                 else
                     ResetSelectedCard();
             }
             // Handle card movement.
-            else if (deploy == 0 && mapLoc.X >= 0 && mapLoc.Y >= 0 && mapLoc.X < map.GetLength(0) && mapLoc.Y < map.GetLength(1) && selectedCard != null && selectedCard.player == activeTurn.GetPlayerTurn())
+            else if (deploy == 0 && mapLoc.X >= 0 && mapLoc.Y >= 0 && mapLoc.X < map.GetLength(0) && mapLoc.Y < map.GetLength(1) && card.player == activeTurn.GetPlayerTurn())
             {
-                MoveLocation[,] moveOption = selectedCard.GetMove();
-                int transX = (int)(mapLoc.X - selectedCardLoc.X) + 2;
-                int transY = (int)(mapLoc.Y - selectedCardLoc.Y) + 2;
+                MoveLocation[,] moveOption = card.GetMove();
+                int transX = (int)(mapLoc.X - cardLoc.X) + 2;
+                int transY = (int)(mapLoc.Y - cardLoc.Y) + 2;
 
                 if (transX == 2 && transY == 2) // center of the move map IE Early out
                     return;
@@ -438,7 +436,7 @@ namespace CardGame
                 {
                     if (mapLoc.X == 3 && transX == 2)
                     {
-                        PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX].modifier);
+                        PlaceCard(card, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX].modifier);
                         SwitchTurns();
                     }
 
@@ -449,7 +447,7 @@ namespace CardGame
                 if (transX >= 0 && transY >= 0 && transX < moveOption.GetLength(0) && transY < moveOption.GetLength(1) && moveOption[transY, transX] != null)
                 {
                     bool good = false;
-                    RecursiveCardMovement(moveOption[transY, transX], moveOption, transX, transY, out good);
+                    RecursiveCardMovement(card, cardLoc, moveOption[transY, transX], moveOption, transX, transY, out good);
                     if (good)
                     {
                         SwitchTurns();
@@ -466,7 +464,7 @@ namespace CardGame
             }
         }
 
-        private bool RecursiveCardMovement(MoveLocation currentLoc, MoveLocation[,] map, int transX, int transY, out bool recurse)
+        private bool RecursiveCardMovement(CardClass card, Vector2 cardLoc, MoveLocation currentLoc, MoveLocation[,] map, int transX, int transY, out bool recurse)
         {
             if (transX == 2 && transY == 2)
             {
@@ -476,34 +474,65 @@ namespace CardGame
 
             if (currentLoc.x >= 0 && currentLoc.y >= 0 && !(currentLoc.x == 2 && currentLoc.y == 2))
             {
-                if (!RecursiveCardMovement(map[currentLoc.x, currentLoc.y], map, currentLoc.y, currentLoc.x, out recurse))
+                if (!RecursiveCardMovement(card, cardLoc, map[currentLoc.x, currentLoc.y], map, currentLoc.y, currentLoc.x, out recurse))
                     return recurse;
             }
             //PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX].modifier)
-            bool place = PlaceCard(selectedCard, (int)selectedCardLoc.X + transX - 2, (int)selectedCardLoc.Y + transY - 2, currentLoc.modifier);
+            bool place = PlaceCard(card, (int)cardLoc.X + transX - 2, (int)cardLoc.Y + transY - 2, currentLoc.modifier);
             recurse = place;
             return place;
         }
 
+        public override void Update(GameTime gt)
+        {
+            activeTurn.Update(gt);
+        }
+
         private void ResetSelectedCard()
         {
-            selectedCard = null;
-            selectedCardLoc.X = -1;
-            selectedCardLoc.Y = -1;
+            //selectedCard = null;
+            //selectedCardLoc.X = -1;
+            //selectedCardLoc.Y = -1;
+            CardClass selectedCard = null;
+            foreach (CardClass c in map)
+            {
+                if (c != null && c.Selected)
+                {
+                    selectedCard = c;
+                    break;
+                }
+            }
+
+            if (selectedCard == null)
+            {
+                selectedCard = activeTurn.GetSelectedCard();
+            }
+
+            if (selectedCard != null)
+                selectedCard.Selected = false;
         }
 
         public override void HandleMouseClick(Vector2 pos)
         {
             if (over)
                 return;
-                
+
+            CardClass selectedCard = null;
+
+            foreach (CardClass c in map)
+                if (c != null && c.Selected)
+                    selectedCard = c;
+
+            if (selectedCard == null)
+                selectedCard = activeTurn.GetSelectedCard();
+
             if (selectedCard == null)
             {
                 ScreenCardSelect(pos);
             }
             else
             {
-                MoveCard(pos);
+                MoveCard(selectedCard, pos);
             }
         }
 
@@ -534,6 +563,7 @@ namespace CardGame
 
             foreach (Turn t in turns)
             {
+                t.ClearHand();
                 t.ShuffleDeck();
 
                 for (int i = 0; i < 5; i++)
