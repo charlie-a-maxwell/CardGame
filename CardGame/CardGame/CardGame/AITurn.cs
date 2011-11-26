@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Storage;
+using System.Diagnostics;
 
 namespace CardGame
 {
@@ -71,6 +72,8 @@ namespace CardGame
         int Y;
         MapView map;
         Random rand = new Random();
+        int WinValue = 20; 
+        Stopwatch Watch = new Stopwatch();
 
         public AITurn(int maxX, int maxY, MapView mv)
             : base(maxX, maxY)
@@ -100,12 +103,17 @@ namespace CardGame
 
             rootNode.currState = ms;
 
+            Watch.Reset();
+            Watch.Start();
             DecisionNode solution = null;
-            while (depth < 4)
+            while (depth < 6)
             {
                 DLS(rootNode, depth, int.MinValue, int.MaxValue);
+                if (Watch.ElapsedMilliseconds >= 500)
+                    break;
                 depth++;
             }
+            Watch.Stop();
 
             int value = int.MinValue;
             foreach (DecisionNode n in rootNode.GetChildren())
@@ -116,6 +124,9 @@ namespace CardGame
                     solution = n;
                 }
             }
+
+            if (solution == null && rootNode.GetChildren().Count > 0)
+                solution = rootNode.GetChildren()[0];
 
             if (solution != null)
             {
@@ -136,140 +147,126 @@ namespace CardGame
                 return false;
         }
 
+        private int ChildNodeSort(DecisionNode n1, DecisionNode n2)
+        {
+            return n1.Value - n2.Value;
+        }
+
         private int DLS(DecisionNode node, int depth, int alpha, int beta)
         {
-            if (depth >= 0)
+
+            if (Watch.ElapsedMilliseconds >= 500)
+                return node.Value; // no more time
+
+
+            if (depth == 0)
             {
-                if (TestWin(node))
+                return node.Value;
+            }
+
+            //if (TestWin(node))
+            //{
+            //    node.Value = WinValue * (node.pt == turn ? 1 : -1);
+            //    return node.Value;
+            //}
+
+            if (node.GetChildren().Count == 0)
+            {
+                ExpandNode(node, depth);
+                node.GetChildren().Sort(ChildNodeSort);
+            }
+
+
+            int value = 0;
+
+            // Maximize!
+            int b = beta;
+            bool firstChild = true;
+            foreach (DecisionNode n in node.GetChildren())
+            {
+                value = -DLS(n, depth - 1, -b, -alpha);
+                if (alpha < value && value < beta && !firstChild)
+                    value = -DLS(n, depth - 1, -beta, -alpha);
+
+                firstChild = false;
+                alpha = Math.Max(alpha, value);
+                if (alpha >= beta)
                 {
-                    int value = 10;
-                    if (node.pt == turn)
-                        value = -10;
-
-                    node.Value = value;
-                    return value;
-                }
-
-                if (node.GetChildren().Count == 0)
-                    ExpandNode(node, depth);
-
-
-                int score = 0;
-
-                if (node.pt == turn)
-                {
-                    // Maximize!
-                    foreach (DecisionNode n in node.GetChildren())
-                    {
-                        score = DLS(n, depth - 1, alpha, beta);
-                        if (score > alpha)
-                            alpha = score;
-                        if (alpha >= beta)
-                        {
-                            node.Value = alpha;
-                            return alpha;
-                        }
-                    }
-
                     node.Value = alpha;
                     return alpha;
                 }
-                else
-                {
-                    // Minimize!
-                    foreach (DecisionNode n in node.GetChildren())
-                    {
-                        score = DLS(n, depth - 1, alpha, beta);
-                        if (score < beta)
-                            beta = score;
-                        if (alpha >= beta)
-                        {
-                            node.Value = beta;
-                            return beta;
-                        }
-                    }
-
-                    node.Value = beta;
-                    return beta;
-                }
-
-            }
-            else
-            {
-                
-                // find the closest value for the 2 different teams.
-                int score = 0;
-                if (node.pt == turn)
-                    score = SecondPlayerWin(node.currState);
-                else
-                    score = FirstPlayerWin(node.currState);
-
-                node.Value = score;
-                return score;
+                b = alpha + 1;
             }
 
-            return 0;
+            node.Value = alpha;
+            return alpha;
         }
 
-        private int FirstPlayerWin(MapState[,] map)
+        private int NodeEval(MapState[,] ms, PlayerTurn currTurn)
         {
-            for (int i = 0; i < map.GetLength(0); i++)
+            int score = 0;
+            Turn activeTurn = map.GetTurn(currTurn);
+            Turn otherTurn = map.GetTurn(currTurn == PlayerTurn.Player1 ? PlayerTurn.Player2 : PlayerTurn.Player1);
+            for (int i = 0; i < ms.GetLength(0); i++)
             {
-                for (int j = 0; j < map.GetLength(1); j++)
+                for (int j = 0; j < ms.GetLength(1); j++)
                 {
-                    if (map[i,j] != null && map[i, j].pt == PlayerTurn.Player1)
+                    if (ms[i, j] != null && ms[i, j].pt == currTurn)
                     {
-                        return (i + j);
+                        score += ms[i, j].ct.GetStat() + ms[i, j].ct.numberOfMoves;
+                        score += (Math.Abs(otherTurn.GateLane() - i) + Math.Abs(2 - j)) * (Math.Abs(otherTurn.GateLane() - i) + Math.Abs(2 - j));
+                        if (otherTurn.GateLane() == i && j == 3)
+                            score += 200;
+                    }
+                    else if (ms[i, j] != null)
+                    {
+                        score -= ms[i, j].ct.GetStat() + ms[i, j].ct.numberOfMoves;
+                        score -= (Math.Abs(otherTurn.GateLane() - i) + Math.Abs(3 - j)) * (Math.Abs(otherTurn.GateLane() - i) + Math.Abs(3 - j));
+                        if (activeTurn.GateLane() == i && j == 3)
+                            score -= 200;
                     }
                 }
             }
 
-            return 0;
+            return score;
         }
 
-        private int SecondPlayerWin(MapState[,] map)
-        {
-            int score = 10;
-            for (int i = map.GetLength(0)-1; i >= 0; i--)
-            {
-                for (int j =  map.GetLength(1)-1; j >= 0; j--)
-                {
-                    if (map[i, j] != null && map[i, j].pt == PlayerTurn.Player2)
-                    {
-                        return score - (map.GetLength(0) - i) - (map.GetLength(1) - j);
-                    }
-                }
-            }
-
-            return 0;
-        }
-
-        private bool CheckForValidMove(CardType ct, MapState[,] map, int locX, int locY, int X, int Y)
+        private bool CheckForValidMove(CardType ct, MapState[,] map, int locY, int locX, int Y, int X)
         {
             if (locX > 0 && locX < map.GetLength(0) && locY > 0 && locY < map.GetLength(1))
             {
+                if (map[locY, locX] != null && map[locY, locX].prevLoc.X == (locX + X - 2) && map[locY, locX].prevLoc.Y == (locY + Y - 2)) return false;
+
                 int tempX = locX;
                 int tempY = locY;
                 int offX = X;
                 int offY = Y;
-                MoveLocation ml = ct.moves[X, Y];
+                MoveLocation ml = ct.moves[Y, X];
+                bool forwardMove;
+                Turn otherTurn = this.map.GetTurn(ct.player == PlayerTurn.Player1 ? PlayerTurn.Player2 : PlayerTurn.Player1);
                 do
                 {
                     tempX = locX + offX - 2;
                     tempY = locY + offY - 2;
-                    if (tempX <= 0 || tempX >= map.GetLength(0) - 1 || tempY <= 0 || tempY >= map.GetLength(1) - 1)
+                    forwardMove = ml.y == offY;
+
+                    if ((tempX <= 0 || tempX >= map.GetLength(0) - 1 || tempY <= 0 || tempY >= map.GetLength(1)))
+                    {
+                        if (!(otherTurn.GateLane() == tempY && tempX == 3 && forwardMove))
+                            return false;
+                    }
+
+                    if (map[locY, locX] != null && map[locY, locX].prevLoc.Y == tempY && map[locY, locX].prevLoc.X == tempX)
                         return false;
-                    else if (map[tempX, tempY] != null && map[tempX, tempY].prevLoc.X == tempX && map[tempX, tempY].prevLoc.Y == tempY)
+                    else if (map[tempY, tempX] != null && map[tempY, tempX].ct.player == ct.player)
                         return false;
-                    else if (map[tempX, tempY] != null && map[tempX, tempY].ct.player == ct.player)
-                        return false;
-                    else if (map[tempX, tempY] != null && map[tempX, tempY].ct.GetStat() > ct.GetStat() + ml.modifier)
+                    else if (map[tempY, tempX] != null && map[tempY, tempX].ct.GetStat() > ct.GetStat() + ml.modifier)
                         return false;
 
-                    offX = ml.x;
-                    offY = ml.y;
+                    offY = ml.x;
+                    offX = ml.y;
                     ml = ct.moves[ml.x, ml.y];
-                } while (ml != null && !(ml.x == 2 && ml.y == 2));
+                } while (ml != null && !(ml.x == offY && ml.y == offX));
 
                 return true;
             }
@@ -291,7 +288,7 @@ namespace CardGame
             {
                 for (int h = 0; h < hand.Count; h++)
                 {
-                    for (int p = 1; p < 5; p++)
+                    for (int p = 1; p <= 5; p++)
                     {
                         if (node.currState[1, p] == null)
                         {
@@ -330,10 +327,10 @@ namespace CardGame
                                     dn.cardStart = new Vector2(i, j);
                                     dn.cardEnd = new Vector2(newX, newY);
                                     dn.CopyState(state);
-                                    s.prevLoc.X = j;
-                                    s.prevLoc.Y = i;
-                                    dn.currState[newY, newX] = s;
+                                    dn.currState[newY, newX] = new MapState(s.pt, s.ct, new Vector2(i, j));
                                     dn.currState[i, j] = null;
+
+                                    dn.Value = NodeEval(dn.currState, dn.pt);
 
                                     node.AddChild(dn);
                                 }
@@ -345,3 +342,5 @@ namespace CardGame
         }
     }
 }
+
+/// Last Test

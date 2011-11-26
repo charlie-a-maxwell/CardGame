@@ -11,6 +11,8 @@ using Microsoft.Xna.Framework.Input;
 
 namespace CardGame
 {
+    public enum GameType { Player1, Player2};
+
     class MapView : Screen
     {
         public CardClass[,] map;
@@ -25,6 +27,7 @@ namespace CardGame
         public int deploy = (2 * 3);
         public static int spacing = 5;
         List<CardType> cardTypes;
+        GameType type = GameType.Player1;
 
         public MapView(string n, GraphicsDevice gd) : base(n)
         {
@@ -33,7 +36,10 @@ namespace CardGame
             map = new CardClass[7, 7];
 
             turns.Add(new Turn1(map.GetLength(1), map.GetLength(0)));
-            turns.Add(new AITurn(map.GetLength(1), map.GetLength(0), this));
+            if (type == GameType.Player1)
+                turns.Add(new AITurn(map.GetLength(1), map.GetLength(0), this));
+            else
+                turns.Add(new Turn2(map.GetLength(1), map.GetLength(0)));
 
             cardTypes = new List<CardType>();
 
@@ -50,7 +56,11 @@ namespace CardGame
             map = new CardClass[7,7];
 
             turns[0] = new Turn1(map.GetLength(0), map.GetLength(1));
-            turns[1] = new AITurn(map.GetLength(0), map.GetLength(1), this);
+            if (type == GameType.Player1)
+                turns[1] = new AITurn(map.GetLength(0), map.GetLength(1), this);
+            else
+                turns[1] = new Turn2(map.GetLength(0), map.GetLength(1));
+
 
             cardTypes = new List<CardType>();
 
@@ -76,36 +86,6 @@ namespace CardGame
             turns[1].BuildDeck(list, cardTypes);
             //BuildPlayerDeck(list, PlayerTurn.Player2);
         }
-
-        //protected void BuildPlayerDeck(List<string>list, Turn turn)
-        //{
-        //    CardType type;
-        //    foreach (string card in list)
-        //    {
-        //        type = cardTypes.Find(
-        //                    delegate(CardType t)
-        //                    {
-        //                        return t.typeName.ToLower() == card.ToLower();
-        //                    });
-        //        if (type != null)
-        //        {
-        //            deck.AddCard(new CardClass(type, p));
-        //        }
-        //    }
-
-        //    switch (p)
-        //    {
-        //        case PlayerTurn.Player1:
-        //            player1Deck = deck;
-        //            player1Deck.SetLoc(new Vector2(center.X - (map.GetLength(1) * CardClass.cardWidth) / 2.0f - 40, center.Y + (map.GetLength(0) * CardClass.cardHeight) - CardClass.cardHeight * 2 - 40));
-        //            break;
-
-        //        case PlayerTurn.Player2:
-        //            player2Deck = deck;
-        //            player2Deck.SetLoc(new Vector2(center.X + (map.GetLength(1) * CardClass.cardWidth) + CardClass.cardWidth * 4 - 30, center.Y + CardClass.cardHeight + 40));
-        //            break;
-        //    }
-        //}
 
         public override void LoadContent(ContentManager cm)
         {
@@ -256,16 +236,24 @@ namespace CardGame
 
         public bool PlaceCard(CardClass card, int x, int y)
         {
-            return PlaceCard(card, x, y, 0);
+            return PlaceCard(card, x, y, 0, 0);
         }
 
 
-        public bool PlaceCard(CardClass card, int x, int y, int modifier)
+        public bool PlaceCard(CardClass card, int x, int y, int transX, int transY)
         {
             if ( x >= 0 && y >= 0 && x < map.GetLength(1) && y < map.GetLength(0))
             {
                 CardClass replacedCard = map[y, x];
                 CardClass winner = card;
+                int modifier = 0;
+                bool forwardMove = false;
+                if (!(transX == 0 && transY == 0))
+                {
+                    modifier = card.GetMove()[transY, transX].modifier;
+                    forwardMove = card.GetMove()[transY, transX].y == transX;
+                }
+                
                 if (replacedCard != null && replacedCard.player != card.player)
                     // Check to see which one wins in this battle.
                     winner = replacedCard.GetCardType().GetStat() <= card.GetCardType().GetStat() + modifier ? card : replacedCard;
@@ -281,7 +269,7 @@ namespace CardGame
                             if (ct.typeName.ToLower().ToString().Equals("stack" + lastLetter.ToLower()))
                             {
                                 winner = new CardClass(ct, card.player);
-                                winner.SetLocation(card.GetLoc(), true);
+                                winner.SetLocation(replacedCard.GetLoc(), true);
                                 break;
                             }
                         }
@@ -293,6 +281,20 @@ namespace CardGame
                         // tried to move onto own card.
                         return false;
                 }
+
+                if (y == activeTurn.GateLane())
+                    return false;
+
+                // Check for movement into the gates
+                Turn other = turns.Find(delegate(Turn t) { return t != activeTurn; });
+                if (other != null && y == other.GateLane())
+                {
+                    if (!forwardMove || x != 3)
+                    {
+                        return false;
+                    }
+                }
+
                 Vector2 oldLoc = ConvertScreenCoordToMap(card.GetPrevLocation());
                 // Cards can't move into their old position.
                 if ((int)oldLoc.X == x && (int)oldLoc.Y == y)
@@ -365,6 +367,14 @@ namespace CardGame
             ResetSelectedCard();
         }
 
+        public Turn GetTurn(PlayerTurn pt)
+        {
+            if (turns[0].GetPlayerTurn() == pt)
+                return turns[0];
+            else
+                return turns[1];
+        }
+
         private bool PlayerCardsLeft(PlayerTurn pt)
         {
             foreach (CardClass card in map)
@@ -430,24 +440,11 @@ namespace CardGame
                 if (transX == 2 && transY == 2) // center of the move map IE Early out
                     return;
 
-                // Check for movement into the gates
-                Turn other = turns.Find(delegate(Turn t) { return t != activeTurn; });
-                if (other != null && mapLoc.Y == other.GateLane())
-                {
-                    if (mapLoc.X == 3 && transX == 2)
-                    {
-                        PlaceCard(card, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX].modifier);
-                        SwitchTurns();
-                    }
-
-                    return;
-                }
-
                 // Check for the actual move.
                 if (transX >= 0 && transY >= 0 && transX < moveOption.GetLength(0) && transY < moveOption.GetLength(1) && moveOption[transY, transX] != null)
                 {
                     bool good = false;
-                    RecursiveCardMovement(card, cardLoc, moveOption[transY, transX], moveOption, transX, transY, out good);
+                    good = RecursiveCardMovement(card, cardLoc, moveOption[transY, transX], moveOption, transX, transY);
                     if (good)
                     {
                         SwitchTurns();
@@ -464,23 +461,43 @@ namespace CardGame
             }
         }
 
-        private bool RecursiveCardMovement(CardClass card, Vector2 cardLoc, MoveLocation currentLoc, MoveLocation[,] map, int transX, int transY, out bool recurse)
+        private bool RecursiveCardMovement(CardClass card, Vector2 cardLoc, MoveLocation currentLoc, MoveLocation[,] map, int transX, int transY)
         {
             if (transX == 2 && transY == 2)
             {
-                recurse = true;
                 return true;
             }
 
-            if (currentLoc.x >= 0 && currentLoc.y >= 0 && !(currentLoc.x == 2 && currentLoc.y == 2))
+            bool placed = false;
+
+
+            Stack<MoveLocation> order = new Stack<MoveLocation>(2);
+            while (currentLoc.x >= 0 && currentLoc.y >= 0 && !(currentLoc.x == 2 && currentLoc.y == 2))
             {
-                if (!RecursiveCardMovement(card, cardLoc, map[currentLoc.x, currentLoc.y], map, currentLoc.y, currentLoc.x, out recurse))
-                    return recurse;
+                order.Push(currentLoc);
+                currentLoc = map[currentLoc.x, currentLoc.y];
             }
-            //PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX].modifier)
-            bool place = PlaceCard(card, (int)cardLoc.X + transX - 2, (int)cardLoc.Y + transY - 2, currentLoc.modifier);
-            recurse = place;
-            return place;
+            order.Push(currentLoc);
+
+            MoveLocation next;
+            while (order.Count > 1)
+            {
+                currentLoc = order.Pop();
+                next = order.Peek();
+                placed = PlaceCard(card, (int)cardLoc.X + next.y - 2, (int)cardLoc.Y + next.x - 2, next.y, next.x) || placed;
+                if (!placed)
+                    return placed;
+            }
+
+
+            //if (currentLoc.x >= 0 && currentLoc.y >= 0 && !(currentLoc.x == 2 && currentLoc.y == 2))
+            //{
+            //    if (!RecursiveCardMovement(card, cardLoc, map[currentLoc.x, currentLoc.y], map, currentLoc.y, currentLoc.x))
+            //        return recurse;
+            //}
+            ////PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX].modifier)
+            placed = PlaceCard(card, (int)cardLoc.X + transX - 2, (int)cardLoc.Y + transY - 2, transX, transY) || placed;
+            return placed;
         }
 
         public override void Update(GameTime gt)

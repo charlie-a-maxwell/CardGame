@@ -50,10 +50,15 @@ namespace CardGame
 
         public static void DrawLine(SpriteBatch sb, Vector2 p1, Vector2 p2, Color c, float width)
         {
+            DrawLine(sb, p1, p2, c, width, 0.9f);
+        }
+
+        public static void DrawLine(SpriteBatch sb, Vector2 p1, Vector2 p2, Color c, float width, float z)
+        {
             float angle = (float)Math.Atan2(p2.Y - p1.Y, p2.X - p1.X);
             float length = Vector2.Distance(p1, p2);
 
-            sb.Draw(lineTex, p1, null, c, angle, Vector2.Zero, new Vector2(length, width), SpriteEffects.None, 0.9f);
+            sb.Draw(lineTex, p1, null, c, angle, Vector2.Zero, new Vector2(length, width), SpriteEffects.None, z);
         }
 
         public static void DrawText(SpriteBatch sb, string s, Vector2 loc)
