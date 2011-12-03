@@ -59,6 +59,11 @@ namespace CardGame
             return hand.SelectCard(loc);
         }
 
+        public CardClass SelectCard(int loc)
+        {
+            return hand.SelectCard(loc);
+        }
+
         public int HandCount()
         {
             return hand.Count;
@@ -67,6 +72,11 @@ namespace CardGame
         public void AddToHand()
         {
             hand.AddCard(deck.GetTopCard());
+        }
+
+        public void AddToHand(CardClass cc)
+        {
+            hand.AddCard(cc);
         }
 
         public void ClearHand()

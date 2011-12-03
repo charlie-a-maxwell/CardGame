@@ -12,6 +12,13 @@ using Microsoft.Xna.Framework.Input;
 namespace CardGame
 {
     public enum GameType { Player1, Player2};
+    public struct MoveList
+    {
+        public CardClass replacedCard;
+        public Vector2 cardPrevLoc;
+        public Vector2 startLoc;
+        public Vector2 toLoc;
+    }
 
     class MapView : Screen
     {
@@ -28,6 +35,7 @@ namespace CardGame
         public static int spacing = 5;
         List<CardType> cardTypes;
         GameType type = GameType.Player1;
+        Stack<MoveList> moveStack;
 
         public MapView(string n, GraphicsDevice gd) : base(n)
         {
@@ -46,6 +54,8 @@ namespace CardGame
             activeTurn = turns[0];
             winner = 0;
 
+            moveStack = new Stack<MoveList>();
+
             SetCenter(new Vector2((gd.Viewport.Width - CardClass.cardWidth * map.GetLength(1)) / 2, (gd.Viewport.Height - CardClass.cardHeight * map.GetLength(1)) / 2));
         }
 
@@ -63,6 +73,7 @@ namespace CardGame
 
 
             cardTypes = new List<CardType>();
+            moveStack = new Stack<MoveList>();
 
             activeTurn = turns[0];
             winner = 0;
@@ -236,11 +247,11 @@ namespace CardGame
 
         public bool PlaceCard(CardClass card, int x, int y)
         {
-            return PlaceCard(card, x, y, 0, 0);
+            return PlaceCard(card, x, y, 0, 0, true);
         }
 
 
-        public bool PlaceCard(CardClass card, int x, int y, int transX, int transY)
+        public bool PlaceCard(CardClass card, int x, int y, int transX, int transY, bool place)
         {
             if ( x >= 0 && y >= 0 && x < map.GetLength(1) && y < map.GetLength(0))
             {
@@ -299,21 +310,62 @@ namespace CardGame
                 // Cards can't move into their old position.
                 if ((int)oldLoc.X == x && (int)oldLoc.Y == y)
                     return false;
-                map[y, x] = winner;
-                Vector2 clear = ConvertScreenCoordToMap(card.GetLoc());
-                if (clear.Y >= 0 && clear.X >= 0)
-                    map[(int)clear.Y, (int)clear.X] = null;
-                winner.SetLocation(center + new Vector2(x * (CardClass.cardWidth + spacing), y * (CardClass.cardHeight + spacing)), true);
 
-                if (card.player == PlayerTurn.Player1)
-                    turns[0].RemoveCardFromHand(card);
-                else if (card.player == PlayerTurn.Player2)
-                    turns[1].RemoveCardFromHand(card);
+                if (place)
+                {
+                    MoveList ml = new MoveList();
+
+                    if (replacedCard != null)
+                    {
+                        ml.replacedCard = (winner == replacedCard ? card : replacedCard);
+                    }
+                    ml.cardPrevLoc = winner.GetPrevLocation();
+                    Vector2 newLoc = center + new Vector2(x * (CardClass.cardWidth + spacing), y * (CardClass.cardHeight + spacing));
+                    ml.toLoc = newLoc;
+                    ml.startLoc = winner.GetLoc();
+
+                    moveStack.Push(ml);
+                    map[y, x] = winner;
+                    Vector2 clear = ConvertScreenCoordToMap(card.GetLoc());
+                    if (clear.Y >= 0 && clear.X >= 0)
+                        map[(int)clear.Y, (int)clear.X] = null;
+                    winner.SetLocation(newLoc, true);
+                
+                    if (card.player == PlayerTurn.Player1)
+                        turns[0].RemoveCardFromHand(card);
+                    else if (card.player == PlayerTurn.Player2)
+                        turns[1].RemoveCardFromHand(card);
+                }
 
                 return true;
             }
 
             return false;
+        }
+
+        public void UndoMove()
+        {
+            if (moveStack.Count > 0)
+            {
+                MoveList ml = moveStack.Pop();
+
+                Vector2 cardPrevLoc = ConvertScreenCoordToMap(ml.cardPrevLoc);
+                Vector2 startLoc = ConvertScreenCoordToMap(ml.startLoc);
+                Vector2 toLoc = ConvertScreenCoordToMap(ml.toLoc);
+
+                CardClass movedCard = map[(int)toLoc.Y, (int)toLoc.X];
+                movedCard.SetLocation(ml.cardPrevLoc, false);
+                movedCard.SetLocation(ml.startLoc, true);
+                if (startLoc.X > 0 & startLoc.Y > 0)
+                    map[(int)startLoc.Y, (int)startLoc.X] = movedCard;
+                else
+                {
+                    Turn activeTurn = GetTurn(movedCard.GetCardType().player);
+                    activeTurn.AddToHand(movedCard);
+                }
+
+                map[(int)toLoc.Y, (int)toLoc.X] = ml.replacedCard;
+            }
         }
 
         public Vector2 ConvertScreenCoordToMap(Vector2 pos)
@@ -411,6 +463,11 @@ namespace CardGame
 
         public void MoveCard(CardClass card, int x, int y)
         {
+            MoveCard(card, x, y, true);
+        }
+
+        public void MoveCard(CardClass card, int x, int y, bool switchturns)
+        {
             Vector2 mapLoc = new Vector2(x, y);
             // Can't move to the sides.
             if (mapLoc.X == 0 || mapLoc.X == map.GetLength(0) - 1)
@@ -426,7 +483,10 @@ namespace CardGame
             { 
                 // placing a new card.
                 if (activeTurn.InDeploymentZone(mapLoc) && map[(int)mapLoc.Y, (int)mapLoc.X] == null && PlaceCard(card, (int)mapLoc.X, (int)mapLoc.Y))
-                    SwitchTurns();
+                {
+                    if (switchturns)
+                        SwitchTurns();
+                }
                 else
                     ResetSelectedCard();
             }
@@ -447,7 +507,8 @@ namespace CardGame
                     good = RecursiveCardMovement(card, cardLoc, moveOption[transY, transX], moveOption, transX, transY);
                     if (good)
                     {
-                        SwitchTurns();
+                        if (switchturns)
+                            SwitchTurns();
                     }
                 }
                 else
@@ -461,7 +522,17 @@ namespace CardGame
             }
         }
 
-        private bool RecursiveCardMovement(CardClass card, Vector2 cardLoc, MoveLocation currentLoc, MoveLocation[,] map, int transX, int transY)
+        public bool RecursiveCardMovement(CardClass card, Vector2 cardLoc, MoveLocation currentLoc, MoveLocation[,] map, int transX, int transY)
+        {
+            return RecursiveCardMovement(card, cardLoc, currentLoc, map, transX, transY, true);
+        }
+
+        public bool TestRecursiveCardMovement(CardClass card, Vector2 cardLoc, MoveLocation currentLoc, MoveLocation[,] map, int transX, int transY)
+        {
+            return RecursiveCardMovement(card, cardLoc, currentLoc, map, transX, transY, false);
+        }
+
+        private bool RecursiveCardMovement(CardClass card, Vector2 cardLoc, MoveLocation currentLoc, MoveLocation[,] map, int transX, int transY, bool place)
         {
             if (transX == 2 && transY == 2)
             {
@@ -484,7 +555,7 @@ namespace CardGame
             {
                 currentLoc = order.Pop();
                 next = order.Peek();
-                placed = PlaceCard(card, (int)cardLoc.X + next.y - 2, (int)cardLoc.Y + next.x - 2, next.y, next.x) || placed;
+                placed = PlaceCard(card, (int)cardLoc.X + next.y - 2, (int)cardLoc.Y + next.x - 2, next.y, next.x, place) || placed;
                 if (!placed)
                     return placed;
             }
@@ -496,7 +567,7 @@ namespace CardGame
             //        return recurse;
             //}
             ////PlaceCard(selectedCard, (int)mapLoc.X, (int)mapLoc.Y, moveOption[transY, transX].modifier)
-            placed = PlaceCard(card, (int)cardLoc.X + transX - 2, (int)cardLoc.Y + transY - 2, transX, transY) || placed;
+            placed = PlaceCard(card, (int)cardLoc.X + transX - 2, (int)cardLoc.Y + transY - 2, transX, transY, place) || placed;
             return placed;
         }
 

@@ -65,6 +65,8 @@ namespace CardGame
 
         [XmlIgnore]
         private int[,] moveOptions;
+        [XmlIgnore]
+        public int numberOfMoves = 0;
         
         public string moveString
         {
@@ -220,6 +222,7 @@ namespace CardGame
                                 }
                             }
                         }
+                        numberOfMoves++;
 
                         if (tempX != -1 && tempY != -1)
                         {
@@ -310,17 +313,6 @@ namespace CardGame
                 int yMargin = 5;
                 //int[,] cardMove = type.GetMove();   //GetMove();
 
-                //float xSize = (width - xMargin * 2) / cardMove.GetLength(1);
-                //float ySize = (height - CardClass.cardHeight - yMargin * 2) / cardMove.GetLength(0);
-                //float offsetX = xMargin + originX;
-                //float offsetY = originY + CardClass.cardHeight + yMargin * 2;
-
-                ////MapView.FillColor(sb, originX, originY, width, height, Color.White);
-                ////MapView.DrawLine(sb, new Vector2(originX, originY), new Vector2(originX, originY + height), Color.Black);
-                ////MapView.DrawLine(sb, new Vector2(originX, originY), new Vector2(originX + width, originY), Color.Black);
-                ////MapView.DrawLine(sb, new Vector2(originX + width, originY), new Vector2(originX + width, originY + height), Color.Black);
-                ////MapView.DrawLine(sb, new Vector2(originX, originY + height), new Vector2(originX + width, originY + height), Color.Black);
-
                 Vector2 origin = new Vector2();
                 Vector2 hor = new Vector2(CardClass.cardWidth, 0);
                 Vector2 ver = new Vector2(0, CardClass.cardHeight);
@@ -330,27 +322,6 @@ namespace CardGame
                 if (type.textureLarge != null)
                     sb.Draw(type.textureLarge, new Rectangle(originX, originX, width, height), null, Color.White, 0.0f, new Vector2(0, 0), SpriteEffects.None, 0.5f);
 
-
-                //for (int i = 0; i < cardMove.GetLength(0); i++)
-                //{
-                //    for (int j = 0; j < cardMove.GetLength(1); j++)
-                //    {
-                //        if (cardMove[i, j] != -999)
-                //        {
-                //            origin = new Vector2(xSize * j + offsetX - 2, ySize * i + offsetY - 5);
-                //            if ((i == cardMove.GetLength(0) / 2) && (j == cardMove.GetLength(1) / 2))
-                //            {
-                //                sb.Draw(circleTex, origin, null, Color.White, 0.0f, new Vector2(15, 15), 0.22f, SpriteEffects.None, 0.0f);
-                //                Screen.DrawText(sb, cardMove[i, j].ToString(), origin + new Vector2(5, 4), textColor, 1.0f);
-                //            }
-                //            else
-                //            {
-                //                sb.Draw(circleTex, origin, null, Color.White, 0.0f, new Vector2(0, 0), 0.18f, SpriteEffects.None, 0.0f);
-                //                Screen.DrawText(sb, (cardMove[i, j] + stat).ToString(), origin + new Vector2(5, 4), textColor, 1.0f);
-                //            }
-                //        }
-                //    }
-                //}
 
                 if (oldLoc.X != -1 && oldLoc.Y != -1)
                 {
@@ -367,10 +338,10 @@ namespace CardGame
                                     border = Color.DarkRed;
                                 else
                                     border = outlineColor;
-                                Screen.DrawLine(sb, origin, origin + hor, border);
-                                Screen.DrawLine(sb, origin, origin + ver, border);
-                                Screen.DrawLine(sb, origin + ver, origin + ver + hor, border);
-                                Screen.DrawLine(sb, origin + hor, origin + hor + ver, border);
+                                Screen.DrawLine(sb, origin, origin + hor, border, 0.1f);
+                                Screen.DrawLine(sb, origin, origin + ver, border, 0.1f);
+                                Screen.DrawLine(sb, origin + ver, origin + ver + hor, border, 0.1f);
+                                Screen.DrawLine(sb, origin + hor, origin + hor + ver, border, 0.1f);
                             }
                         }
                     }
