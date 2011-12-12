@@ -48,7 +48,7 @@ namespace CardGame
         int Y;
         MapView map;
         Random rand = new Random();
-        int WinValue = 20;
+        int WinValue = 600;
         int maxDepth = 6;
         Stopwatch Watch = new Stopwatch();
 
@@ -64,18 +64,18 @@ namespace CardGame
         public override void Update(GameTime gt)
         {
             int depth = 0;
-            //MapState[,] ms = new MapState[X, Y];
-            //for(int i = 0; i < map.map.GetLength(0); i++)
-            //{
-            //    for (int j = 0; j < map.map.GetLength(1); j++)
-            //    {
-            //        CardClass cc = map.map[i, j];
-            //        if (cc != null)
-            //        {
-            //            ms[i, j] = new MapState(cc.player, cc.GetCardType(), map.ConvertScreenCoordToMap(cc.GetPrevLocation()));
-            //        }
-            //    }
-            //}
+            CardClass[,] temp = new CardClass[7,7];
+            for (int i = 0; i < map.map.GetLength(0); i++)
+            {
+                for (int j = 0; j < map.map.GetLength(1); j++)
+                {
+                    CardClass cc = map.map[i, j];
+                    if (cc != null)
+                    {
+                        temp[i, j] = new CardClass(cc.GetCardType(), cc.GetCardType().player);
+                    }
+                }
+            }
             rootNode = new DecisionNode(X, Y, PlayerTurn.Player2);
 
             //rootNode.currState = ms;
@@ -83,15 +83,14 @@ namespace CardGame
             Watch.Reset();
             Watch.Start();
             DecisionNode solution = null;
-            while (depth < maxDepth)
+           // while (depth <= maxDepth)
             {
-                DLS(rootNode, depth, int.MinValue, int.MaxValue);
+                DLS(rootNode, 0, -999999, 999999);
                 //if (Watch.ElapsedMilliseconds >= 500)
                 //    break;
                 depth++;
             }
             Watch.Stop();
-
             int value = int.MinValue;
             foreach (DecisionNode n in rootNode.GetChildren())
             {
@@ -120,13 +119,15 @@ namespace CardGame
         {
             if (map.map[0, 3] != null)
                 return true;
+            else if (map.map[5, 3] != null)
+                return true;
             else
                 return false;
         }
 
         private int ChildNodeSort(DecisionNode n1, DecisionNode n2)
         {
-            return n1.Value - n2.Value;
+            return n2.Value - n1.Value;
         }
 
         private int DLS(DecisionNode node, int depth, int alpha, int beta)
@@ -138,12 +139,13 @@ namespace CardGame
 
             if (depth == maxDepth)
             {
+                node.Value = NodeEval(map.map, node.pt, node.cardStart, node.cardEnd) * (node.pt == PlayerTurn.Player2 ? 1 : -1);
                 return node.Value;
             }
 
             //if (TestWin(node))
             //{
-            //    node.Value = WinValue * (node.pt == turn ? 1 : -1);
+            //    node.Value = WinValue;
             //    return node.Value;
             //}
 
@@ -153,14 +155,16 @@ namespace CardGame
                 node.GetChildren().Sort(ChildNodeSort);
             }
 
-
-            int value = 0;
-
             // Maximize!
-            int b = beta;
-            bool firstChild = true;
             CardClass movedCard;
 
+            if (node.GetChildren().Count == 0)
+            {
+                node.Value = NodeEval(map.map, node.pt, node.cardStart, node.cardEnd) * (node.pt == PlayerTurn.Player2 ? 1 : -1);
+                return node.Value;
+            }
+
+            int value = 0;
             foreach (DecisionNode n in node.GetChildren())
             {
                 if (n.cardStart.X == -1)
@@ -169,54 +173,71 @@ namespace CardGame
                     movedCard = activeTurn.SelectCard((int)n.cardStart.Y);
                 }
                 else
-                    movedCard = map.map[(int)n.cardStart.Y, (int)n.cardStart.X];
+                    movedCard = map.map[(int)n.cardStart.X, (int)n.cardStart.Y];
 
-                if (movedCard != null)
-                    map.MoveCard(movedCard, (int)n.cardEnd.X, (int)n.cardEnd.Y, false);
+                bool placed = false;
+                placed = map.MoveCardAI(movedCard, (int)n.cardEnd.X, (int)n.cardEnd.Y, depth);
 
-                value = -DLS(n, depth - 1, -b, -alpha);
-                if (alpha < value && value < beta && !firstChild)
-                    value = -DLS(n, depth - 1, -beta, -alpha);
+                value = -DLS(n, depth+1, -beta, -alpha);
 
-                if (movedCard != null)
-                    map.UndoMove();
+                if (placed)
+                    map.UndoMove(movedCard);
 
-                firstChild = false;
-                alpha = Math.Max(alpha, value);
-                if (alpha >= beta)
+                if (value >= beta)
                 {
-                    node.Value = alpha;
-                    return alpha;
+                    node.Value = beta;
+                    return beta;
                 }
-                b = alpha + 1;
+                if (value >= alpha)
+                    alpha = value;
             }
 
             node.Value = alpha;
             return alpha;
         }
 
-        private int NodeEval(CardClass[,] ms, PlayerTurn currTurn)
+        private int NodeEval(CardClass[,] ms, PlayerTurn currTurn, Vector2 cardStart, Vector2 cardEnd)
         {
             int score = 0;
             Turn activeTurn = map.GetTurn(currTurn);
             Turn otherTurn = map.GetTurn(currTurn == PlayerTurn.Player1 ? PlayerTurn.Player2 : PlayerTurn.Player1);
+            CardClass cc = null;
             for (int i = 0; i < ms.GetLength(0); i++)
             {
                 for (int j = 0; j < ms.GetLength(1); j++)
                 {
-                    if (ms[i, j] != null && ms[i, j].GetCardType().player == currTurn)
+                    if (i == cardStart.X && j == cardStart.Y)
                     {
-                        score += ms[i, j].GetCardType().GetStat() + ms[i, j].GetCardType().numberOfMoves;
-                        score += (Math.Abs(otherTurn.GateLane() - i) + Math.Abs(2 - j)) * (Math.Abs(otherTurn.GateLane() - i) + Math.Abs(2 - j));
-                        if (otherTurn.GateLane() == i && j == 3)
-                            score += 200;
+                        cc = null;
                     }
-                    else if (ms[i, j] != null)
+                    else if (i == cardEnd.X && j == cardEnd.Y)
                     {
-                        score -= ms[i, j].GetCardType().GetStat() + ms[i, j].GetCardType().numberOfMoves;
-                        score -= (Math.Abs(otherTurn.GateLane() - i) + Math.Abs(3 - j)) * (Math.Abs(otherTurn.GateLane() - i) + Math.Abs(3 - j));
+                        int x = (int)cardStart.X;
+                        int y = (int)cardStart.Y;
+                        if (x == -1 && otherTurn.GetPlayerTurn() == PlayerTurn.Player2)
+                            cc = otherTurn.SelectCard(y);
+                        else
+                            cc =  ms[x, y];
+                    }
+                    else
+                    {
+                        cc = ms[i, j];
+                    }
+
+
+                    if (cc != null && cc.GetCardType().player != currTurn)
+                    {
+                        score += cc.GetCardType().GetStat() + cc.GetCardType().numberOfMoves;
+                        score += (Math.Abs(otherTurn.GateLane() - i) + Math.Abs(3 - j)) * (Math.Abs(otherTurn.GateLane() - i) + Math.Abs(3 - j));
+                        if (otherTurn.GateLane() == i && j == 3)
+                            score += WinValue;
+                    }
+                    else if (cc != null)
+                    {
+                        score -= cc.GetCardType().GetStat() + cc.GetCardType().numberOfMoves;
+                        score -= (Math.Abs(activeTurn.GateLane() - i) + Math.Abs(3 - j)) * (Math.Abs(activeTurn.GateLane() - i) + Math.Abs(3 - j));
                         if (activeTurn.GateLane() == i && j == 3)
-                            score -= 200;
+                            score -= WinValue;
                     }
                 }
             }
@@ -224,53 +245,8 @@ namespace CardGame
             return score;
         }
 
-        //private bool CheckForValidMove(CardType ct, MapState[,] map, int locY, int locX, int Y, int X)
-        //{
-        //    if (locX > 0 && locX < map.GetLength(0) && locY > 0 && locY < map.GetLength(1))
-        //    {
-        //        if (map[locY, locX] != null && map[locY, locX].prevLoc.X == (locX + X - 2) && map[locY, locX].prevLoc.Y == (locY + Y - 2)) return false;
-
-        //        int tempX = locX;
-        //        int tempY = locY;
-        //        int offX = X;
-        //        int offY = Y;
-        //        MoveLocation ml = ct.moves[Y, X];
-        //        bool forwardMove;
-        //        Turn otherTurn = this.map.GetTurn(ct.player == PlayerTurn.Player1 ? PlayerTurn.Player2 : PlayerTurn.Player1);
-        //        do
-        //        {
-        //            tempX = locX + offX - 2;
-        //            tempY = locY + offY - 2;
-        //            forwardMove = ml.y == offY;
-
-        //            if ((tempX <= 0 || tempX >= map.GetLength(0) - 1 || tempY <= 0 || tempY >= map.GetLength(1)))
-        //            {
-        //                if (!(otherTurn.GateLane() == tempY && tempX == 3 && forwardMove))
-        //                    return false;
-        //            }
-
-        //            if (map[locY, locX] != null && map[locY, locX].prevLoc.Y == tempY && map[locY, locX].prevLoc.X == tempX)
-        //                return false;
-        //            else if (map[tempY, tempX] != null && map[tempY, tempX].ct.player == ct.player)
-        //                return false;
-        //            else if (map[tempY, tempX] != null && map[tempY, tempX].ct.GetStat() > ct.GetStat() + ml.modifier)
-        //                return false;
-
-        //            offY = ml.x;
-        //            offX = ml.y;
-        //            ml = ct.moves[ml.x, ml.y];
-        //        } while (ml != null && !(ml.x == offY && ml.y == offX));
-
-        //        return true;
-        //    }
-
-        //    return false;
-        //}
-
         private void ExpandNode(DecisionNode node, int depth)
         {
-            CardClass[,] state = map.map;
-
             CardClass s;
             MoveLocation[,] moveMap;
 
@@ -290,6 +266,7 @@ namespace CardGame
                             dn.moveI = 2;
                             dn.moveJ = 2;
 
+                            //dn.Value = NodeEval(map.map, dn.pt, dn.cardStart, dn.cardEnd);
 
                             node.AddChild(dn);
                         }
@@ -297,13 +274,13 @@ namespace CardGame
                 }
             }
 
-            if (map.deploy - depth >= 0) return;
+            if (map.deploy - depth > 0) return;
 
-            for (int i = 1; i < state.GetLength(0)-1; i++)
+            for (int i = 1; i < map.map.GetLength(0) - 1; i++)
             {
-                for (int j = 1; j < state.GetLength(1)-1; j++)
+                for (int j = 1; j < map.map.GetLength(1) - 1; j++)
                 {
-                    s = state[i, j];
+                    s = map.map[i, j];
                     if (s != null && s.GetCardType().player == node.pt)
                     {
                         moveMap = s.GetCardType().moves;
@@ -314,7 +291,11 @@ namespace CardGame
                             {
                                 int newX = j + (mj -2);
                                 int newY = i + (mi -2);
-                                if (moveMap[mi, mj] != null && !(mi== 2 && mj == 2) && map.TestRecursiveCardMovement(map.map[i, j], new Vector2(newX, newY), s.GetMove()[mi, mj], s.GetMove(), mj, mi))
+
+                                if (newX <= 0 || newX >= map.map.GetLength(0) - 1)
+                                    continue;
+
+                                if (moveMap[mi, mj] != null && !(mi== 2 && mj == 2) && map.TestRecursiveCardMovement(s, new Vector2(j, i), s.GetMove()[mi, mj], s.GetMove(), mj, mi))
                                 {
                                     DecisionNode dn = new DecisionNode(X, Y, (node.pt == PlayerTurn.Player1 ? PlayerTurn.Player2 : PlayerTurn.Player1));
                                     dn.cardStart = new Vector2(i, j);
@@ -322,7 +303,7 @@ namespace CardGame
                                     dn.moveI = mi;
                                     dn.moveJ = mj;
 
-                                    dn.Value = NodeEval(map.map, dn.pt);
+                                    //dn.Value = NodeEval(map.map, dn.pt, dn.cardStart, dn.cardEnd);
 
                                     node.AddChild(dn);
                                 }

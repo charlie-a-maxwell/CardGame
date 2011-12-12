@@ -338,10 +338,10 @@ namespace CardGame
                                     border = Color.DarkRed;
                                 else
                                     border = outlineColor;
-                                Screen.DrawLine(sb, origin, origin + hor, border, 0.1f);
-                                Screen.DrawLine(sb, origin, origin + ver, border, 0.1f);
-                                Screen.DrawLine(sb, origin + ver, origin + ver + hor, border, 0.1f);
-                                Screen.DrawLine(sb, origin + hor, origin + hor + ver, border, 0.1f);
+                                Screen.DrawLine(sb, origin, origin + hor, border, 0.9f);
+                                Screen.DrawLine(sb, origin, origin + ver, border, 0.9f);
+                                Screen.DrawLine(sb, origin + ver, origin + ver + hor, border, 0.9f);
+                                Screen.DrawLine(sb, origin + hor, origin + hor + ver, border, 0.9f);
                             }
                         }
                     }
