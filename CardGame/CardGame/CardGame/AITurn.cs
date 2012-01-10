@@ -196,6 +196,52 @@ namespace CardGame
             return alpha;
         }
 
+        private int DLSRoot(DecisionNode node, int depth, int alpha, int beta)
+        {
+
+            ExpandNode(node, depth);
+
+            // Maximize!
+            CardClass movedCard;
+
+            if (node.GetChildren().Count == 0)
+            {
+                node.Value = NodeEval(map.map, node.pt, node.cardStart, node.cardEnd) * (node.pt == PlayerTurn.Player2 ? 1 : -1);
+                return node.Value;
+            }
+
+            int value = 0;
+            foreach (DecisionNode n in node.GetChildren())
+            {
+                if (n.cardStart.X == -1)
+                {
+                    Turn activeTurn = map.GetTurn(node.pt);
+                    movedCard = activeTurn.SelectCard((int)n.cardStart.Y);
+                }
+                else
+                    movedCard = map.map[(int)n.cardStart.X, (int)n.cardStart.Y];
+
+                bool placed = false;
+                placed = map.MoveCardAI(movedCard, (int)n.cardEnd.X, (int)n.cardEnd.Y, depth);
+
+                value = -DLS(n, depth + 1, -beta, -alpha);
+
+                if (placed)
+                    map.UndoMove(movedCard);
+
+                if (value >= beta)
+                {
+                    node.Value = beta;
+                    return beta;
+                }
+                if (value >= alpha)
+                    alpha = value;
+            }
+
+            node.Value = alpha;
+            return alpha;
+        }
+
         private int NodeEval(CardClass[,] ms, PlayerTurn currTurn, Vector2 cardStart, Vector2 cardEnd)
         {
             int score = 0;
