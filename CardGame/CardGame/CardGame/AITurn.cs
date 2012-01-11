@@ -112,7 +112,7 @@ namespace CardGame
 
             //if (Watch.ElapsedMilliseconds >= 500)
             //    return node.Value; // no more time
-
+            //test to see if this works.
 
             if (depth == maxDepth)
             {
