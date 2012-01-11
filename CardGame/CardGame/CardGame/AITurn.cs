@@ -96,7 +96,36 @@ namespace CardGame
             // Check if there are no cards and no cards in hand.
             if (map.map[0, 3] != null)
                 return true;
-            else if (map.map[5, 3] != null)
+            else if (map.map[6, 3] != null)
+                return true;
+
+            CardClass cc;
+            bool foundActive = false;
+            bool foundOther = false;
+            Turn activeTurn = map.GetTurn(node.pt);
+            Turn otherTurn = map.GetTurn(node.pt == PlayerTurn.Player1 ? PlayerTurn.Player2 : PlayerTurn.Player1);
+
+            for (int i = 0; i < map.map.GetLength(0); i++)
+            {
+                for (int j = 0; j < map.map.GetLength(1); j++)
+                {
+                    cc = map.map[i, j];
+
+
+                    if (cc != null && cc.GetCardType().player != node.pt)
+                    {
+                        foundActive = true;
+                    }
+                    else if (cc != null)
+                    {
+                        foundOther = true;
+                    }
+                }
+            }
+
+            if (!foundActive && activeTurn.HandCount() == 0)
+                return true;
+            else if (!foundOther && otherTurn.HandCount() == 0)
                 return true;
             else
                 return false;
@@ -112,7 +141,7 @@ namespace CardGame
 
             //if (Watch.ElapsedMilliseconds >= 500)
             //    return node.Value; // no more time
-            //test to see if this works.
+
 
             if (depth == maxDepth)
             {
@@ -122,7 +151,7 @@ namespace CardGame
 
             if (TestWin(node))
             {
-                node.Value = NodeEval(map.map, node.pt, node.cardStart, node.cardEnd, depth); ;
+                node.Value = NodeEval(map.map, node.pt, node.cardStart, node.cardEnd, depth);
                 return node.Value;
             }
 
@@ -152,20 +181,18 @@ namespace CardGame
                 else
                     movedCard = map.map[(int)n.cardStart.X, (int)n.cardStart.Y];
 
-                bool placed = false;
-                placed = map.MoveCardAI(movedCard, (int)n.cardEnd.X, (int)n.cardEnd.Y, depth);
+                map.MoveCardAI(movedCard, (int)n.cardEnd.X, (int)n.cardEnd.Y, depth);
 
                 value = -DLS(n, depth+1, -beta, -alpha);
 
-                if (placed)
-                    map.UndoMove(movedCard);
+                map.UndoMove(movedCard);
 
                 if (value >= beta)
                 {
                     node.Value = beta;
                     return beta;
                 }
-                if (value >= alpha)
+                if (value > alpha)
                     alpha = value;
             }
 
@@ -224,45 +251,28 @@ namespace CardGame
             CardClass cc = null;
             bool foundActive = false;
             bool foundOther = false;
-            int win_value = WinValue - 5 * depth;
+            int win_value = WinValue - 10 * depth;
             int dis = 0;
             for (int i = 0; i < ms.GetLength(0); i++)
             {
                 for (int j = 0; j < ms.GetLength(1); j++)
                 {
-                    if (i == cardStart.X && j == cardStart.Y)
-                    {
-                        cc = null;
-                    }
-                    else if (i == cardEnd.X && j == cardEnd.Y)
-                    {
-                        int x = (int)cardStart.X;
-                        int y = (int)cardStart.Y;
-                        if (x == -1 && otherTurn.GetPlayerTurn() == PlayerTurn.Player2)
-                            cc = otherTurn.SelectCard(y);
-                        else
-                            cc =  ms[x, y];
-                    }
-                    else
-                    {
-                        cc = ms[i, j];
-                    }
+                    cc = ms[i, j];
 
-
-                    if (cc != null && cc.GetCardType().player != currTurn)
+                    if (cc != null && cc.GetCardType().player == currTurn)
                     {
                         foundActive = true;
-                        score += cc.GetCardType().GetStat() + cc.GetCardType().numberOfMoves;
+                        score += cc.GetCardType().GetStat() + cc.GetCardType().numberOfMoves + cc.GetCardType().weight;
                         dis = Math.Abs(otherTurn.GateLane() - i) + Math.Abs(3 - j);
                         if (dis == 0)
-                            score -= win_value;
+                            score += win_value;
                         else
-                            score -= (int)(moveValue * (1.0f /dis));
+                            score += (int)(moveValue * (1.0f /dis));
                     }
                     else if (cc != null)
                     {
                         foundOther = true;
-                        score -= cc.GetCardType().GetStat() + cc.GetCardType().numberOfMoves;
+                        score -= cc.GetCardType().GetStat() - cc.GetCardType().numberOfMoves - cc.GetCardType().weight;
                         dis = Math.Abs(activeTurn.GateLane() - i) + Math.Abs(3 - j);
                         if (dis == 0)
                             score -= win_value;
@@ -274,6 +284,16 @@ namespace CardGame
 
             // Add for loop for the hands to sum them.
 
+            foreach (CardClass c in hand.GetCardList())
+            {
+                score += c.GetCardType().GetStat() + c.GetCardType().numberOfMoves + c.GetCardType().weight;
+            }
+
+            foreach (CardClass c in otherTurn.GetHand().GetCardList())
+            {
+                score -= c.GetCardType().GetStat() - c.GetCardType().numberOfMoves - c.GetCardType().weight;
+            }
+
             if (!foundActive && hand.Count == 0)
                 score -= win_value;
 
@@ -281,7 +301,7 @@ namespace CardGame
                 score -= win_value;
 
 
-            return score * (currTurn == PlayerTurn.Player2 ? -1 : 1);
+            return score;// *(currTurn == PlayerTurn.Player2 ? 1 : -1);
         }
 
         private void ExpandNode(DecisionNode node, int depth)

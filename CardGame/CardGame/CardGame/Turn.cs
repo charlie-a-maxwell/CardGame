@@ -118,6 +118,11 @@ namespace CardGame
         {
             return hand.GetSelectedCard();
         }
+
+        public Hand GetHand()
+        {
+            return hand;
+        }
     }
 
     class Turn1 : Turn

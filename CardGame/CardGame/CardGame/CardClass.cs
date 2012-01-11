@@ -67,7 +67,7 @@ namespace CardGame
         private int[,] moveOptions;
         [XmlIgnore]
         public int numberOfMoves = 0;
-        
+        public int weight = 0;
         public string moveString
         {
             get
@@ -523,6 +523,11 @@ namespace CardGame
         public void Clear()
         {
             hand.Clear();
+        }
+
+        public List<CardClass> GetCardList()
+        {
+            return hand;
         }
     }
 

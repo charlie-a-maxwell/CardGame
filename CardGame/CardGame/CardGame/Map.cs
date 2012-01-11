@@ -150,6 +150,7 @@ namespace CardGame
 
             Vector2 origin;
             Color trans = new Color(Color.LightGray, 0.3f);
+            CardClass selectedCard = null;
             for (int i = 0; i < map.GetLength(0); i++)
             {
                 for (int j = 0; j < map.GetLength(1); j++)
@@ -175,6 +176,9 @@ namespace CardGame
                     if (map[i, j] != null)
                     {
                         map[i, j].Render(sb, spacing);
+
+                        if (map[i, j].Selected)
+                            selectedCard = map[i, j];
                     }
 
                     if (i == 0 && j == 3)
@@ -210,6 +214,9 @@ namespace CardGame
 
                 }
             }
+
+            if (selectedCard != null)
+                selectedCard.Render(sb, spacing);
 
             string text = "";
             Color textColor = Color.Black;
