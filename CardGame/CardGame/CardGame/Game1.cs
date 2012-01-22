@@ -142,6 +142,7 @@ namespace CardGame
             Screen.SetGraphics(GraphicsDevice);
             mouseHandler = new MouseHandler();
             mouseHandler.leftMouseDown += new MouseHandler.LeftMouseDown(sm.HandleMouseClick);
+            mouseHandler.moveEvent += new MouseHandler.MouseMove(sm.HandleMouseMove);
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             sm.AddScreen(new MapView("Map", GraphicsDevice));
@@ -247,12 +248,6 @@ namespace CardGame
             // Allows the game to exit
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
-
-            if (Mouse.GetState().LeftButton == ButtonState.Pressed)
-            {
-                int x = Mouse.GetState().X;
-                int y = Mouse.GetState().Y;
-            }
 
             if (lastKeyDown <= 0 && Keyboard.GetState().GetPressedKeys().Length > 0)
             {
@@ -372,11 +367,13 @@ namespace CardGame
         private long lastMouseDown;
         private const long mouseRefresh = 200;
         public delegate void LeftMouseDown(Vector2 pos);
+        public delegate void MouseMove(Vector2 newPos);
         public Rectangle renderSize = new Rectangle(0, 0, 60, 60);
 
         public Vector2 offset = new Vector2(0, 0);
 
         public LeftMouseDown leftMouseDown = null;
+        public MouseMove moveEvent = null;
 
         public MouseHandler()
         {
@@ -388,6 +385,12 @@ namespace CardGame
         public void Update(GameTime gameTime)
         {
             MouseState state = Mouse.GetState();
+            if (pos.X != state.X || pos.Y != state.Y)
+            {
+                if (moveEvent != null)
+                    moveEvent(new Vector2(state.X, state.Y));
+            }
+
             this.pos.X = state.X;
             this.pos.Y = state.Y;
             if (state.LeftButton == ButtonState.Pressed && leftMouseDown != null && lastMouseDown < 0)

@@ -39,6 +39,7 @@ namespace CardGame
         GameType type = GameType.Player1;
         Stack<MoveList> moveStack;
         uint moveID = 0;
+        ContentManager content;
 
         public MapView(string n, GraphicsDevice gd) : base(n)
         {
@@ -104,6 +105,7 @@ namespace CardGame
         public override void LoadContent(ContentManager cm)
         {
             base.LoadContent(cm);
+            content = cm;
 
             MapBackground = cm.Load<Texture2D>("MapBack");
             Gate1 = cm.Load<Texture2D>("DoorPlayer1");
@@ -695,7 +697,7 @@ namespace CardGame
             }
         }
 
-        public void StartGame()
+        public void StartGame(GameType gt)
         {
             for (int i = 0; i < map.GetLength(0); i++)
             {
@@ -705,19 +707,17 @@ namespace CardGame
                 }
             }
 
+            if (type == gt)
+                turns[1] = new AITurn(map.GetLength(0), map.GetLength(1), this);
+            else
+                turns[1] = new Turn2(map.GetLength(0), map.GetLength(1));
+
+            turns[1].LoadTexture(content);
+
             deploy = 6;
             over = false;
 
-            //turns[0] = new Turn1(map.GetLength(1), map.GetLength(0));
-            //turns[1] = new Turn2(map.GetLength(1), map.GetLength(0));
-            //player1Hand = new Hand(PlayerTurn.Player1);
-            //player2Hand = new Hand(PlayerTurn.Player2);
-            //player1Hand.SetRenderLoc(new Vector2(center.X - (map.GetLength(1) * CardClass.cardWidth) / 2.0f - 40, center.Y + (map.GetLength(0) * CardClass.cardHeight) - CardClass.cardHeight));
-            //player2Hand.SetRenderLoc(new Vector2(center.X + (map.GetLength(1) * CardClass.cardWidth) - 20 + CardClass.cardWidth * 4, center.Y));
-
             SetCenter(center);
-
-
             LoadDecks();
 
             foreach (Turn t in turns)

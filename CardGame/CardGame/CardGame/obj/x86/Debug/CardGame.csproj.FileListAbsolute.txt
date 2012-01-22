@@ -55,7 +55,6 @@ C:\projects\CardGame\CardGame\CardGame\obj\x86\Debug\CardGame.exe.manifest
 C:\projects\CardGame\CardGame\CardGame\obj\x86\Debug\CardGame.application
 C:\projects\CardGame\CardGame\CardGame\obj\x86\Debug\CardGame.exe
 C:\projects\CardGame\CardGame\CardGame\obj\x86\Debug\CardGame.pdb
-C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DeckBack.xnb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\SplashScreen.xnb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Cloud0.xnb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Cloud1.xnb
@@ -63,3 +62,19 @@ C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Cloud2.xnb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Background.xnb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\CloudT1.xnb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\CloudT2.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card1AL.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card1DL.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card2AL.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card2DL.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card3AL.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card3DL.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card4AL.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card4DL.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card5AL.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card5DL.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DeckBackA.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\DeckBackD.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card6A.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card6D.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card6AL.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card6DL.xnb

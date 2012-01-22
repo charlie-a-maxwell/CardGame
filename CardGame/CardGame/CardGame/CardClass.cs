@@ -583,7 +583,7 @@ namespace CardGame
         public void Render(SpriteBatch sb)
         {
             if (deckTex != null && deck.Count > 0)
-                sb.Draw(deckTex, new Rectangle((int)renderLoc.X, (int)renderLoc.Y, CardClass.cardWidth, CardClass.cardHeight), (owner == PlayerTurn.Player1 ? Color.LightBlue : Color.Red ));
+                sb.Draw(deckTex, new Rectangle((int)renderLoc.X, (int)renderLoc.Y, CardClass.cardWidth, CardClass.cardHeight), Color.White);
         }
 
         public bool Intersect(Vector2 point)
