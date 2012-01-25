@@ -25,8 +25,84 @@
     <Title>Card Movement Continued</Title>
   </TutorialInfo>
   <TutorialInfo>
-    <TextureName>Card3DL</TextureName>
+    <TextureName></TextureName>
     <text>      Returning to a space you just came from: When moving cards around the board it is important to note that at no time can a single card move back to a space that it came from or crossed the last time it was moved. For example, if you moved a soldier card forward on the board, the next time it moves it could only move left, right, or forward. The number of rounds in between these movements is irrelevant.</text>
     <Title>Important Movement Rules</Title>
+  </TutorialInfo>
+  <TutorialInfo>
+    <TextureName></TextureName>
+    <text>      Additionally, let us examine an Assassin Card's movement. If an Assassin Card moves two spots to the right, it will only be able to move forward, right, or back the next time it moves. It cannot go back to the left one or two spaces in the direction it just came from as the spot it would be moving to was one that it either came from or crossed last time it moved.</text>
+    <Title>Example</Title>
+  </TutorialInfo>
+  <TutorialInfo>
+    <TextureName></TextureName>
+    <text>      Exception: The one exception is if a Solider Card moves forward to stack with another Soldier Card, the newly created Host Card is able to move back to where that Soldier Card just came from, as the Host Card should be treated as a completely new card on the board after its creation. However, after a Host Card has been moved once, it behaves like any other card with regard to movement. Please see "Card Stacking" for more information.</text>
+    <Title>Stacking Exception</Title>
+  </TutorialInfo>
+  <TutorialInfo>
+    <TextureName></TextureName>
+    <text>      Cards that can move multiple spaces which include Spearmen, Assassins, and Champions, do not need to cover two squares when moving in the relevant direction unless they choose to. For example, an Assassin Card may be able to move two squares both to the left and right but if it wishes to move just one space to the left or right it may do so. Additionally the Champion Card can also just move diagonally one square if it so desires.
+      Moving through other cards: No card in this version of the game is able to move through or over other cards, be it an enemy or friendly card.</text>
+    <Title>Multiple Move Spaces</Title>
+  </TutorialInfo>
+  <TutorialInfo>
+    <TextureName></TextureName>
+    <text>      Each card's center circle represents is base attack power at its current location. The other circles represent where it can move to as well as what its attack power will be when it moves to attack that position. When one card attacks another, the player should look at the number value in the circle representing where it is moving to, and see if it is higher or equal to the base attack power (the large center circle) of the card it is attacking. If so, the card being attacked is defeated and removed from the board. Note: In case of a tie, the attacker will always win.</text>
+    <Title>Attack Power</Title>
+  </TutorialInfo>
+  <TutorialInfo>
+    <TextureName>tutorial2</TextureName>
+    <text>      If a Soldier Card is in front of an Assassin Card, and it is the Soldier Card's turn to attack, a player can see that the circle above the Soldier's center circle is a 7 while the Assassin's base value is 6. Thus when the soldier moves forward it will defeat the Assassin Card.</text>
+    <Title>Attack Power Example 1</Title>
+  </TutorialInfo>
+  <TutorialInfo>
+    <TextureName>tutorial3</TextureName>
+    <text>      If a Spearmen card was to the left of a Defender Card and it was the Spearman's turn to attack, the player would look at the circle to the right of the Spearmen's center circle and see that it is an 8. The Defender's base value is also 8. In this case, the Spearmen is still able to defeat the Defender as it is a tie, which as mentioned before, always goes to the attacker.</text>
+    <Title>Attack Power Example 2</Title>
+  </TutorialInfo>
+  <TutorialInfo>
+    <TextureName></TextureName>
+    <text>      Deployment Phase: When the game begins both players will be dealt 5 cards. They will then take turns deploying one card on the table till they both have deployed 3 cards. At this point players will only be allowed to have a max number of three cards in their hand at a time. 
+      
+      Turns: After the deployment phase the player that first deployed will begin their first turn. During a turn a player will choose to do one of two things. Either deploys an additional card on any open space in the deployment zone, or moving a card (or attacking, if the space one is moving a card to is occupied by an enemy card). After a player has done one of these two things, it will then be the other players turn.</text>
+    <Title>Deployment and Turns</Title>
+  </TutorialInfo>
+  <TutorialInfo>
+    <TextureName>Card6AL</TextureName>
+    <text>      Stacking is a special maneuver that only Soldier Cards are able to perform. This happens when one Solider Card is moved on top of another. By doing this the two Solider Cards will be combined into one card, a Host Card. This card behaves as a Solider with +1 to each of its attack values. This maneuver is most commonly used when Solider Cards are looking to defeat or repel Defender Cards.</text>
+    <Title>Stacking</Title>
+  </TutorialInfo>
+  <TutorialInfo>
+    <TextureName>Card1AL</TextureName>
+    <text>      Solider Cards are the base of one's army. Soldiers are capable of defeating all other cards when attacking except Defenders. However they are capable of performing a maneuver called stacking. See the section on "Stacking" for more information. Each deck contains 4 Solider Cards.</text>
+    <Title>Soldier</Title>
+  </TutorialInfo>
+  <TutorialInfo>
+    <TextureName>Card6DL</TextureName>
+    <text>      Host Cards are created by combining two Soldier Cards. They function as stronger Soldier Cards, which enables them to defeat Defender Cards.</text>
+    <Title>Hosts</Title>
+  </TutorialInfo>
+  <TutorialInfo>
+    <TextureName>Card4AL</TextureName>
+    <text>      Spearmen are powerful cards with the ability to move two spaces forward. These cards are great for offensive pushes. Each deck contains only one Spearmen Card.</text>
+    <Title>Spearmen</Title>
+  </TutorialInfo>
+  <TutorialInfo>
+    <TextureName>Card5DL</TextureName>
+    <text>      Champions have a more unique movement style. They are great for cutting through enemy lines to attack more difficult to reach cards. Their attack value does suffer greatly though when moving to the sides or back. Each deck contains only one Champion Card.
+      Note: When moving these cards forward the move diagonally one and then optionally forward one more square. They do not move to the side one and then forward.
+    </text>
+    <Title>Champion</Title>
+  </TutorialInfo>
+  <TutorialInfo>
+    <TextureName>Card3AL</TextureName>
+    <text>      Assassins are powerful cards that specialize in movement and attack power.
+      However, these qualities apply only to the cards abilities to move sideways. This makes them vulnerable to attack from the front or back, but great for attacking or covering spaces to its sides. Each deck contains 2 Assassin Cards.</text>
+    <Title>Assassin</Title>
+  </TutorialInfo>
+  <TutorialInfo>
+    <TextureName>Card2DL</TextureName>
+    <text>      Defenders are at their best when they are immobile. This makes them essential for defending gates. Additionally, they are able to be quite effective offensively when going up against Soldiers and Assassins. Each deck contains 2 Defender Cards.</text>
+    <Title>Defender</Title>
   </TutorialInfo>
 </ArrayOfTutorialInfo>

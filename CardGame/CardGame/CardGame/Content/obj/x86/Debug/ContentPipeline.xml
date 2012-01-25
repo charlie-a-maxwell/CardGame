@@ -401,6 +401,24 @@
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\tutorial1.xnb</Output>
       <Time>2012-01-23T20:36:43.386-06:00</Time>
     </Item>
+    <Item>
+      <Source>tutorial2.png</Source>
+      <Name>tutorial2</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\tutorial2.xnb</Output>
+      <Time>2012-01-24T20:32:55.077-06:00</Time>
+    </Item>
+    <Item>
+      <Source>tutorial3.png</Source>
+      <Name>tutorial3</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\tutorial3.xnb</Output>
+      <Time>2012-01-24T20:33:05.604-06:00</Time>
+    </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
       <TargetPlatform>Windows</TargetPlatform>
