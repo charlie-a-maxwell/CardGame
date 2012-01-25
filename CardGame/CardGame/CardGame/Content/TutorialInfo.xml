@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<ArrayOfTutorialInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <TutorialInfo>
+    <TextureName></TextureName>
+    <text>      In the First Seal players will take the side of either Heaven or Hell's Army. Each Player has a deck of ten cards representing different types of soldiers that they will use in the battle. The game ends when all of you opponent's cards have been slain or when you reach the enemy "Gate."</text>
+    <Title>Overview</Title>
+  </TutorialInfo>
+  <TutorialInfo>
+    <TextureName>tutorial1</TextureName>
+    <text>      Deployment Zone: Cards can only be deployed on the first row nearest to the player.
+      Gates: Each side will have a gate located just in front of their deployment zone. If a player moves one of their cards on to the enemy's gate their side immediately wins.
+      Picture: Sample Board</text>
+    <Title>The Board</Title>
+  </TutorialInfo>
+  <TutorialInfo>
+    <TextureName></TextureName>
+    <text>      All cards have circles on them with numbers located inside. The circles represent how the cards can move.
+      For example, Soldier Cards have 5 circles on them. One in the center, which represents its "Attack Power" (see the section on attack power for more information), and 4 surrounding it. As the circles are on the top, bottom, and sides of the center circle, this means that the Soldier can move one space to the left, right, front, or back.
+      When looking at the Assassin Card, one can see it has two circles to the left and right of the center circle, with one on the top and one on the bottom. This means that the Assassin can move forward and back one space, but can also move up to two spaces to the left or right.</text>
+    <Title>Card Movement</Title>
+  </TutorialInfo>
+  <TutorialInfo>
+    <TextureName>Card5AL</TextureName>
+    <text>      For another example, look at the Champion Card. As seen on the card it has one circle on both sides of the center circle as well as one below it. Additionally, it has two lines of circles above it. These lines represent optional ways the Champion Card can move forward. This cards movement can be seen as moving diagonally forward to the left or right and, if desired, one more space forward.</text>
+    <Title>Card Movement Continued</Title>
+  </TutorialInfo>
+  <TutorialInfo>
+    <TextureName>Card3DL</TextureName>
+    <text>      Returning to a space you just came from: When moving cards around the board it is important to note that at no time can a single card move back to a space that it came from or crossed the last time it was moved. For example, if you moved a soldier card forward on the board, the next time it moves it could only move left, right, or forward. The number of rounds in between these movements is irrelevant.</text>
+    <Title>Important Movement Rules</Title>
+  </TutorialInfo>
+</ArrayOfTutorialInfo>

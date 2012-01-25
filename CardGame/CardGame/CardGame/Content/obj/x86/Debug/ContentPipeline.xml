@@ -392,6 +392,15 @@
       <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card6DL.xnb</Output>
       <Time>2011-09-30T20:17:54-05:00</Time>
     </Item>
+    <Item>
+      <Source>tutorial1.png</Source>
+      <Name>tutorial1</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+      <Options>None</Options>
+      <Output>C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\tutorial1.xnb</Output>
+      <Time>2012-01-23T20:36:43.386-06:00</Time>
+    </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
       <TargetPlatform>Windows</TargetPlatform>

@@ -5,7 +5,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Input;
-
+using System.Xml.Serialization;
+using System.IO;
 
 namespace CardGame
 {
@@ -86,6 +87,41 @@ namespace CardGame
         }
     }
 
+    public class TextBox : ScreenObject
+    {
+        protected String text;
+        protected float width, height;
+        public bool selected;
+
+        public TextBox(Vector2 l, Screen p, String t)
+            : base(l, p)
+        {
+            text = Screen.FormatTextToWidth(t, 100.0f);
+        }
+
+        public TextBox(Vector2 l, Screen p, String t, float w, float h)
+            : base(l, p)
+        {
+            width = w;
+            height = h;
+            text = Screen.FormatTextToWidth(t, w);
+        }
+
+        public override void LoadContent(ContentManager cm)
+        {
+        }
+
+        public override bool TestClick(Vector2 point)
+        {
+            return point.X > loc.X && point.X < loc.X + width && point.Y > loc.Y && point.Y < loc.Y + height;
+        }
+
+        public override void Render(SpriteBatch sb)
+        {
+            Screen.DrawUnalteredText(sb, text, loc, Color.Black, 1.0f);
+        }
+    }
+
     public abstract class Screen
     {
         protected static Texture2D lineTex;
@@ -162,6 +198,31 @@ namespace CardGame
             sb.DrawString(font, s, loc + fontOrigin / 2, c, 0, fontOrigin / 2, scale, effect, 0.0f);
         }
 
+        public static void DrawUnalteredText(SpriteBatch sb, string s, Vector2 loc, Color c, float scale)
+        {
+            if (font == null) return;
+            sb.DrawString(font, s, loc, c, 0, new Vector2(0,0), scale, SpriteEffects.None, 0.0f);
+        }
+
+        public static String FormatTextToWidth(String s, float width)
+        {
+            String outString = String.Empty;
+            String[] array = s.Split(' ');
+            String line = String.Empty;
+
+            foreach (String word in array)
+            {
+                if (font.MeasureString(line + word).Length() > width)
+                {
+                    outString = outString + line + '\n';
+                    line = String.Empty;
+                }
+                line = line + word + ' ';
+            }
+            outString = outString + line;
+            return outString;
+        }
+
         public static Vector2 MeasureString(string s)
         {
             if (font == null) return new Vector2(0,0);
@@ -180,14 +241,57 @@ namespace CardGame
 
         public virtual void HandleMouseClick(Vector2 pos)
         {
+            foreach (ScreenObject so in screenObjects)
+            {
+                if (so.TestClick(pos) && so is Button)
+                {
+                    (so as Button).Click(this);
+                    break;
+                }
+            }
         }
 
         public virtual void HandleMouseMove(Vector2 pos)
         {
+            foreach (ScreenObject so in screenObjects)
+            {
+                if (so.TestClick(pos) && so is Button)
+                {
+                    (so as Button).selected = true;
+                }
+                else if (so is Button)
+                {
+                    (so as Button).selected = false;
+                }
+            }
+        }
+
+        protected ScreenObject GetSelectedObject()
+        {
+            foreach (ScreenObject so in screenObjects)
+                if (so is Button && (so as Button).selected)
+                    return so;
+
+            return null;
         }
 
         public virtual void HandleKeydown(Keys[] k)
         {
+            try
+            {
+                foreach (Keys t in k)
+                {
+                    switch (t)
+                    {
+                        case Keys.Enter:
+                            ScreenObject so = GetSelectedObject();
+                            if (so != null && so is Button)
+                                (so as Button).Click(this);
+                            break;
+                    }
+                }
+            }
+            catch (Exception e) { }
         }
 
         public virtual bool Init()
@@ -206,7 +310,7 @@ namespace CardGame
         }
     }
 
-    class SplashScreen : Screen
+    public class SplashScreen : Screen
     {
         Texture2D tex;
 
@@ -251,63 +355,8 @@ namespace CardGame
         {
             if (manager != null)
             {
-                //manager.SetCurrentScreenByName("Tutorial");
+                manager.SetCurrentScreenByName("Tutorial");
             }
-        }
-
-        public override void HandleMouseClick(Vector2 pos)
-        {
-            foreach (ScreenObject so in screenObjects)
-            {
-                if (so.TestClick(pos) && so is Button)
-                {
-                    (so as Button).Click(this);
-                    break;
-                }
-            }
-        }
-
-        public override void HandleMouseMove(Vector2 pos)
-        {
-            foreach (ScreenObject so in screenObjects)
-            {
-                if (so.TestClick(pos) && so is Button)
-                {
-                    (so as Button).selected = true;
-                }
-                else if (so is Button)
-                {
-                    (so as Button).selected = false;
-                }
-            }
-        }
-
-        private ScreenObject GetSelectedObject()
-        {
-            foreach (ScreenObject so in screenObjects)
-                if (so is Button && (so as Button).selected)
-                    return so;
-
-            return null;
-        }
-
-        public override void HandleKeydown(Keys[] k)
-        {
-            try
-            {
-                foreach (Keys t in k)
-                {
-                    switch (t)
-                    {
-                        case Keys.Enter:
-                            ScreenObject so = GetSelectedObject();
-                            if (so != null && so is Button)
-                                (so as Button).Click(this);
-                            break;
-                    }
-                }
-            }
-            catch (Exception e){ }
         }
 
         public override void LoadContent(ContentManager cm)
@@ -399,6 +448,104 @@ namespace CardGame
         {
             if (currentScreen != null)
                 currentScreen.HandleKeydown(k);
+        }
+    }
+
+    public class TutorialInfo
+    {
+        public string TextureName;
+        [XmlIgnore]
+        public Texture2D image;
+        public string text;
+        public string Title;
+    }
+
+    public class TutorialScreen : Screen
+    {
+        Texture2D tex;
+        int currIndex = 0;
+        List<TutorialInfo> info;
+
+        public TutorialScreen()
+            : base()
+        {
+        }
+
+        public TutorialScreen(string s)
+            : base(s)
+        {
+        }
+
+        public override bool Init()
+        {
+            info = new List<TutorialInfo>();
+
+            screenObjects.Add(new Button(new Vector2(220, 475), this, "<- Previous", new OnClick(Previous_Click)));
+            screenObjects.Add(new Button(new Vector2(540, 475), this, "Next ->", new OnClick(Next_Click)));
+
+            if (File.Exists("Content/GameOptions.xml"))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(List<TutorialInfo>));
+                Stream options = File.Open("Content/TutorialInfo.xml", FileMode.Open);
+                info = (List<TutorialInfo>)serializer.Deserialize(options);
+                options.Close();
+            }
+
+            return true;
+        }
+
+        public void Next_Click(object sender)
+        {
+            if (currIndex < info.Count-1)
+                currIndex++;
+        }
+
+
+        public void Previous_Click(object sender)
+        {
+            if (currIndex == 0)
+                manager.SetCurrentScreenByName("SplashScreen");
+            else
+                currIndex--;
+        }
+
+
+        public override void LoadContent(ContentManager cm)
+        {
+            base.LoadContent(cm);
+            foreach (TutorialInfo i in info)
+            {
+                if (i.TextureName.Length > 0)
+                    i.image = cm.Load<Texture2D>(i.TextureName);
+                else
+                    i.image = null;
+            }
+        }
+
+        public override void Render(SpriteBatch sb, GraphicsDevice device)
+        {
+            foreach (ScreenObject so in screenObjects)
+            {
+                so.Render(sb);
+            }
+
+            DrawText(sb, info[currIndex].Title, new Vector2(device.Viewport.Width / 2, 30), Color.Black, 2.0f);
+
+            if (info[currIndex].image != null)
+            {
+                float ratio = 0.0f;
+                if (info[currIndex].image.Width > info[currIndex].image.Height)
+                    ratio = 400.0f / info[currIndex].image.Width;
+                else
+                    ratio = 200.0f / info[currIndex].image.Height;
+
+                sb.Draw(info[currIndex].image, new Vector2(device.Viewport.Width / 2, device.Viewport.Height / 2 - 200), null, Color.White, 0.0f, new Vector2((info[currIndex].image.Width * ratio) / 2, (info[currIndex].image.Height * ratio) / 2), ratio, SpriteEffects.None, 0.0f);
+                DrawUnalteredText(sb, FormatTextToWidth(info[currIndex].text, 350), new Vector2(device.Viewport.Width / 2 - 150, device.Viewport.Height / 2), Color.Black, 1.0f);
+            }
+            else
+            {
+                DrawUnalteredText(sb, FormatTextToWidth(info[currIndex].text, 350), new Vector2(device.Viewport.Width / 2 - 150, device.Viewport.Height / 2 - 220), Color.Black, 1.0f);
+            }
         }
     }
 }

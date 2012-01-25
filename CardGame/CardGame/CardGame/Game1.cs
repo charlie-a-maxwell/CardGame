@@ -147,6 +147,7 @@ namespace CardGame
 
             sm.AddScreen(new MapView("Map", GraphicsDevice));
             sm.AddScreen(new SplashScreen("SplashScreen"));
+            sm.AddScreen(new TutorialScreen("Tutorial"));
 
             if (File.Exists("Content/GameOptions.xml"))
             {

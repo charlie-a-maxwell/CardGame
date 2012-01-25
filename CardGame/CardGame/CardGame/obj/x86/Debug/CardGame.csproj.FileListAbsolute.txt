@@ -78,3 +78,5 @@ C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card6A.xnb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card6D.xnb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card6AL.xnb
 C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\Card6DL.xnb
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\TutorialInfo.xml
+C:\projects\CardGame\CardGame\CardGame\bin\x86\Debug\Content\tutorial1.xnb
