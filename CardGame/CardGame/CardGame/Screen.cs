@@ -206,6 +206,12 @@ namespace CardGame
 
         public static String FormatTextToWidth(String s, float width)
         {
+            int lines = 0;
+            return FormatTextToWidth(s, width, out lines);
+        }
+
+        public static String FormatTextToWidth(String s, float width, out int numLines)
+        {
             String outString = String.Empty;
             String[] array = s.Split(' ');
             String line = String.Empty;
@@ -220,6 +226,8 @@ namespace CardGame
                 line = line + word + ' ';
             }
             outString = outString + line;
+
+            numLines = outString.Split('\n').Length;
             return outString;
         }
 
@@ -513,6 +521,7 @@ namespace CardGame
         public override void LoadContent(ContentManager cm)
         {
             base.LoadContent(cm);
+            tex = cm.Load<Texture2D>("MapBack");
             foreach (TutorialInfo i in info)
             {
                 if (i.TextureName.Length > 0)
@@ -529,8 +538,11 @@ namespace CardGame
                 so.Render(sb);
             }
 
-            DrawText(sb, info[currIndex].Title, new Vector2(device.Viewport.Width / 2, 30), Color.Black, 2.0f);
+            DrawText(sb, info[currIndex].Title, new Vector2(device.Viewport.Width / 2 - MeasureString(info[currIndex].Title).X /2, 30), Color.Black, 2.0f);
 
+            int height = (int)MeasureString("A").Y;
+            int lines = 0;
+            string text = string.Empty;
             if (info[currIndex].image != null)
             {
                 float ratio = 0.0f;
@@ -540,11 +552,17 @@ namespace CardGame
                     ratio = 200.0f / info[currIndex].image.Height;
 
                 sb.Draw(info[currIndex].image, new Vector2(device.Viewport.Width / 2, device.Viewport.Height / 2 - 200), null, Color.White, 0.0f, new Vector2((info[currIndex].image.Width * ratio) / 2, (info[currIndex].image.Height * ratio) / 2), ratio, SpriteEffects.None, 0.0f);
-                DrawUnalteredText(sb, FormatTextToWidth(info[currIndex].text, 350), new Vector2(device.Viewport.Width / 2 - 150, device.Viewport.Height / 2), Color.Black, 1.0f);
+                
+                text = FormatTextToWidth(info[currIndex].text, 600, out lines);
+                sb.Draw(tex, new Rectangle(device.Viewport.Width / 2 - 280, device.Viewport.Height / 2 - 5, 610, height * lines), null, Color.White); 
+                DrawUnalteredText(sb, text, new Vector2(device.Viewport.Width / 2 - 275, device.Viewport.Height / 2), Color.Black, 1.0f);
             }
             else
             {
-                DrawUnalteredText(sb, FormatTextToWidth(info[currIndex].text, 350), new Vector2(device.Viewport.Width / 2 - 150, device.Viewport.Height / 2 - 220), Color.Black, 1.0f);
+                text = FormatTextToWidth(info[currIndex].text, 600, out lines);
+                sb.Draw(tex, new Rectangle(device.Viewport.Width / 2 - 280, device.Viewport.Height / 2 - 225, 610, height * lines), null, Color.White); 
+
+                DrawUnalteredText(sb, text, new Vector2(device.Viewport.Width / 2 - 275, device.Viewport.Height / 2 - 220), Color.Black, 1.0f);
             }
         }
     }
