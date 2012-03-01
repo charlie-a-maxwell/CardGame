@@ -251,9 +251,11 @@ namespace CardGame
         }
         Vector2 loc;
         Vector2 oldLoc;
+        Vector2 movingLoc;
         static Color outlineColor = Color.Yellow;
         static Texture2D circleTex = null;
         private bool placed = false;
+        private bool moving = false;
         public bool Selected = false;
 
         public static void SetCircleText(Texture2D tex)
@@ -261,13 +263,12 @@ namespace CardGame
             circleTex = tex;
         }
 
-
-
         public CardClass(CardType t)
         {
             type = t;
             loc = new Vector2(-1, -1);
             oldLoc = new Vector2(-1, -1);
+            movingLoc = new Vector2(-1, -1);
         }
 
         public CardClass(CardType t, PlayerTurn pt)
@@ -277,6 +278,22 @@ namespace CardGame
             oldLoc = new Vector2(-1, -1);
         }
 
+        public void SetMoving(Vector2 v)
+        {
+            movingLoc = v;
+            moving = true;
+        }
+
+        public Vector2 GetMovingLoc()
+        {
+            return movingLoc;
+        }
+
+        public void EndMoving()
+        {
+            moving = false;
+        }
+
         public void Render(SpriteBatch sb)
         {
             Render(sb, 0);
@@ -284,6 +301,12 @@ namespace CardGame
 
         public void Render(SpriteBatch sb, int space)
         {
+            Vector2 curLoc = loc;
+            if (moving)
+            {
+                curLoc = movingLoc;
+            }
+
             SpriteEffects effect = SpriteEffects.None;
             Color textColor = (player == PlayerTurn.Player1 ? Color.Black : Color.DarkRed);
 
@@ -291,11 +314,11 @@ namespace CardGame
                 effect = SpriteEffects.FlipVertically;
 
             if (type.texture != null)
-                sb.Draw(type.texture, new Rectangle((int)loc.X, (int)loc.Y, cardWidth, cardHeight), null, Color.White, 0.0f, new Vector2(0, 0), effect, 0.5f);
+                sb.Draw(type.texture, new Rectangle((int)curLoc.X, (int)curLoc.Y, cardWidth, cardHeight), null, Color.White, 0.0f, new Vector2(0, 0), effect, 0.5f);
 
-            sb.Draw(circleTex, loc + new Vector2((cardWidth / 2.0f) - 15, (player == PlayerTurn.Player1 || !placed ? cardHeight - 30 : 0)), null, Color.White, 0.0f, new Vector2(0, 0), 0.18f, SpriteEffects.None, 0.0f);
+            sb.Draw(circleTex, curLoc + new Vector2((cardWidth / 2.0f) - 15, (player == PlayerTurn.Player1 || !placed ? cardHeight - 30 : 0)), null, Color.White, 0.0f, new Vector2(0, 0), 0.18f, SpriteEffects.None, 0.0f);
 
-            Screen.DrawText(sb, type.GetStat().ToString(), loc + new Vector2((cardWidth / 2.0f) - 9, (player == PlayerTurn.Player1 || !placed ? cardHeight - 30 : 0) + 4), textColor, 1.0f, effect);
+            Screen.DrawText(sb, type.GetStat().ToString(), curLoc + new Vector2((cardWidth / 2.0f) - 9, (player == PlayerTurn.Player1 || !placed ? cardHeight - 30 : 0) + 4), textColor, 1.0f, effect);
 
 
 

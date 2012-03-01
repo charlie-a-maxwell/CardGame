@@ -549,20 +549,20 @@ namespace CardGame
                 if (info[currIndex].image.Width > info[currIndex].image.Height)
                     ratio = 400.0f / info[currIndex].image.Width;
                 else
-                    ratio = 200.0f / info[currIndex].image.Height;
+                    ratio = 275.0f / info[currIndex].image.Height;
 
-                sb.Draw(info[currIndex].image, new Vector2(device.Viewport.Width / 2, device.Viewport.Height / 2 - 200), null, Color.White, 0.0f, new Vector2((info[currIndex].image.Width * ratio) / 2, (info[currIndex].image.Height * ratio) / 2), ratio, SpriteEffects.None, 0.0f);
+                sb.Draw(info[currIndex].image, new Vector2(device.Viewport.Width / 2 - 40, device.Viewport.Height / 2 - 165), null, Color.White, 0.0f, new Vector2((info[currIndex].image.Width * ratio) / 2, (info[currIndex].image.Height * ratio) / 2), ratio, SpriteEffects.None, 0.0f);
                 
-                text = FormatTextToWidth(info[currIndex].text, 600, out lines);
-                sb.Draw(tex, new Rectangle(device.Viewport.Width / 2 - 280, device.Viewport.Height / 2 - 5, 610, height * lines), null, Color.White); 
-                DrawUnalteredText(sb, text, new Vector2(device.Viewport.Width / 2 - 275, device.Viewport.Height / 2), Color.Black, 1.0f);
+                text = FormatTextToWidth(info[currIndex].text, 700, out lines);
+                sb.Draw(tex, new Rectangle(device.Viewport.Width / 2 - 320, device.Viewport.Height / 2 + 43, 710, height * lines), null, Color.White);
+                DrawUnalteredText(sb, text, new Vector2(device.Viewport.Width / 2 - 315, device.Viewport.Height / 2 + 48), Color.Black, 1.0f);
             }
             else
             {
-                text = FormatTextToWidth(info[currIndex].text, 600, out lines);
-                sb.Draw(tex, new Rectangle(device.Viewport.Width / 2 - 280, device.Viewport.Height / 2 - 225, 610, height * lines), null, Color.White); 
+                text = FormatTextToWidth(info[currIndex].text, 700, out lines);
+                sb.Draw(tex, new Rectangle(device.Viewport.Width / 2 - 320, device.Viewport.Height / 2 - 225, 710, height * lines), null, Color.White);
 
-                DrawUnalteredText(sb, text, new Vector2(device.Viewport.Width / 2 - 275, device.Viewport.Height / 2 - 220), Color.Black, 1.0f);
+                DrawUnalteredText(sb, text, new Vector2(device.Viewport.Width / 2 - 315, device.Viewport.Height / 2 - 220), Color.Black, 1.0f);
             }
         }
     }

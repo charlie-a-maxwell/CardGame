@@ -64,6 +64,7 @@ namespace CardGame
 
         public override void Update(GameTime gt)
         {
+            if (map.moving) return;
             rootNode = new DecisionNode(X, Y, PlayerTurn.Player2);
 
             //rootNode.currState = ms;

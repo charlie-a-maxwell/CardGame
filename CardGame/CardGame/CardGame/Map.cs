@@ -21,6 +21,18 @@ namespace CardGame
         public Vector2 toLoc;
         public uint moveID;
     }
+    public class MoveSteps
+    {
+        public int x;
+        public int y;
+        public MoveSteps(int X, int Y)
+        {
+            x = X;
+            y = Y;
+        }
+    }
+
+    public enum GameState { GameOver, GameRunning, GameAnimating };
 
     class MapView : Screen
     {
@@ -32,14 +44,18 @@ namespace CardGame
         List<Turn> turns = new List<Turn>(2);
         Turn activeTurn;
         PlayerTurn winner;
-        bool over = false;
-        public int deploy = (2 * 3);
+        GameState currState = GameState.GameOver;
+        public int deploy = 6;
         public static int spacing = 5;
         List<CardType> cardTypes;
         GameType type = GameType.Player1;
         Stack<MoveList> moveStack;
         uint moveID = 0;
         ContentManager content;
+        Stack<MoveSteps> movementSteps;
+        CardClass moveCard = null;
+        Vector2 moveStartLoc;
+        public bool moving = false;
 
         public MapView(string n, GraphicsDevice gd) : base(n)
         {
@@ -59,6 +75,7 @@ namespace CardGame
             winner = 0;
 
             moveStack = new Stack<MoveList>();
+            movementSteps = new Stack<MoveSteps>(3);
 
             SetCenter(new Vector2((gd.Viewport.Width - CardClass.cardWidth * map.GetLength(1)) / 2, (gd.Viewport.Height - CardClass.cardHeight * map.GetLength(1)) / 2));
         }
@@ -223,7 +240,7 @@ namespace CardGame
             string text = "";
             Color textColor = Color.Black;
             //DrawOutline(sb);
-            if (over)
+            if (currState == GameState.GameOver)
             {
                 foreach (Turn t in turns)
                     t.Render(sb);
@@ -231,11 +248,12 @@ namespace CardGame
             }
             else 
             {
-                activeTurn.RenderHand(sb);
+                if (activeTurn.GetPlayerTurn() == PlayerTurn.Player1 || type != GameType.Player1)
+                    activeTurn.RenderHand(sb);
                 text = activeTurn.GetPlayerTurn().ToString();
             }
 
-            if (over)
+            if (currState == GameState.GameOver)
             {
                 text += " wins! Press Esc to exit.";
             }
@@ -353,6 +371,11 @@ namespace CardGame
             return false;
         }
 
+        public Vector2 ConvertMapCoordToScreen(int x, int y)
+        {
+            return new Vector2(x * (CardClass.cardWidth + spacing), y * (CardClass.cardHeight + spacing));
+        }
+
         public void UndoMove(CardClass cc)
         {
             if (moveStack.Count > 0)
@@ -465,6 +488,24 @@ namespace CardGame
             ResetSelectedCard();
         }
 
+        private void SetupCardMovementAnimation(CardClass card, int offsetX, int offsetY, Vector2 cardLoc)
+        {
+            moveCard = card;
+            MoveLocation[,] map = card.GetMove();
+            moveStartLoc = ConvertMapCoordToScreen((int)cardLoc.X, (int)cardLoc.Y) + center;
+            MoveLocation currentLoc = map[offsetY, offsetX];
+            movementSteps.Clear();
+            movementSteps.Push(new MoveSteps(offsetX, offsetY));
+            while (currentLoc.x >= 0 && currentLoc.y >= 0 && !(currentLoc.x == 2 && currentLoc.y == 2))
+            {
+                movementSteps.Push(new MoveSteps(currentLoc.y, currentLoc.x));
+                currentLoc = map[currentLoc.x, currentLoc.y];
+            }
+            
+            moveCard.SetMoving(moveStartLoc);
+            moving = true;
+        }
+
         public Turn GetTurn(PlayerTurn pt)
         {
             if (turns[0].GetPlayerTurn() == pt)
@@ -490,14 +531,14 @@ namespace CardGame
             {
                 // player 2 wins by kill!
                 winner = PlayerTurn.Player2;
-                over = true;
+                currState = GameState.GameOver;
             }
 
             if ((turns[1].HandCount() == 0 && !PlayerCardsLeft(PlayerTurn.Player2)) || map[0, 3] != null)
             {
                 // player 1 wins by kill!
                 winner = PlayerTurn.Player1;
-                over = true;
+                currState = GameState.GameOver;
             }
         }
 
@@ -540,7 +581,9 @@ namespace CardGame
                     moveID++;
                     good = true;
                     if (aiTest)
+                    {
                         SwitchTurns();
+                    }
                 }
                 else
                     ResetSelectedCard();
@@ -563,7 +606,10 @@ namespace CardGame
                     {
                         moveID++;
                         if (aiTest)
+                        {
+                            SetupCardMovementAnimation(card, transX, transY, cardLoc);
                             SwitchTurns();
+                        }
                     }
                 }
                 else
@@ -647,6 +693,30 @@ namespace CardGame
         public override void Update(GameTime gt)
         {
             activeTurn.Update(gt);
+            if (movementSteps.Count > 0 && moveCard != null)
+            {
+                MoveSteps ml = movementSteps.Peek();
+                Vector2 currentLoc = moveCard.GetMovingLoc();
+                Vector2 v = ConvertMapCoordToScreen(ml.x - 2, ml.y - 2) + moveStartLoc;
+                Vector2 dir = v - currentLoc;
+                dir.Normalize();
+
+                dir = dir * (float)(20/gt.ElapsedGameTime.TotalMilliseconds);
+                
+                if (Vector2.Distance(v, currentLoc) < 1.0f)
+                {
+                    movementSteps.Pop();
+                }
+
+                currentLoc = dir + currentLoc;
+                moveCard.SetMoving(currentLoc);
+            }
+            else if (moveCard != null)
+            {
+                moveCard.EndMoving();
+                moveCard = null;
+                moving = false;
+            }
         }
 
         private void ResetSelectedCard()
@@ -675,7 +745,7 @@ namespace CardGame
 
         public override void HandleMouseClick(Vector2 pos)
         {
-            if (over)
+            if (currState != GameState.GameRunning)
                 return;
 
             CardClass selectedCard = null;
@@ -693,7 +763,8 @@ namespace CardGame
             }
             else
             {
-                MoveCard(selectedCard, pos);
+                if (!moving)
+                    MoveCard(selectedCard, pos);
             }
         }
 
@@ -714,8 +785,8 @@ namespace CardGame
 
             turns[1].LoadTexture(content);
 
-            deploy = 6;
-            over = false;
+            deploy = 1;
+            currState = GameState.GameRunning;
 
             SetCenter(center);
             LoadDecks();
@@ -758,7 +829,7 @@ namespace CardGame
                     switch (t)
                     {
                         case Keys.Escape:
-                            if (over == true && manager != null)
+                            if (currState == GameState.GameOver && manager != null)
                             {
                                 manager.SetCurrentScreenByName("SplashScreen");
                             }
