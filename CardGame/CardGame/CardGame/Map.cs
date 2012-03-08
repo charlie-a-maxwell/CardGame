@@ -777,15 +777,16 @@ namespace CardGame
                     map[i, j] = null;
                 }
             }
+            type = gt;
 
-            if (type == gt)
+            if (type == GameType.Player1)
                 turns[1] = new AITurn(map.GetLength(0), map.GetLength(1), this);
             else
                 turns[1] = new Turn2(map.GetLength(0), map.GetLength(1));
 
             turns[1].LoadTexture(content);
 
-            deploy = 1;
+            deploy = 6;
             currState = GameState.GameRunning;
 
             SetCenter(center);
